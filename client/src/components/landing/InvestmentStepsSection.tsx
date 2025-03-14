@@ -1,106 +1,124 @@
-import { Book, Users, Search, MessageCircle, CheckCircle } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef, MouseEvent } from "react";
+import { Book, Users, ShoppingBag, MessageCircle, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+interface StepProps {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  index: number;
+}
+
+const Step = ({ title, description, icon, index }: StepProps) => {
+  return (
+    <div 
+      className="process-step-card hover-glow" 
+      style={{ "--step-index": index } as React.CSSProperties}
+      onMouseMove={(e) => {
+        const el = e.currentTarget;
+        const rect = el.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        el.style.setProperty("--x", `${x}px`);
+        el.style.setProperty("--y", `${y}px`);
+      }}
+    >
+      <div className="flex-shrink-0 mr-4 p-2 rounded-full bg-primary/20 text-primary">
+        {icon}
+      </div>
+      <div>
+        <h3 className="text-lg font-semibold text-gray-100 mb-1">{title}</h3>
+        <p className="text-sm text-gray-300">{description}</p>
+      </div>
+    </div>
+  );
+};
 
 const InvestmentStepsSection = () => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const sectionRef = useRef<HTMLDivElement>(null);
-  
-  const steps = [
-    {
-      number: 1,
-      title: "Learn",
-      description: "Read up on key strategy from our resource library.",
-      icon: <Book className="h-5 w-5" />
-    },
-    {
-      number: 2,
-      title: "Join Our Marketplace",
-      description: "Sign up, complete verification, and connect with a secure network of vetted buyers and sellers.",
-      icon: <Users className="h-5 w-5" />
-    },
-    {
-      number: 3,
-      title: "Browse & Analyze Notes",
-      description: "Filter for notes with detailed loan data and borrower insights.",
-      icon: <Search className="h-5 w-5" />
-    },
-    {
-      number: 4,
-      title: "Connect & Negotiate",
-      description: "Communicate securely with sellers, verify details, and negotiate terms.",
-      icon: <MessageCircle className="h-5 w-5" />
-    },
-    {
-      number: 5,
-      title: "Complete Your Investment",
-      description: "Finalize transactions through partnered escrow services.",
-      icon: <CheckCircle className="h-5 w-5" />
-    }
-  ];
 
-  // Add mouse movement effect for hover glow
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      const hoverElements = document.querySelectorAll('.hover-glow');
-      
-      hoverElements.forEach((element) => {
-        const rect = element.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        
-        (element as HTMLElement).style.setProperty('--x', `${x}%`);
-        (element as HTMLElement).style.setProperty('--y', `${y}%`);
-      });
+      if (sectionRef.current) {
+        const rect = sectionRef.current.getBoundingClientRect();
+        setMousePosition({
+          x: ((e.clientX - rect.left) / rect.width) * 100,
+          y: ((e.clientY - rect.top) / rect.height) * 100
+        });
+      }
     };
-    
-    document.addEventListener('mousemove', handleMouseMove);
-    
+
+    const section = sectionRef.current;
+    if (section) {
+      section.addEventListener('mousemove', handleMouseMove as unknown as EventListener);
+    }
+
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
+      if (section) {
+        section.removeEventListener('mousemove', handleMouseMove as unknown as EventListener);
+      }
     };
   }, []);
 
   return (
-    <section className="py-12 gradient-bg-light relative" style={{ height: '20vh', minHeight: '200px' }} ref={sectionRef}>
-      <div className="container mx-auto px-4 h-full flex items-center">
-        <div className="w-full relative z-10">
-          <div className="flex flex-wrap justify-between items-center">
-            {steps.map((step, index) => (
-              <div 
-                key={step.number}
-                className="text-center mx-2 opacity-0 hover-glow flex-1"
-                style={{
-                  animationName: 'fadeIn',
-                  animationDuration: '0.5s',
-                  animationDelay: `${index * 0.1}s`,
-                  animationFillMode: 'forwards'
-                }}
-              >
-                <div className="flex flex-col items-center">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-2">
-                    {step.number}
-                  </div>
-                  <h3 className="category-title mb-1 text-base md:text-lg">
-                    {step.title}
-                  </h3>
-                  <p className="text-gray-300 text-xs md:text-sm">
-                    {step.description}
-                  </p>
-                </div>
-                
-                {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-1/2 right-0 transform translate-x-1/2 -translate-y-1/2">
-                    <div className="w-8 h-0.5 bg-primary/30"></div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+    <section 
+      ref={sectionRef}
+      className="relative py-12 overflow-hidden"
+      style={{
+        background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(var(--primary-rgb), 0.15) 0%, transparent 60%), linear-gradient(135deg, #121212 0%, #1a1a1a 100%)`
+      }}
+    >
+      <div className="container mx-auto px-6 lg:px-8">
+        <div className="mb-8 max-w-2xl mx-auto text-center">
+          <h2 className="section-title mb-4 text-center">Your 5-Step Investment Journey</h2>
+          <p className="section-description text-center">
+            Navigate the mortgage note investment process with confidence through our streamlined 5-step approach.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+          <Step
+            title="Learn"
+            description="Explore our comprehensive educational resources to understand note investing fundamentals."
+            icon={<Book className="h-5 w-5" />}
+            index={0}
+          />
+          <Step
+            title="Join"
+            description="Create your account and verify your investor profile to gain marketplace access."
+            icon={<Users className="h-5 w-5" />}
+            index={1}
+          />
+          <Step
+            title="Browse"
+            description="Search our curated marketplace for vetted note opportunities that match your criteria."
+            icon={<ShoppingBag className="h-5 w-5" />}
+            index={2}
+          />
+          <Step
+            title="Connect"
+            description="Communicate directly with sellers and perform your due diligence with our support."
+            icon={<MessageCircle className="h-5 w-5" />}
+            index={3}
+          />
+          <Step
+            title="Complete"
+            description="Close the transaction securely through our platform with all documentation handled."
+            icon={<CheckCircle className="h-5 w-5" />}
+            index={4}
+          />
+        </div>
+
+        <div className="mt-10 text-center">
+          <Button 
+            className="bg-primary/90 hover:bg-primary text-white"
+            size="lg"
+          >
+            Start Your Investment Journey
+          </Button>
         </div>
       </div>
-      
-      {/* Sleek outline border */}
-      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
     </section>
   );
 };

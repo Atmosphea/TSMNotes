@@ -5,6 +5,10 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --primary-rgb: 47, 112, 233;
+  }
+  
   * {
     @apply border-border;
   }
@@ -80,6 +84,21 @@
     content: '';
     @apply absolute w-full h-1 bottom-0 left-0 bg-primary/60;
     animation: glow 1.5s infinite alternate;
+  }
+  
+  .nav-glow {
+    @apply relative transition-colors;
+  }
+  
+  .nav-glow::before {
+    content: '';
+    @apply absolute inset-0 opacity-0 rounded-md transition-opacity duration-300;
+    background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(var(--primary-rgb), 0.2) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  
+  .nav-glow:hover::before {
+    @apply opacity-100;
   }
   
   .category-title {

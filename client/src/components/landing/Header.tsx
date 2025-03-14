@@ -38,7 +38,7 @@ const Header = () => {
   };
 
   return (
-    <header className={`sticky top-0 z-50 w-full ${scrolled ? 'bg-white/90 backdrop-blur-md border-b border-gray-200' : 'bg-transparent'} transition-all duration-200`}>
+    <header className={`sticky top-0 z-50 w-full ${scrolled ? 'bg-black/50 backdrop-blur-md border-b border-gray-800' : 'bg-transparent'} transition-all duration-200`}>
       <div className="container mx-auto flex h-16 items-center justify-between px-6 lg:px-8">
         <div className="flex items-center space-x-3">
           <Link href="/" className="flex items-center space-x-2">
@@ -50,16 +50,60 @@ const Header = () => {
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
-          <button onClick={() => scrollToSection("features")} className="text-sm font-medium hover:text-primary transition-colors">
+          <button 
+            onClick={() => scrollToSection("features")} 
+            className="text-sm font-medium hover:text-primary transition-colors nav-glow px-3 py-2"
+            onMouseMove={(e) => {
+              const el = e.currentTarget;
+              const rect = el.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              el.style.setProperty("--x", `${x}px`);
+              el.style.setProperty("--y", `${y}px`);
+            }}
+          >
             Features
           </button>
-          <button onClick={() => scrollToSection("how-it-works")} className="text-sm font-medium hover:text-primary transition-colors">
+          <button 
+            onClick={() => scrollToSection("how-it-works")} 
+            className="text-sm font-medium hover:text-primary transition-colors nav-glow px-3 py-2"
+            onMouseMove={(e) => {
+              const el = e.currentTarget;
+              const rect = el.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              el.style.setProperty("--x", `${x}px`);
+              el.style.setProperty("--y", `${y}px`);
+            }}
+          >
             How It Works
           </button>
-          <button onClick={() => scrollToSection("testimonials")} className="text-sm font-medium hover:text-primary transition-colors">
+          <button 
+            onClick={() => scrollToSection("testimonials")} 
+            className="text-sm font-medium hover:text-primary transition-colors nav-glow px-3 py-2"
+            onMouseMove={(e) => {
+              const el = e.currentTarget;
+              const rect = el.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              el.style.setProperty("--x", `${x}px`);
+              el.style.setProperty("--y", `${y}px`);
+            }}
+          >
             Testimonials
           </button>
-          <button onClick={() => scrollToSection("faq")} className="text-sm font-medium hover:text-primary transition-colors">
+          <button 
+            onClick={() => scrollToSection("faq")} 
+            className="text-sm font-medium hover:text-primary transition-colors nav-glow px-3 py-2"
+            onMouseMove={(e) => {
+              const el = e.currentTarget;
+              const rect = el.getBoundingClientRect();
+              const x = e.clientX - rect.left;
+              const y = e.clientY - rect.top;
+              el.style.setProperty("--x", `${x}px`);
+              el.style.setProperty("--y", `${y}px`);
+            }}
+          >
             FAQ
           </button>
         </nav>
@@ -90,7 +134,7 @@ const Header = () => {
       
       {/* Mobile menu */}
       <div className={`md:hidden ${isMenuOpen ? 'block' : 'hidden'}`}>
-        <div className="px-4 pt-2 pb-3 space-y-1 bg-white/95 backdrop-blur-md border-t border-gray-200">
+        <div className="px-4 pt-2 pb-3 space-y-1 bg-black/70 backdrop-blur-md border-t border-gray-800">
           <button 
             onClick={() => scrollToSection("features")} 
             className="block px-3 py-2 rounded-md text-base font-medium hover:text-primary"
