@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { BookOpen, FileText, DollarSign, Home, BarChart, PieChart } from "lucide-react";
+import { BookOpen, FileText, DollarSign, Home, BarChart, PieChart, Info } from "lucide-react";
 
 const TerminologySection = () => {
   const [activeTab, setActiveTab] = useState("terms");
@@ -125,6 +125,10 @@ const TerminologySection = () => {
                 <BookOpen className="h-4 w-4 mr-2" />
                 Terminology
               </TabsTrigger>
+              <TabsTrigger value="unseasoned" className="data-[state=active]:bg-primary/20">
+                <Info className="h-4 w-4 mr-2" />
+                Unseasoned Notes
+              </TabsTrigger>
               <TabsTrigger value="evaluation" className="data-[state=active]:bg-primary/20">
                 <BarChart className="h-4 w-4 mr-2" />
                 Evaluation
@@ -139,7 +143,7 @@ const TerminologySection = () => {
           <TabsContent value="terms" className="mt-0">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {keyTerms.map((item, index) => (
-                <div key={index} className="terminology-card">
+                <div key={index} className="terminology-card" style={{ '--card-index': index } as React.CSSProperties}>
                   <div className="flex items-center mb-3">
                     <div className="feature-icon-container w-10 h-10 mr-3">
                       {item.icon}
@@ -149,6 +153,105 @@ const TerminologySection = () => {
                   <p className="text-gray-300 text-sm">{item.description}</p>
                 </div>
               ))}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="unseasoned" className="mt-0">
+            <div className="glass-card p-8">
+              <h3 className="font-bold text-2xl mb-6 text-gradient">What Are Unseasoned Notes & How Can You Profit?</h3>
+              
+              <div className="space-y-8">
+                <div className="glass-card p-6 hover-glow">
+                  <h4 className="category-title mb-4">Understanding Unseasoned Notes</h4>
+                  <p className="text-gray-300 leading-relaxed">
+                    An unseasoned note is a newly created mortgage loan that hasn't yet built a track record of consistent payments. 
+                    When a borrower takes out a loan to buy a home, the lender can sell that loan (or "note") to investors instead of 
+                    holding onto it. Since an unseasoned note has little to no payment history, it carries more risk—but that also 
+                    means it can be purchased at a discount, creating potential for higher returns.
+                  </p>
+                </div>
+                
+                <div className="glass-card p-6 hover-glow">
+                  <h4 className="category-title mb-4">How the Process Works</h4>
+                  <ul className="space-y-4">
+                    <li className="process-step-card" style={{ '--step-index': 0 } as React.CSSProperties}>
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-4 shrink-0">1</div>
+                      <div>
+                        <h5 className="font-bold text-gray-100 mb-1">Banks & Lenders Sell Notes</h5>
+                        <p className="text-gray-300 text-sm">
+                          Instead of waiting years to collect payments, lenders sell mortgage notes to investors for a lump sum of cash.
+                        </p>
+                      </div>
+                    </li>
+                    <li className="process-step-card" style={{ '--step-index': 1 } as React.CSSProperties}>
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-4 shrink-0">2</div>
+                      <div>
+                        <h5 className="font-bold text-gray-100 mb-1">Investors Buy at a Discount</h5>
+                        <p className="text-gray-300 text-sm">
+                          Because the payment history is unproven, unseasoned notes are often sold below their full value.
+                        </p>
+                      </div>
+                    </li>
+                    <li className="process-step-card" style={{ '--step-index': 2 } as React.CSSProperties}>
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mr-4 shrink-0">3</div>
+                      <div>
+                        <h5 className="font-bold text-gray-100 mb-1">Earning Potential</h5>
+                        <p className="text-gray-300 text-sm">
+                          If the borrower keeps making payments, the investor collects monthly income. As the note builds a payment history, 
+                          its value increases, allowing for resale at a profit.
+                        </p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+                
+                <div className="glass-card p-6 hover-glow">
+                  <div className="flex items-center justify-between">
+                    <h4 className="category-title mb-0">Market Dynamics Visualization</h4>
+                    <div className="text-gray-200 text-sm">Illustrative model</div>
+                  </div>
+                  
+                  <div className="mt-8 flex justify-center">
+                    <div className="w-full max-w-lg h-64 relative">
+                      {/* Value vs Time graph visualization */}
+                      <div className="absolute inset-0">
+                        <div className="absolute bottom-0 left-0 w-full h-px bg-gray-500/30"></div>
+                        <div className="absolute left-0 bottom-0 h-full w-px bg-gray-500/30"></div>
+                        
+                        {/* X-axis labels */}
+                        <div className="absolute bottom-[-20px] left-0 text-xs text-gray-400">0 Months</div>
+                        <div className="absolute bottom-[-20px] left-1/4 text-xs text-gray-400">6 Months</div>
+                        <div className="absolute bottom-[-20px] left-1/2 text-xs text-gray-400">12 Months</div>
+                        <div className="absolute bottom-[-20px] left-3/4 text-xs text-gray-400">18 Months</div>
+                        <div className="absolute bottom-[-20px] right-0 text-xs text-gray-400">24 Months</div>
+                        
+                        {/* Purchase price */}
+                        <div className="absolute bottom-[30%] left-0 w-full border-t border-dashed border-red-400/50"></div>
+                        <div className="absolute bottom-[30%] left-[-5px] text-xs text-red-400">Purchase Price</div>
+                        
+                        {/* Face value */}
+                        <div className="absolute bottom-[60%] left-0 w-full border-t border-dashed border-green-400/50"></div>
+                        <div className="absolute bottom-[60%] left-[-5px] text-xs text-green-400">Face Value</div>
+                        
+                        {/* Graph line */}
+                        <div className="absolute bottom-[20%] left-[5%] w-[90%] h-[60%]">
+                          <svg className="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <path 
+                              d="M0,80 C10,70 20,55 30,45 C40,35 60,30 70,25 C80,20 90,15 100,10" 
+                              fill="none" 
+                              stroke="hsl(var(--primary))" 
+                              strokeWidth="2"
+                              strokeDasharray="220"
+                              strokeDashoffset="220"
+                              className="animate-draw"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </TabsContent>
 

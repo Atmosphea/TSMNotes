@@ -40,11 +40,15 @@ const ProcessSection = () => {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {processes.map((process, index) => (
-            <div key={process.id} className="process-card group">
+            <div 
+              key={process.id} 
+              className="process-card group hover-glow"
+              style={{ '--card-index': index } as React.CSSProperties}
+            >
               <div className="feature-icon-container p-3 mb-6 group-hover:bg-primary/20 transition-all">
                 {process.icon}
               </div>
-              <h3 className="text-xl font-bold text-gray-100 mb-3">
+              <h3 className="text-xl font-bold text-gray-100 mb-3 category-title">
                 {process.title}
               </h3>
               <p className="text-gray-300 text-sm">
