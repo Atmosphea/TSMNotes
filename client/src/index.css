@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,5 +11,37 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+  .section-title {
+    @apply font-serif text-3xl font-bold text-left text-foreground;
+  }
+  
+  .section-description {
+    @apply mt-3 text-lg text-gray-600 text-left;
+  }
+  
+  .accent-border {
+    @apply border-l-4 border-primary pl-4;
+  }
+  
+  .parallax-bg {
+    @apply bg-fixed bg-cover bg-center;
+  }
+}
+
+@layer utilities {
+  .font-serif {
+    font-family: 'Playfair Display', serif;
+  }
+  
+  .font-sans {
+    font-family: 'Inter', sans-serif;
   }
 }
