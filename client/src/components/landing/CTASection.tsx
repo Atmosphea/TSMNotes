@@ -16,8 +16,8 @@ const CTASection = () => {
   useEffect(() => {
     // If this was a real app with real data, we'd use the actual count
     // For now, we'll use the mocked values
-    if (waitlistCountData) {
-      setPreregisteredCount(waitlistCountData.count + 500);
+    if (waitlistCountData && typeof waitlistCountData === 'object' && 'count' in waitlistCountData) {
+      setPreregisteredCount((waitlistCountData as {count: number}).count + 500);
     }
   }, [waitlistCountData]);
 
