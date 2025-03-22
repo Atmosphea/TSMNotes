@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogClose, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { 
   FileText, 
@@ -26,7 +27,10 @@ import {
   ArrowRight,
   PlusCircle,
   Plus,
-  ChevronRight
+  ChevronRight,
+  Eye,
+  Edit2,
+  Upload
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { formatCurrency } from "@/lib/utils";
@@ -175,6 +179,14 @@ const SellingPage = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("listings");
   const [documents, setDocuments] = useState<{ name: string; size: number; type: string }[]>([]);
+  const [showPreview, setShowPreview] = useState(false);
+  const [contactInfo, setContactInfo] = useState({
+    name: "John Doe",
+    email: "john.doe@example.com",
+    phone: "(555) 123-4567"
+  });
+  const [editingContact, setEditingContact] = useState(false);
+  const [selectedListing, setSelectedListing] = useState<NoteListing | null>(null);
   
   // Initialize form with default values
   const form = useForm<NoteListingFormValues>({
@@ -394,23 +406,23 @@ const SellingPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-violet-800 to-fuchsia-900 text-white">
+    <div className="min-h-screen bg-gray-100 text-gray-800">
       <div className="container mx-auto px-4 py-16">
         <div className="space-y-12">
           <div className="text-center">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold text-purple-700">
               Sell Your Mortgage Note
             </h1>
-            <p className="text-lg text-gray-200 mt-2 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 mt-2 max-w-2xl mx-auto">
               Complete the form below to create your listing and get top dollar for your note
             </p>
           </div>
           
-          {/* Centered form with invisible fields */}
-          <div className="max-w-2xl mx-auto">
-            <Card className="border border-purple-500/20 bg-black/30 backdrop-blur-md shadow-xl shadow-purple-900/20">
-              <CardHeader className="text-center border-b border-purple-500/20 pb-6">
-                <CardTitle className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          {/* Centered form with horizontal fields */}
+          <div className="max-w-4xl mx-auto">
+            <Card className="border border-gray-200 bg-white shadow-md">
+              <CardHeader className="text-center border-b border-gray-200 pb-6">
+                <CardTitle className="text-2xl font-bold text-purple-700">
                   Note Details
                 </CardTitle>
               </CardHeader>
@@ -419,7 +431,8 @@ const SellingPage = () => {
                 <Form {...form}>
                   <form className="space-y-8">
                     <div className="space-y-6">
-                      <div className="border-b border-purple-500/20 pb-4 relative">
+                      <div className="pb-4 relative">
+                        <h3 className="text-lg font-medium text-gray-700 mb-2">Property Address</h3>
                         <FormField
                           control={form.control}
                           name="propertyAddress"
@@ -427,19 +440,20 @@ const SellingPage = () => {
                             <FormItem>
                               <FormControl>
                                 <Input
-                                  placeholder="Property Address (e.g. 123 Main St, Anytown, USA)"
-                                  className={customInputClass}
+                                  placeholder="Enter property address (e.g. 123 Main St, Anytown, USA)"
+                                  className="w-full border-gray-300 focus:border-purple-500 focus:ring-purple-500 rounded-md"
                                   {...field}
                                 />
                               </FormControl>
-                              <FormMessage className="text-pink-500" />
+                              <FormMessage className="text-red-500" />
                             </FormItem>
                           )}
                         />
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-8">
-                        <div className="border-b border-purple-500/20 pb-2 relative">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="pb-2 relative">
+                          <h3 className="text-lg font-medium text-gray-700 mb-2">Loan Amount</h3>
                           <FormField
                             control={form.control}
                             name="loanAmount"
@@ -447,11 +461,11 @@ const SellingPage = () => {
                               <FormItem>
                                 <FormControl>
                                   <div className="relative">
-                                    <DollarSign className="absolute left-0 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                                    <DollarSign className="absolute left-2 top-1/2 transform -translate-y-1/2 text-purple-500" />
                                     <Input
                                       type="number"
-                                      placeholder="Loan Amount"
-                                      className={`${customInputClass} pl-6`}
+                                      placeholder="Enter loan amount"
+                                      className="w-full border-gray-300 focus:border-purple-500 focus:ring-purple-500 rounded-md pl-9"
                                       {...field}
                                       onChange={(e) => {
                                         field.onChange(parseFloat(e.target.value));
@@ -460,7 +474,7 @@ const SellingPage = () => {
                                     />
                                   </div>
                                 </FormControl>
-                                <FormMessage className="text-pink-500" />
+                                <FormMessage className="text-red-500" />
                               </FormItem>
                             )}
                           />

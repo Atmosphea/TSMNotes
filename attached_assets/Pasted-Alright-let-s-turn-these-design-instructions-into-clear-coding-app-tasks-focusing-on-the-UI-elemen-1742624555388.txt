@@ -1,0 +1,63 @@
+Alright, let's turn these design instructions into clear coding app tasks, focusing on the UI elements and interactions:
+
+**Coding App Tasks: Note Listing Creation and Preview**
+
+**1. Theme and Styling:**
+
+* **Task 1.1: Light Gray Theme with Purple Accents:**
+    * Implement a light gray color scheme for the main background and primary elements.
+    * Use purple as the accent color for interactive elements (buttons, links, highlights).
+    * Ensure color contrast is sufficient for accessibility.
+* **Task 1.2: Horizontal Layout for Input Fields:**
+    * Modify the layout for input fields to display them horizontally within their container.
+    * Ensure the container is responsive and adjusts to different screen sizes.
+
+**2. Input Field Elements:**
+
+* **Task 2.1: Add H3 Labels Above Input Fields:**
+    * For each input field on the note listing creation form, add an `<h3>` element directly above it to serve as a clear label.
+* **Task 2.2: Reflowable Input Boxes:**
+    * Make the input boxes reflowable, meaning they should adjust their width and height based on the content and container size.
+    * make sure that the input boxes do not distort when the page is resized.
+
+**3. Upload and Review Functionality:**
+
+* **Task 3.1: Replace Upload Field with Button:**
+    * Remove the default file upload field.
+    * Replace it with a button labeled "Upload Documents" placed outside and adjacent to the "Review" button.
+* **Task 3.2: Rename "Create Listing" to "Review":**
+    * Change the label of the "Create Listing" button to "Review".
+* **Task 3.3: Implement "Review" Button Popup:**
+    * When the "Review" button is clicked:
+        * Display a popup/modal overlaying the current page.
+        * Dim the background of the page to 40% opacity.
+        * Apply a drop shadow to the popup for visual separation.
+* **Task 3.4: "Listing Preview" Content:**
+    * The popup should display a "Listing Preview" containing:
+        * All the details entered into the note listing creation form.
+        * A document upload section.
+        * The user's contact information, displayed to potential buyers.
+        * make the contact information clickable so the user can change it.
+* **Task 3.5: Note Card "Review" Functionality:**
+    * When the review button is pushed on a note card, the listing preview popup should appear with the note card information.
+
+**4. User Interaction:**
+
+* **Task 4.1: Contact Information Editing:**
+    * Make the contact information within the "Listing Preview" clickable, allowing the user to edit it.
+    * The user should be able to change this information from within the popup.
+* **Task 4.2: Document Upload in Preview:**
+    * allow the user to upload documents from within the popup.
+* **Task 4.3: Confirmation in Preview:**
+    * Add a confirmation button to the preview popup.
+* **Task 4.4: Close preview:**
+    * Add a close button to the preview popup.
+
+**Technical Notes:**
+
+* Use appropriate HTML elements for semantic structure.
+* Employ CSS for styling and layout, ensuring responsiveness.
+* Use JavaScript for interactivity (popup, data population, contact editing).
+* Use a javascript framework, such as react, or vue.
+* Use a css framework such as tailwind.
+* Make sure that the upload button can handle multiple files.
