@@ -235,8 +235,18 @@ export class MemStorage implements IStorage {
   async createNoteListing(insertNoteListing: InsertNoteListing): Promise<NoteListing> {
     const id = this.currentNoteListingId++;
     const noteListing: NoteListing = {
-      ...insertNoteListing,
       id,
+      sellerId: insertNoteListing.sellerId,
+      loanAmount: insertNoteListing.loanAmount,
+      interestRate: insertNoteListing.interestRate,
+      loanTerm: insertNoteListing.loanTerm,
+      paymentAmount: insertNoteListing.paymentAmount,
+      timeHeld: insertNoteListing.timeHeld,
+      remainingPayments: insertNoteListing.remainingPayments,
+      propertyAddress: insertNoteListing.propertyAddress,
+      askingPrice: insertNoteListing.askingPrice,
+      propertyType: insertNoteListing.propertyType,
+      description: insertNoteListing.description || null,
       status: 'active',
       createdAt: new Date(),
       updatedAt: new Date()
@@ -266,9 +276,20 @@ export class MemStorage implements IStorage {
       return undefined;
     }
     
+    // Handle description field correctly
     const updatedListing: NoteListing = {
       ...existingListing,
-      ...listing,
+      sellerId: listing.sellerId ?? existingListing.sellerId,
+      loanAmount: listing.loanAmount ?? existingListing.loanAmount,
+      interestRate: listing.interestRate ?? existingListing.interestRate,
+      loanTerm: listing.loanTerm ?? existingListing.loanTerm,
+      paymentAmount: listing.paymentAmount ?? existingListing.paymentAmount,
+      timeHeld: listing.timeHeld ?? existingListing.timeHeld,
+      remainingPayments: listing.remainingPayments ?? existingListing.remainingPayments,
+      propertyAddress: listing.propertyAddress ?? existingListing.propertyAddress,
+      askingPrice: listing.askingPrice ?? existingListing.askingPrice,
+      propertyType: listing.propertyType ?? existingListing.propertyType,
+      description: listing.description !== undefined ? (listing.description || null) : existingListing.description,
       updatedAt: new Date()
     };
     
@@ -284,8 +305,12 @@ export class MemStorage implements IStorage {
   async createNoteDocument(insertDocument: InsertNoteDocument): Promise<NoteDocument> {
     const id = this.currentNoteDocumentId++;
     const document: NoteDocument = {
-      ...insertDocument,
       id,
+      noteListingId: insertDocument.noteListingId,
+      documentType: insertDocument.documentType,
+      documentUrl: insertDocument.documentUrl,
+      fileName: insertDocument.fileName,
+      fileSize: insertDocument.fileSize,
       uploadedAt: new Date()
     };
     this.noteDocuments.set(id, document);
