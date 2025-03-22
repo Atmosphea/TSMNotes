@@ -95,6 +95,16 @@ export default function MarketplacePage() {
   const [ltvRatioMin, setLtvRatioMin] = useState(0);
   const [ltvRatioMax, setLtvRatioMax] = useState(95);
   
+  // Property type tab states
+  const [activePropertyTab, setActivePropertyTab] = useState<"realEstate" | "business" | "other">("realEstate");
+  
+  // Property type category mapping
+  const propertyTypeCategories = {
+    realEstate: ["Residential Mortgages", "Commercial Mortgages", "Land Contracts"],
+    business: ["Small Business Loans"],
+    other: ["Promissory Notes", "Commercial and Industrial (C&I) Loans", "Equipment Loans", "Consumer Loans"]
+  };
+  
   // Fetch note listings from the API
   const { data, isLoading, error } = useQuery<{ success: boolean; data: NoteListing[] }>({
     queryKey: ["/api/note-listings"],
@@ -316,157 +326,285 @@ export default function MarketplacePage() {
               });
               setActiveFilterCount(count);
             }}>
-              {/* Top Row with Main Numeric Filters */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div>
-                  <p className="text-white text-sm font-medium mb-1">Loan Amount</p>
-                  <div className="flex justify-between gap-2">
-                    <div className="flex-1">
-                      <p className="text-gray-300 text-xs">Min</p>
-                      <input 
-                        type="number" 
-                        className="w-full p-1 bg-gray-800 border border-gray-700 rounded text-white text-xl"
+              {/* Top Row with Advanced Range Sliders */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                {/* Loan Amount Range Slider */}
+                <div className="bg-black/10 p-4 rounded-xl">
+                  <p className="text-white text-sm font-medium mb-3">Loan Amount ($)</p>
+                  <div className="flex flex-col space-y-4">
+                    <div className="relative h-2 bg-gray-700 rounded-full">
+                      <div 
+                        className="absolute h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" 
+                        style={{ 
+                          left: `${(originalAmountMin / 30000000) * 100}%`, 
+                          right: `${100 - (originalAmountMax / 30000000) * 100}%` 
+                        }}
+                      ></div>
+                      <input
+                        type="range"
+                        className="absolute w-full h-2 appearance-none bg-transparent cursor-pointer z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                        min="0"
+                        max="30000000"
+                        step="10000"
                         value={originalAmountMin}
-                        onChange={(e) => setOriginalAmountMin(Number(e.target.value) || 0)}
-                        min="0"
+                        onChange={(e) => setOriginalAmountMin(Number(e.target.value))}
                       />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-gray-300 text-xs">Max</p>
-                      <input 
-                        type="number"
-                        className="w-full p-1 bg-gray-800 border border-gray-700 rounded text-white text-xl"
+                      <input
+                        type="range"
+                        className="absolute w-full h-2 appearance-none bg-transparent cursor-pointer z-20 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-pink-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                        min="0"
+                        max="30000000"
+                        step="10000"
                         value={originalAmountMax}
-                        onChange={(e) => setOriginalAmountMax(Number(e.target.value) || 0)}
-                        min="0"
+                        onChange={(e) => {
+                          const value = Number(e.target.value);
+                          if (value > originalAmountMin) {
+                            setOriginalAmountMax(value);
+                          }
+                        }}
                       />
+                    </div>
+                    
+                    <div className="flex justify-between gap-4">
+                      <div className="w-1/2">
+                        <p className="text-gray-300 text-xs mb-1">Min</p>
+                        <input 
+                          type="text" 
+                          className="w-full p-2 bg-gray-800/5 border border-gray-700/20 rounded text-white text-lg opacity-5 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
+                          value={formatCurrency(originalAmountMin)}
+                          onChange={(e) => {
+                            const value = Number(e.target.value.replace(/[^0-9]/g, ''));
+                            if (!isNaN(value)) {
+                              setOriginalAmountMin(value);
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="w-1/2">
+                        <p className="text-gray-300 text-xs mb-1">Max</p>
+                        <input 
+                          type="text"
+                          className="w-full p-2 bg-gray-800/5 border border-gray-700/20 rounded text-white text-lg opacity-5 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
+                          value={formatCurrency(originalAmountMax)}
+                          onChange={(e) => {
+                            const value = Number(e.target.value.replace(/[^0-9]/g, ''));
+                            if (!isNaN(value) && value > originalAmountMin) {
+                              setOriginalAmountMax(value);
+                            }
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
                 
-                <div>
-                  <p className="text-white text-sm font-medium mb-1">Interest Rate</p>
-                  <div className="flex justify-between gap-2">
-                    <div className="flex-1">
-                      <p className="text-gray-300 text-xs">Min %</p>
-                      <input 
-                        type="number" 
-                        className="w-full p-1 bg-gray-800 border border-gray-700 rounded text-white text-xl"
+                {/* Interest Rate Range Slider */}
+                <div className="bg-black/10 p-4 rounded-xl">
+                  <p className="text-white text-sm font-medium mb-3">Interest Rate (%)</p>
+                  <div className="flex flex-col space-y-4">
+                    <div className="relative h-2 bg-gray-700 rounded-full">
+                      <div 
+                        className="absolute h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" 
+                        style={{ 
+                          left: `${(interestRateMin / 30) * 100}%`, 
+                          right: `${100 - (interestRateMax / 30) * 100}%` 
+                        }}
+                      ></div>
+                      <input
+                        type="range"
+                        className="absolute w-full h-2 appearance-none bg-transparent cursor-pointer z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                        min="0"
+                        max="30"
+                        step="0.25"
                         value={interestRateMin}
-                        onChange={(e) => setInterestRateMin(Number(e.target.value) || 0)}
-                        min="0"
-                        max="100"
-                        step="0.1"
+                        onChange={(e) => setInterestRateMin(Number(e.target.value))}
                       />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-gray-300 text-xs">Max %</p>
-                      <input 
-                        type="number"
-                        className="w-full p-1 bg-gray-800 border border-gray-700 rounded text-white text-xl"
+                      <input
+                        type="range"
+                        className="absolute w-full h-2 appearance-none bg-transparent cursor-pointer z-20 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-pink-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                        min="0"
+                        max="30"
+                        step="0.25"
                         value={interestRateMax}
-                        onChange={(e) => setInterestRateMax(Number(e.target.value) || 0)}
-                        min="0"
-                        max="100"
-                        step="0.1"
+                        onChange={(e) => {
+                          const value = Number(e.target.value);
+                          if (value > interestRateMin) {
+                            setInterestRateMax(value);
+                          }
+                        }}
                       />
+                    </div>
+                    
+                    <div className="flex justify-between gap-4">
+                      <div className="w-1/2">
+                        <p className="text-gray-300 text-xs mb-1">Min</p>
+                        <input 
+                          type="text" 
+                          className="w-full p-2 bg-gray-800/5 border border-gray-700/20 rounded text-white text-lg opacity-5 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
+                          value={`${interestRateMin}%`}
+                          onChange={(e) => {
+                            const value = Number(e.target.value.replace(/[^0-9.]/g, ''));
+                            if (!isNaN(value)) {
+                              setInterestRateMin(value);
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="w-1/2">
+                        <p className="text-gray-300 text-xs mb-1">Max</p>
+                        <input 
+                          type="text"
+                          className="w-full p-2 bg-gray-800/5 border border-gray-700/20 rounded text-white text-lg opacity-5 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
+                          value={`${interestRateMax}%`}
+                          onChange={(e) => {
+                            const value = Number(e.target.value.replace(/[^0-9.]/g, ''));
+                            if (!isNaN(value) && value > interestRateMin) {
+                              setInterestRateMax(value);
+                            }
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
                 
-                <div>
-                  <p className="text-white text-sm font-medium mb-1">Loan Term</p>
-                  <div className="flex justify-between gap-2">
-                    <div className="flex-1">
-                      <p className="text-gray-300 text-xs">Min Years</p>
-                      <input 
-                        type="number"
-                        className="w-full p-1 bg-gray-800 border border-gray-700 rounded text-white text-xl"
+                {/* Loan Term Range Slider */}
+                <div className="bg-black/10 p-4 rounded-xl">
+                  <p className="text-white text-sm font-medium mb-3">Loan Term (Years)</p>
+                  <div className="flex flex-col space-y-4">
+                    <div className="relative h-2 bg-gray-700 rounded-full">
+                      <div 
+                        className="absolute h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" 
+                        style={{ 
+                          left: `${(loanTermYearsMin / 50) * 100}%`, 
+                          right: `${100 - (loanTermYearsMax / 50) * 100}%` 
+                        }}
+                      ></div>
+                      <input
+                        type="range"
+                        className="absolute w-full h-2 appearance-none bg-transparent cursor-pointer z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                        min="0"
+                        max="50"
+                        step="1"
                         value={loanTermYearsMin}
-                        onChange={(e) => setLoanTermYearsMin(Number(e.target.value) || 0)}
-                        min="0"
-                        max="40"
+                        onChange={(e) => setLoanTermYearsMin(Number(e.target.value))}
                       />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-gray-300 text-xs">Max Years</p>
-                      <input 
-                        type="number" 
-                        className="w-full p-1 bg-gray-800 border border-gray-700 rounded text-white text-xl"
+                      <input
+                        type="range"
+                        className="absolute w-full h-2 appearance-none bg-transparent cursor-pointer z-20 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-pink-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                        min="0"
+                        max="50"
+                        step="1"
                         value={loanTermYearsMax}
-                        onChange={(e) => setLoanTermYearsMax(Number(e.target.value) || 0)}
-                        min="0"
-                        max="40"
+                        onChange={(e) => {
+                          const value = Number(e.target.value);
+                          if (value > loanTermYearsMin) {
+                            setLoanTermYearsMax(value);
+                          }
+                        }}
                       />
+                    </div>
+                    
+                    <div className="flex justify-between gap-4">
+                      <div className="w-1/2">
+                        <p className="text-gray-300 text-xs mb-1">Min</p>
+                        <input 
+                          type="text" 
+                          className="w-full p-2 bg-gray-800/5 border border-gray-700/20 rounded text-white text-lg opacity-5 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
+                          value={`${loanTermYearsMin} years`}
+                          onChange={(e) => {
+                            const value = Number(e.target.value.replace(/[^0-9]/g, ''));
+                            if (!isNaN(value)) {
+                              setLoanTermYearsMin(value);
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="w-1/2">
+                        <p className="text-gray-300 text-xs mb-1">Max</p>
+                        <input 
+                          type="text"
+                          className="w-full p-2 bg-gray-800/5 border border-gray-700/20 rounded text-white text-lg opacity-5 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
+                          value={`${loanTermYearsMax} years`}
+                          onChange={(e) => {
+                            const value = Number(e.target.value.replace(/[^0-9]/g, ''));
+                            if (!isNaN(value) && value > loanTermYearsMin) {
+                              setLoanTermYearsMax(value);
+                            }
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
                 
-                <div>
-                  <p className="text-white text-sm font-medium mb-1">Asking Price</p>
-                  <div className="flex justify-between gap-2">
-                    <div className="flex-1">
-                      <p className="text-gray-300 text-xs">Min $</p>
-                      <input 
-                        type="number" 
-                        className="w-full p-1 bg-gray-800 border border-gray-700 rounded text-white text-xl"
+                {/* Asking Price Range Slider */}
+                <div className="bg-black/10 p-4 rounded-xl">
+                  <p className="text-white text-sm font-medium mb-3">Asking Price ($)</p>
+                  <div className="flex flex-col space-y-4">
+                    <div className="relative h-2 bg-gray-700 rounded-full">
+                      <div 
+                        className="absolute h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" 
+                        style={{ 
+                          left: `${(priceMin / 50000000) * 100}%`, 
+                          right: `${100 - (priceMax / 50000000) * 100}%` 
+                        }}
+                      ></div>
+                      <input
+                        type="range"
+                        className="absolute w-full h-2 appearance-none bg-transparent cursor-pointer z-10 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                        min="0"
+                        max="50000000"
+                        step="10000"
                         value={priceMin}
-                        onChange={(e) => setPriceMin(Number(e.target.value) || 0)}
-                        min="0"
+                        onChange={(e) => setPriceMin(Number(e.target.value))}
                       />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-gray-300 text-xs">Max $</p>
-                      <input 
-                        type="number" 
-                        className="w-full p-1 bg-gray-800 border border-gray-700 rounded text-white text-xl"
+                      <input
+                        type="range"
+                        className="absolute w-full h-2 appearance-none bg-transparent cursor-pointer z-20 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-pink-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                        min="0"
+                        max="50000000"
+                        step="10000"
                         value={priceMax}
-                        onChange={(e) => setPriceMax(Number(e.target.value) || 0)}
-                        min="0"
+                        onChange={(e) => {
+                          const value = Number(e.target.value);
+                          if (value > priceMin) {
+                            setPriceMax(value);
+                          }
+                        }}
                       />
                     </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Sliders for ranges */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-white text-sm font-medium">Yield Range (%)</p>
-                    <p className="text-xs text-gray-300">
-                      {interestRateMin}% - {interestRateMax}%
-                    </p>
-                  </div>
-                  <div className="relative h-2 bg-gray-700 rounded-full">
-                    <input
-                      type="range"
-                      className="absolute w-full h-2 appearance-none bg-transparent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-500"
-                      min="0"
-                      max="24"
-                      value={interestRateMax}
-                      onChange={(e) => setInterestRateMax(Number(e.target.value))}
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <p className="text-white text-sm font-medium">Price Range ($)</p>
-                    <p className="text-xs text-gray-300">
-                      ${priceMin} - ${priceMax}
-                    </p>
-                  </div>
-                  <div className="relative h-2 bg-gray-700 rounded-full">
-                    <input
-                      type="range"
-                      className="absolute w-full h-2 appearance-none bg-transparent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-500"
-                      min="0"
-                      max="300000"
-                      step="5000"
-                      value={priceMax}
-                      onChange={(e) => setPriceMax(Number(e.target.value))}
-                    />
+                    
+                    <div className="flex justify-between gap-4">
+                      <div className="w-1/2">
+                        <p className="text-gray-300 text-xs mb-1">Min</p>
+                        <input 
+                          type="text" 
+                          className="w-full p-2 bg-gray-800/5 border border-gray-700/20 rounded text-white text-lg opacity-5 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
+                          value={formatCurrency(priceMin)}
+                          onChange={(e) => {
+                            const value = Number(e.target.value.replace(/[^0-9]/g, ''));
+                            if (!isNaN(value)) {
+                              setPriceMin(value);
+                            }
+                          }}
+                        />
+                      </div>
+                      <div className="w-1/2">
+                        <p className="text-gray-300 text-xs mb-1">Max</p>
+                        <input 
+                          type="text"
+                          className="w-full p-2 bg-gray-800/5 border border-gray-700/20 rounded text-white text-lg opacity-5 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
+                          value={formatCurrency(priceMax)}
+                          onChange={(e) => {
+                            const value = Number(e.target.value.replace(/[^0-9]/g, ''));
+                            if (!isNaN(value) && value > priceMin) {
+                              setPriceMax(value);
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -519,28 +657,92 @@ export default function MarketplacePage() {
                 </div>
               </div>
               
-              {/* Checkboxes for Property Type */}
-              <div className="mt-6">
-                <p className="text-white text-sm mb-2">Property Type</p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {['Single Family', 'Multi-Family', 'Commercial', 'Land'].map(type => (
-                    <label key={type} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        className="w-4 h-4 accent-purple-500"
-                        checked={selectedPropertyTypes.includes(type)}
-                        onChange={() => {
-                          if (selectedPropertyTypes.includes(type)) {
-                            setSelectedPropertyTypes(selectedPropertyTypes.filter(t => t !== type));
-                          } else {
-                            setSelectedPropertyTypes([...selectedPropertyTypes, type]);
-                          }
-                        }}
-                      />
-                      <span className="text-white text-sm">{type}</span>
-                    </label>
+              {/* Tabbed Property Type Selector */}
+              <div className="mt-10 bg-black/10 p-6 rounded-xl">
+                <p className="text-white text-sm font-semibold mb-4">Property Type</p>
+                
+                {/* Tab Navigation */}
+                <div className="flex border-b border-gray-700/30 mb-5">
+                  <button
+                    type="button"
+                    className={`px-5 py-3 text-sm font-medium transition-all duration-200 border-b-2 focus:outline-none ${
+                      activePropertyTab === "realEstate" 
+                        ? "text-white border-purple-500" 
+                        : "text-gray-400 border-transparent hover:text-gray-200 hover:border-gray-600"
+                    }`}
+                    onClick={() => setActivePropertyTab("realEstate")}
+                  >
+                    Real Estate Loans
+                  </button>
+                  <button
+                    type="button"
+                    className={`px-5 py-3 text-sm font-medium transition-all duration-200 border-b-2 focus:outline-none ${
+                      activePropertyTab === "business" 
+                        ? "text-white border-purple-500" 
+                        : "text-gray-400 border-transparent hover:text-gray-200 hover:border-gray-600"
+                    }`}
+                    onClick={() => setActivePropertyTab("business")}
+                  >
+                    Business Loans
+                  </button>
+                  <button
+                    type="button"
+                    className={`px-5 py-3 text-sm font-medium transition-all duration-200 border-b-2 focus:outline-none ${
+                      activePropertyTab === "other" 
+                        ? "text-white border-purple-500" 
+                        : "text-gray-400 border-transparent hover:text-gray-200 hover:border-gray-600"
+                    }`}
+                    onClick={() => setActivePropertyTab("other")}
+                  >
+                    Other Loan Types
+                  </button>
+                </div>
+                
+                {/* Tab Content */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  {propertyTypeCategories[activePropertyTab].map(type => (
+                    <button
+                      key={type}
+                      type="button"
+                      className={`py-2 px-4 rounded-md text-sm text-left transition-all duration-200 ${
+                        selectedPropertyTypes.includes(type)
+                          ? "bg-purple-600 text-white font-medium shadow-lg"
+                          : "bg-gray-800/20 text-gray-300 hover:bg-gray-800/40"
+                      }`}
+                      onClick={() => {
+                        if (selectedPropertyTypes.includes(type)) {
+                          setSelectedPropertyTypes(selectedPropertyTypes.filter(t => t !== type));
+                        } else {
+                          setSelectedPropertyTypes([...selectedPropertyTypes, type]);
+                        }
+                      }}
+                    >
+                      {type}
+                    </button>
                   ))}
                 </div>
+                
+                {/* Selected Types Summary */}
+                {selectedPropertyTypes.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <p className="text-xs text-gray-400 mr-2 mt-1">Selected:</p>
+                    {selectedPropertyTypes.map(type => (
+                      <div key={type} className="flex items-center bg-purple-800/30 text-purple-200 text-xs rounded-full px-3 py-1">
+                        <span>{type}</span>
+                        <button 
+                          type="button" 
+                          className="ml-1 text-purple-200 hover:text-white"
+                          onClick={() => setSelectedPropertyTypes(selectedPropertyTypes.filter(t => t !== type))}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M18 6 6 18"></path>
+                            <path d="m6 6 12 12"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               
               {/* Toggle for Secured */}
@@ -651,6 +853,7 @@ export default function MarketplacePage() {
                     setPropertyCounty('');
                     setLtvRatioMin(0);
                     setLtvRatioMax(95);
+                    setActivePropertyTab("realEstate");
                     setAdvancedFilters(null);
                     setActiveFilterCount(0);
                   }}
