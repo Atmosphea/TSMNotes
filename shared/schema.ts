@@ -65,6 +65,7 @@ export const noteDocuments = pgTable("note_documents", {
   documentUrl: text("document_url").notNull(),
   fileName: text("file_name").notNull(),
   fileSize: integer("file_size").notNull(),
+  uploadedById: integer("uploaded_by_id"), // User ID of the uploader
   uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
 });
 
@@ -84,6 +85,18 @@ export const notes = pgTable("notes", {
   askingPrice: text("asking_price").notNull(),
   active: boolean("active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// Extend the user schema to include passwordHash for internal use
+export const userExtendedSchema = z.object({
+  username: z.string(),
+  email: z.string().email(),
+  passwordHash: z.string(),
+  firstName: z.string().nullable().optional(),
+  lastName: z.string().nullable().optional(),
+  role: z.string().nullable().optional(),
+  phone: z.string().nullable().optional(),
+  company: z.string().nullable().optional(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -120,6 +133,7 @@ export const insertNoteListingSchema = createInsertSchema(noteListings).pick({
   askingPrice: true,
   propertyType: true,
   description: true,
+  status: true,
 });
 
 export const insertNoteDocumentSchema = createInsertSchema(noteDocuments).pick({
@@ -128,6 +142,7 @@ export const insertNoteDocumentSchema = createInsertSchema(noteDocuments).pick({
   documentUrl: true,
   fileName: true,
   fileSize: true,
+  uploadedById: true,
 });
 
 export const insertNoteSchema = createInsertSchema(notes).pick({

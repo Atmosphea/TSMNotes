@@ -12,9 +12,97 @@ import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import bcrypt from "bcrypt";
 
+// Function to add sample note listings
+async function addSampleListings() {
+  const listings = await storage.getAllNoteListings();
+  
+  // Only add sample data if there are no listings yet
+  if (listings.length === 0) {
+    // Create a sample user first
+    // Using type assertion to work around schema constraints for sample data
+    const sampleUser = await storage.createUser({
+      username: "sample_investor",
+      email: "investor@notetrade.com",
+      password: await bcrypt.hash("password123", 10),
+      firstName: "Jane",
+      lastName: "Smith",
+      company: "Investment Partners LLC",
+      phone: "555-123-4567",
+      role: "seller"
+    } as any);
+    
+    // Create some sample note listings with type assertion
+    await storage.createNoteListing({
+      sellerId: sampleUser.id,
+      loanAmount: 150000,
+      interestRate: 7.25,
+      loanTerm: 360,
+      paymentAmount: 1023.12,
+      timeHeld: 18,
+      remainingPayments: 342,
+      propertyType: "Single Family",
+      propertyAddress: "123 Oak Lane, Austin, TX 78701",
+      askingPrice: 125000,
+      status: "active",
+      description: "Well-performing note with a strong payment history. Property is in an excellent neighborhood with rising property values."
+    } as any);
+    
+    await storage.createNoteListing({
+      sellerId: sampleUser.id,
+      loanAmount: 85000,
+      interestRate: 6.5,
+      loanTerm: 240,
+      paymentAmount: 635.75,
+      timeHeld: 24,
+      remainingPayments: 216,
+      propertyType: "Condo",
+      propertyAddress: "456 Pine Street #302, Seattle, WA 98101",
+      askingPrice: 70000,
+      status: "active",
+      description: "Seasoned note backed by a renovated condo in downtown Seattle. Borrower has excellent credit and perfect payment history."
+    } as any);
+    
+    await storage.createNoteListing({
+      sellerId: sampleUser.id,
+      loanAmount: 225000,
+      interestRate: 8.1,
+      loanTerm: 300,
+      paymentAmount: 1560.42,
+      timeHeld: 36,
+      remainingPayments: 264,
+      propertyType: "Multi-Family",
+      propertyAddress: "789 Maple Ave, Chicago, IL 60611",
+      askingPrice: 195000,
+      status: "active",
+      description: "High-yield note secured by a well-maintained duplex in a rapidly appreciating area of Chicago. Strong rental income supports payments."
+    } as any);
+    
+    // Add sample document for the first listing with type assertion
+    await storage.createNoteDocument({
+      noteListingId: 1,
+      fileName: "Loan_Agreement.pdf",
+      fileSize: 2048,
+      documentType: "Loan Agreement",
+      documentUrl: "https://example.com/docs/loan_agreement.pdf",
+      uploadedById: sampleUser.id
+    } as any);
+    
+    await storage.createNoteDocument({
+      noteListingId: 1,
+      fileName: "Property_Appraisal.pdf",
+      fileSize: 4096,
+      documentType: "Appraisal",
+      documentUrl: "https://example.com/docs/appraisal.pdf",
+      uploadedById: sampleUser.id
+    } as any);
+  }
+}
+
 const emailSchema = z.string().email("Please enter a valid email address");
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Add sample listings on startup
+  await addSampleListings();
   // Waitlist API route
   app.post("/api/waitlist", async (req, res) => {
     try {
@@ -355,6 +443,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ 
         success: false, 
         message: "An error occurred while deleting the document" 
+      });
+    }
+  });
+  
+  // User API Routes
+  
+  // Get user by ID
+  app.get("/api/users/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Invalid user ID" 
+        });
+      }
+      
+      const user = await storage.getUser(id);
+      if (!user) {
+        return res.status(404).json({ 
+          success: false, 
+          message: "User not found" 
+        });
+      }
+      
+      // Don't return password hash or other sensitive information
+      const { passwordHash, ...safeUser } = user;
+      
+      return res.status(200).json({ 
+        success: true, 
+        data: safeUser
+      });
+    } catch (error) {
+      console.error("Error getting user:", error);
+      return res.status(500).json({ 
+        success: false, 
+        message: "An error occurred while fetching the user" 
       });
     }
   });
