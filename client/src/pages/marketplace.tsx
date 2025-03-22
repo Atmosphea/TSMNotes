@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
+import { cn } from "@/lib/utils";
 import { 
   Breadcrumb,
   BreadcrumbItem,
@@ -56,6 +57,7 @@ import {
 } from "lucide-react";
 
 export default function MarketplacePage() {
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const isMobile = useIsMobile();
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState<string>("newest");
@@ -507,3 +509,38 @@ export default function MarketplacePage() {
     </div>
   );
 }
+      <main className="flex-1 container px-4 py-8 mx-auto max-w-7xl">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Filters Section */}
+          <aside className={cn(
+            "lg:w-80 bg-background rounded-lg border p-4",
+            "lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)]",
+            "transition-all duration-300 ease-in-out",
+            isFilterOpen ? "block" : "hidden lg:block"
+          )}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold">Filters</h2>
+              <Button variant="ghost" size="icon" onClick={() => setIsFilterOpen(false)} className="lg:hidden">
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <SearchFilter />
+          </aside>
+
+          {/* Main Content */}
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-3xl font-bold">Available Notes</h1>
+              <Button variant="outline" onClick={() => setIsFilterOpen(true)} className="lg:hidden">
+                <Filter className="h-4 w-4 mr-2" />
+                Filters
+              </Button>
+            </div>
+            
+            {/* Note listings grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Your existing note cards here */}
+            </div>
+          </div>
+        </div>
+      </main>

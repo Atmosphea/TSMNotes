@@ -239,21 +239,25 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onApply, onClose, isDrawer 
 
         {/* Price */}
         <div className="bg-gray-700/50 p-4 rounded-lg transition-all duration-300 hover:bg-gray-700/70">
-          <label className="text-white font-bold mb-2 block">Asking Price ($)</label>
-          <div className="flex space-x-4">
+          <label className="text-white font-bold mb-2 block">Asking Price: ${filters.price_min} - ${filters.price_max}</label>
+          <div className="space-y-4">
             <input
-              type="number"
-              placeholder="Min"
+              type="range"
+              min="0"
+              max="1000000"
+              step="1000"
               value={filters.price_min}
-              onChange={(e) => handleInputChange('price_min', e.target.value ? Number(e.target.value) : '')}
-              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-purple-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300 py-2"
+              onChange={(e) => handleInputChange('price_min', Number(e.target.value))}
+              className="w-full accent-purple-500"
             />
             <input
-              type="number"
-              placeholder="Max"
+              type="range"
+              min="0"
+              max="1000000"
+              step="1000"
               value={filters.price_max}
-              onChange={(e) => handleInputChange('price_max', e.target.value ? Number(e.target.value) : '')}
-              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-purple-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300 py-2"
+              onChange={(e) => handleInputChange('price_max', Number(e.target.value))}
+              className="w-full accent-purple-500"
             />
           </div>
         </div>
