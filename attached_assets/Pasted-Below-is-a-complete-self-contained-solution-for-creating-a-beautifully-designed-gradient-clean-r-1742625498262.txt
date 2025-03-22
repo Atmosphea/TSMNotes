@@ -1,0 +1,702 @@
+Below is a complete, self-contained solution for creating a beautifully designed, gradient, clean, responsive, and animated search filter component that meets the specified requirements. This component is built for integration into the provided tech stack: React with TypeScript, TailwindCSS, Wouter, React Query, and an Express.js backend with PostgreSQL and Drizzle ORM. I'll provide the code and explanations to ensure it’s ready to be pasted into Replit for integration.
+
+---
+
+### Overview
+
+The search filter component will:
+- Occupy 80vw and 80vh with a dark gray gradient background and rounded corners.
+- Feature orange accents and outlines for interactive elements.
+- Use "invisible" text input fields (blending seamlessly with the background, styled with bold fonts and gray placeholder numbers).
+- Include smooth animations (focusing on component entry and basic input interactions).
+- Support all specified filter parameters with appropriate UI representations (dropdowns, range inputs, checkboxes, toggles, etc.).
+- Be responsive across devices.
+- Manage filter state locally and provide an "Apply Filters" button to trigger searches.
+
+Due to the ambiguity of "animates the caret forward smoothly," I’ll interpret it as a smooth transition for input focus states and component animations, as custom caret animations are complex and not standard for filter inputs.
+
+---
+
+### Implementation
+
+Here’s the React component written in TypeScript, styled with TailwindCSS:
+
+```tsx
+// src/components/SearchFilter.tsx
+import React, { useState } from 'react';
+
+interface FilterState {
+  note_type: string;
+  original_amount_min: number | '';
+  original_amount_max: number | '';
+  current_amount_min: number | '';
+  current_amount_max: number | '';
+  interest_rate_min: number | '';
+  interest_rate_max: number | '';
+  maturity_date_start: string;
+  maturity_date_end: string;
+  location_state: string;
+  location_city: string;
+  price_min: number | '';
+  price_max: number | '';
+  note_status: string[];
+  property_type: string[];
+  property_zip_code: string;
+  loan_term_years_min: number | '';
+  loan_term_years_max: number | '';
+  loan_term_months: number | '';
+  is_secured: boolean;
+  collateral_type: string;
+  date_of_note_start: string;
+  date_of_note_end: string;
+  payment_frequency: string;
+  amortization_type: string;
+  description: string;
+  property_county: string;
+  loan_to_value_ratio_min: number | '';
+  loan_to_value_ratio_max: number | '';
+}
+
+const noteTypes = ['Promissory', 'Mortgage', 'Business', 'Land Contract'];
+const states = ['CA', 'TX', 'NY', 'FL']; // Example states
+const noteStatuses = ['Performing', 'Defaulted', 'REO'];
+const propertyTypes = ['Single Family', 'Multi-Family', 'Commercial', 'Land'];
+const collateralTypes = ['Real Estate', 'Equipment'];
+const paymentFrequencies = ['Monthly', 'Quarterly', 'Annually'];
+const amortizationTypes = ['Fixed', 'Adjustable', 'Interest-Only'];
+
+const SearchFilter: React.FC<{ onApply: (filters: FilterState) => void }> = ({ onApply }) => {
+  const [filters, setFilters] = useState<FilterState>({
+    note_type: '',
+    original_amount_min: '',
+    original_amount_max: '',
+    current_amount_min: '',
+    current_amount_max: '',
+    interest_rate_min: '',
+    interest_rate_max: '',
+    maturity_date_start: '',
+    maturity_date_end: '',
+    location_state: '',
+    location_city: '',
+    price_min: '',
+    price_max: '',
+    note_status: [],
+    property_type: [],
+    property_zip_code: '',
+    loan_term_years_min: '',
+    loan_term_years_max: '',
+    loan_term_months: '',
+    is_secured: false,
+    collateral_type: '',
+    date_of_note_start: '',
+    date_of_note_end: '',
+    payment_frequency: '',
+    amortization_type: '',
+    description: '',
+    property_county: '',
+    loan_to_value_ratio_min: '',
+    loan_to_value_ratio_max: '',
+  });
+
+  const handleCheckboxChange = (field: 'note_status' | 'property_type', value: string) => {
+    const current = filters[field];
+    const updated = current.includes(value)
+      ? current.filter((item) => item !== value)
+      : [...current, value];
+    setFilters({ ...filters, [field]: updated });
+  };
+
+  const handleClearFilters = () => {
+    setFilters({
+      note_type: '',
+      original_amount_min: '',
+      original_amount_max: '',
+      current_amount_min: '',
+      current_amount_max: '',
+      interest_rate_min: '',
+      interest_rate_max: '',
+      maturity_date_start: '',
+      maturity_date_end: '',
+      location_state: '',
+      location_city: '',
+      price_min: '',
+      price_max: '',
+      note_status: [],
+      property_type: [],
+      property_zip_code: '',
+      loan_term_years_min: '',
+      loan_term_years_max: '',
+      loan_term_months: '',
+      is_secured: false,
+      collateral_type: '',
+      date_of_note_start: '',
+      date_of_note_end: '',
+      payment_frequency: '',
+      amortization_type: '',
+      description: '',
+      property_county: '',
+      loan_to_value_ratio_min: '',
+      loan_to_value_ratio_max: '',
+    });
+  };
+
+  const handleApplyFilters = () => {
+    onApply(filters);
+  };
+
+  return (
+    <div className="w-[80vw] h-[80vh] bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-6 overflow-y-auto shadow-lg animate-fade-in">
+      <h2 className="text-2xl font-bold text-white mb-6">Search Filters</h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Note Type */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Note Type</label>
+          <select
+            value={filters.note_type}
+            onChange={(e) => setFilters({ ...filters, note_type: e.target.value })}
+            className="w-full bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400"
+          >
+            <option value="">Select Note Type</option>
+            {noteTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Original Amount */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Original Amount</label>
+          <div className="flex space-x-4">
+            <input
+              type="number"
+              placeholder="0"
+              value={filters.original_amount_min}
+              onChange={(e) =>
+                setFilters({ ...filters, original_amount_min: e.target.value ? Number(e.target.value) : '' })
+              }
+              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+            />
+            <input
+              type="number"
+              placeholder="0"
+              value={filters.original_amount_max}
+              onChange={(e) =>
+                setFilters({ ...filters, original_amount_max: e.target.value ? Number(e.target.value) : '' })
+              }
+              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+            />
+          </div>
+        </div>
+
+        {/* Current Amount */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Current Amount</label>
+          <div className="flex space-x-4">
+            <input
+              type="number"
+              placeholder="0"
+              value={filters.current_amount_min}
+              onChange={(e) =>
+                setFilters({ ...filters, current_amount_min: e.target.value ? Number(e.target.value) : '' })
+              }
+              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+            />
+            <input
+              type="number"
+              placeholder="0"
+              value={filters.current_amount_max}
+              onChange={(e) =>
+                setFilters({ ...filters, current_amount_max: e.target.value ? Number(e.target.value) : '' })
+              }
+              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+            />
+          </div>
+        </div>
+
+        {/* Interest Rate */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Interest Rate (%)</label>
+          <div className="flex space-x-4">
+            <input
+              type="number"
+              placeholder="0"
+              value={filters.interest_rate_min}
+              onChange={(e) =>
+                setFilters({ ...filters, interest_rate_min: e.target.value ? Number(e.target.value) : '' })
+              }
+              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+            />
+            <input
+              type="number"
+              placeholder="0"
+              value={filters.interest_rate_max}
+              onChange={(e) =>
+                setFilters({ ...filters, interest_rate_max: e.target.value ? Number(e.target.value) : '' })
+              }
+              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+            />
+          </div>
+        </div>
+
+        {/* Maturity Date */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Maturity Date</label>
+          <div className="flex space-x-4">
+            <input
+              type="date"
+              value={filters.maturity_date_start}
+              onChange={(e) => setFilters({ ...filters, maturity_date_start: e.target.value })}
+              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400"
+            />
+            <input
+              type="date"
+              value={filters.maturity_date_end}
+              onChange={(e) => setFilters({ ...filters, maturity_date_end: e.target.value })}
+              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400"
+            />
+          </div>
+        </div>
+
+        {/* Location State */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">State</label>
+          <select
+            value={filters.location_state}
+            onChange={(e) => setFilters({ ...filters, location_state: e.target.value })}
+            className="w-full bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400"
+          >
+            <option value="">Select State</option>
+            {states.map((state) => (
+              <option key={state} value={state}>
+                {state}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Location City */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">City</label>
+          <input
+            type="text"
+            placeholder="Enter city"
+            value={filters.location_city}
+            onChange={(e) => setFilters({ ...filters, location_city: e.target.value })}
+            className="w-full bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+          />
+        </div>
+
+        {/* Price */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Price</label>
+          <div className="flex space-x-4">
+            <input
+              type="number"
+              placeholder="0"
+              value={filters.price_min}
+              onChange={(e) => setFilters({ ...filters, price_min: e.target.value ? Number(e.target.value) : '' })}
+              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+            />
+            <input
+              type="number"
+              placeholder="0"
+              value={filters.price_max}
+              onChange={(e) => setFilters({ ...filters, price_max: e.target.value ? Number(e.target.value) : '' })}
+              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+            />
+          </div>
+        </div>
+
+        {/* Note Status */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Note Status</label>
+          <div className="flex flex-wrap gap-4">
+            {noteStatuses.map((status) => (
+              <label key={status} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={filters.note_status.includes(status)}
+                  onChange={() => handleCheckboxChange('note_status', status)}
+                  className="form-checkbox h-5 w-5 text-orange-500"
+                />
+                <span className="text-white font-bold">{status}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Property Type */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Property Type</label>
+          <div className="flex flex-wrap gap-4">
+            {propertyTypes.map((type) => (
+              <label key={type} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={filters.property_type.includes(type)}
+                  onChange={() => handleCheckboxChange('property_type', type)}
+                  className="form-checkbox h-5 w-5 text-orange-500"
+                />
+                <span className="text-white font-bold">{type}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Property Zip Code */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Zip Code</label>
+          <input
+            type="text"
+            placeholder="Enter zip code"
+            value={filters.property_zip_code}
+            onChange={(e) => setFilters({ ...filters, property_zip_code: e.target.value })}
+            className="w-full bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+          />
+        </div>
+
+        {/* Loan Term Years */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Loan Term (Years)</label>
+          <div className="flex space-x-4">
+            <input
+              type="number"
+              placeholder="0"
+              value={filters.loan_term_years_min}
+              onChange={(e) =>
+                setFilters({ ...filters, loan_term_years_min: e.target.value ? Number(e.target.value) : '' })
+              }
+              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+            />
+            <input
+              type="number"
+              placeholder="0"
+              value={filters.loan_term_years_max}
+              onChange={(e) =>
+                setFilters({ ...filters, loan_term_years_max: e.target.value ? Number(e.target.value) : '' })
+              }
+              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+            />
+          </div>
+        </div>
+
+        {/* Loan Term Months */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Loan Term (Months)</label>
+          <input
+            type="number"
+            placeholder="0"
+            value={filters.loan_term_months}
+            onChange={(e) =>
+              setFilters({ ...filters, loan_term_months: e.target.value ? Number(e.target.value) : '' })
+            }
+            className="w-full bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+          />
+        </div>
+
+        {/* Is Secured */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Is Secured</label>
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              checked={filters.is_secured}
+              onChange={(e) => setFilters({ ...filters, is_secured: e.target.checked })}
+              className="form-checkbox h-5 w-5 text-orange-500"
+            />
+            <span className="ml-2 text-white font-bold">{filters.is_secured ? 'Yes' : 'No'}</span>
+          </div>
+        </div>
+
+        {/* Collateral Type (Conditional) */}
+        {filters.is_secured && (
+          <div className="bg-gray-700 p-4 rounded-lg">
+            <label className="text-white font-bold mb-2 block">Collateral Type</label>
+            <select
+              value={filters.collateral_type}
+              onChange={(e) => setFilters({ ...filters, collateral_type: e.target.value })}
+              className="w-full bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400"
+            >
+              <option value="">Select Collateral Type</option>
+              {collateralTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Date of Note */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Date of Note</label>
+          <div className="flex space-x-4">
+            <input
+              type="date"
+              value={filters.date_of_note_start}
+              onChange={(e) => setFilters({ ...filters, date_of_note_start: e.target.value })}
+              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400"
+            />
+            <input
+              type="date"
+              value={filters.date_of_note_end}
+              onChange={(e) => setFilters({ ...filters, date_of_note_end: e.target.value })}
+              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400"
+            />
+          </div>
+        </div>
+
+        {/* Payment Frequency */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Payment Frequency</label>
+          <select
+            value={filters.payment_frequency}
+            onChange={(e) => setFilters({ ...filters, payment_frequency: e.target.value })}
+            className="w-full bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400"
+          >
+            <option value="">Select Frequency</option>
+            {paymentFrequencies.map((freq) => (
+              <option key={freq} value={freq}>
+                {freq}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Amortization Type */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Amortization Type</label>
+          <select
+            value={filters.amortization_type}
+            onChange={(e) => setFilters({ ...filters, amortization_type: e.target.value })}
+            className="w-full bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400"
+          >
+            <option value="">Select Type</option>
+            {amortizationTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Description */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Description</label>
+          <input
+            type="text"
+            placeholder="Enter keywords"
+            value={filters.description}
+            onChange={(e) => setFilters({ ...filters, description: e.target.value })}
+            className="w-full bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+          />
+        </div>
+
+        {/* Property County */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">County</label>
+          <input
+            type="text"
+            placeholder="Enter county"
+            value={filters.property_county}
+            onChange={(e) => setFilters({ ...filters, property_county: e.target.value })}
+            className="w-full bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+          />
+        </div>
+
+        {/* Loan to Value Ratio */}
+        <div className="bg-gray-700 p-4 rounded-lg">
+          <label className="text-white font-bold mb-2 block">Loan to Value Ratio (%)</label>
+          <div className="flex space-x-4">
+            <input
+              type="number"
+              placeholder="0"
+              value={filters.loan_to_value_ratio_min}
+              onChange={(e) =>
+                setFilters({ ...filters, loan_to_value_ratio_min: e.target.value ? Number(e.target.value) : '' })
+              }
+              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+            />
+            <input
+              type="number"
+              placeholder="0"
+              value={filters.loan_to_value_ratio_max}
+              onChange={(e) =>
+                setFilters({ ...filters, loan_to_value_ratio_max: e.target.value ? Number(e.target.value) : '' })
+              }
+              className="w-1/2 bg-transparent text-white border-b border-gray-500 focus:border-orange-500 focus:outline-none font-bold placeholder-gray-400 transition-all duration-300"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="mt-8 flex justify-end space-x-4">
+        <button
+          onClick={handleClearFilters}
+          className="px-4 py-2 bg-gray-600 text-white font-bold rounded-lg hover:bg-gray-700 transition transform hover:scale-105"
+        >
+          Clear Filters
+        </button>
+        <button
+          onClick={handleApplyFilters}
+          className="px-4 py-2 bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 transition transform hover:scale-105"
+        >
+          Apply Filters
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default SearchFilter;
+```
+
+---
+
+### TailwindCSS Animation Setup
+
+To enable the `animate-fade-in` class used above, add the following to your Tailwind configuration:
+
+```js
+// tailwind.config.js
+module.exports = {
+  content: ['./src/**/*.{ts,tsx}'],
+  theme: {
+    extend: {
+      animation: {
+        'fade-in': 'fadeIn 0.5s ease-in-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+    },
+  },
+  plugins: [],
+};
+```
+
+---
+
+### Integration into the App
+
+To use this component in your React app with the specified tech stack:
+
+1. **Parent Component Example** (e.g., `App.tsx` or a page component):
+
+```tsx
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import SearchFilter from './components/SearchFilter';
+import axios from 'axios';
+
+const fetchNotes = async (filters: any) => {
+  const response = await axios.post('http://localhost:3001/api/notes/search', filters);
+  return response.data;
+};
+
+const App: React.FC = () => {
+  const [showFilters, setShowFilters] = React.useState(false);
+  const { data, refetch } = useQuery(['notes'], () => fetchNotes({}), { enabled: false });
+
+  const handleApplyFilters = (filters: any) => {
+    refetch({ queryKey: ['notes', filters] });
+    setShowFilters(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <button
+        onClick={() => setShowFilters(true)}
+        className="px-4 py-2 bg-orange-500 text-white rounded-lg font-bold"
+      >
+        Open Filters
+      </button>
+      {showFilters && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <SearchFilter onApply={handleApplyFilters} />
+        </div>
+      )}
+      {/* Render notes data here */}
+    </div>
+  );
+};
+
+export default App;
+```
+
+2. **Backend API Endpoint** (e.g., Express.js with Drizzle ORM):
+
+```ts
+// server/src/routes/notes.ts
+import express from 'express';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import { eq, and, between } from 'drizzle-orm';
+import { notes } from '../schema'; // Assume schema is defined
+import postgres from 'postgres';
+
+const router = express.Router();
+const client = postgres('postgresql://user:password@localhost:5432/db');
+const db = drizzle(client);
+
+router.post('/search', async (req, res) => {
+  const filters = req.body;
+  let query = db.select().from(notes);
+
+  if (filters.note_type) query = query.where(eq(notes.note_type, filters.note_type));
+  if (filters.original_amount_min || filters.original_amount_max)
+    query = query.where(
+      between(
+        notes.original_amount,
+        filters.original_amount_min || 0,
+        filters.original_amount_max || Infinity
+      )
+    );
+  // Add similar conditions for other filters
+
+  const results = await query;
+  res.json(results);
+});
+
+export default router;
+```
+
+---
+
+### Design and Features Explained
+
+- **Dimensions and Background**: The component uses `w-[80vw] h-[80vh]` with a `bg-gradient-to-br from-gray-800 to-gray-900` for a dark gray gradient, and `rounded-2xl` for rounded corners.
+- **Orange Accents**: Orange is used for focus borders (`focus:border-orange-500`) and the "Apply Filters" button (`bg-orange-500`).
+- **Invisible Inputs**: Inputs have a transparent background (`bg-transparent`), a subtle gray bottom border (`border-b border-gray-500`), and gray placeholders (`placeholder-gray-400`). No raw HTML styles are visible due to Tailwind styling.
+- **Bold Font**: All labels and inputs use `font-bold`.
+- **Gray Placeholder Numbers**: Number inputs use `placeholder="0"`, styled with `placeholder-gray-400`.
+- **Animation**: The component fades in with `animate-fade-in`. Inputs have a smooth transition on focus (`transition-all duration-300`).
+- **Responsive Design**: The grid switches from two columns (`md:grid-cols-2`) to one (`grid-cols-1`) on smaller screens, and `overflow-y-auto` ensures scrollability.
+- **Filter Types**:
+  - **Dropdowns**: Native `<select>` elements for simplicity (e.g., `note_type`, `location_state`).
+  - **Range Inputs**: Two number inputs for min/max (e.g., `original_amount`, `interest_rate`).
+  - **Checkboxes**: Multi-select groups (e.g., `note_status`, `property_type`).
+  - **Toggle**: Checkbox styled for `is_secured`.
+  - **Conditional Fields**: `collateral_type` appears only if `is_secured` is true.
+  - **Date Inputs**: Using `type="date"` (replace with `react-datepicker` for better styling later).
+  - **Text Inputs**: For `location_city`, `description`, etc., with placeholders.
+
+---
+
+### Next Steps for Integration
+
+1. **Autocomplete**: Replace `location_city` and `property_county` inputs with an autocomplete component (e.g., `react-select`) fetching data from the backend based on `location_state`.
+2. **Date Picker**: Integrate `react-datepicker` for `maturity_date` and `date_of_note` for a polished UI.
+3. **Dynamic Updates**: Use React Query’s `useQuery` with a debounced filter update for real-time results (optional).
+4. **Accessibility**: Add `aria-labels` and ensure keyboard navigation.
+5. **Backend**: Expand the API to handle all filter parameters and optimize queries with Drizzle ORM.
+
+---
+
+This component fulfills the query’s requirements and is ready to be pasted into Replit. Adjust the option arrays (e.g., `noteTypes`, `states`) and backend integration as needed for your specific data.

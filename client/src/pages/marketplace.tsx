@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { 
@@ -10,6 +10,7 @@ import {
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { 
   Card, 
   CardHeader, 
@@ -39,6 +40,8 @@ import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import { type NoteListing } from "@shared/schema";
+import { FilterModal, FilterDrawer, FilterState } from "@/components/marketplace";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Filter,
   Search,
@@ -48,13 +51,18 @@ import {
   DollarSign,
   Percent,
   ArrowUpDown,
-  MoreVertical
+  MoreVertical,
+  X
 } from "lucide-react";
 
 export default function MarketplacePage() {
+  const isMobile = useIsMobile();
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState<string>("newest");
   const [filterPropertyType, setFilterPropertyType] = useState<string | null>(null);
+  const [advancedFilters, setAdvancedFilters] = useState<FilterState | null>(null);
+  const [activeFilterCount, setActiveFilterCount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
   
   // Fetch note listings from the API
   const { data, isLoading, error } = useQuery<{ success: boolean; data: NoteListing[] }>({
@@ -67,9 +75,73 @@ export default function MarketplacePage() {
   // Properties for filtering
   const propertyTypes = Array.from(new Set(noteListings.map(listing => listing.propertyType)));
   
+  // Handle advanced filter application
+  const handleApplyFilters = (filters: FilterState) => {
+    setAdvancedFilters(filters);
+    // Reset to first page when applying new filters
+    setPage(1);
+  };
+  
   // Filter and sort the listings
   const filteredListings = noteListings
-    .filter(listing => filterPropertyType ? listing.propertyType === filterPropertyType : true)
+    .filter(listing => {
+      // Basic property type filter
+      if (filterPropertyType && listing.propertyType !== filterPropertyType) {
+        return false;
+      }
+      
+      // Search query filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchesSearch = 
+          listing.propertyAddress.toLowerCase().includes(query) ||
+          listing.propertyType.toLowerCase().includes(query) ||
+          listing.description?.toLowerCase().includes(query);
+        
+        if (!matchesSearch) return false;
+      }
+      
+      // Advanced filters
+      if (advancedFilters) {
+        // Property type filter from advanced filters
+        if (advancedFilters.property_type.length > 0 && 
+            !advancedFilters.property_type.includes(listing.propertyType)) {
+          return false;
+        }
+        
+        // Note status filter
+        if (advancedFilters.note_status.length > 0) {
+          const status = listing.status === 'active' ? 'Performing' : 'Non-Performing';
+          if (!advancedFilters.note_status.includes(status)) {
+            return false;
+          }
+        }
+        
+        // Price range filter
+        if (advancedFilters.price_min !== '' && listing.askingPrice < advancedFilters.price_min) {
+          return false;
+        }
+        if (advancedFilters.price_max !== '' && listing.askingPrice > advancedFilters.price_max) {
+          return false;
+        }
+        
+        // Interest rate filter
+        if (advancedFilters.interest_rate_min !== '' && listing.interestRate < advancedFilters.interest_rate_min) {
+          return false;
+        }
+        if (advancedFilters.interest_rate_max !== '' && listing.interestRate > advancedFilters.interest_rate_max) {
+          return false;
+        }
+        
+        // Location state filter
+        if (advancedFilters.location_state && 
+            !listing.propertyAddress.includes(advancedFilters.location_state)) {
+          return false;
+        }
+      }
+      
+      return true;
+    })
     .sort((a, b) => {
       if (sortBy === "newest") {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
