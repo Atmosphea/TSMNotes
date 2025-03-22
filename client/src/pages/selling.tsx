@@ -188,6 +188,13 @@ const SellingPage = () => {
   const [editingContact, setEditingContact] = useState(false);
   const [selectedListing, setSelectedListing] = useState<NoteListing | null>(null);
   
+  // Function to handle file upload from various places
+  const handleFileInputChange = (e: any) => {
+    if (e.target && e.target.files) {
+      handleFileUpload(e as React.ChangeEvent<HTMLInputElement>);
+    }
+  };
+  
   // Initialize form with default values
   const form = useForm<NoteListingFormValues>({
     resolver: zodResolver(noteListingFormSchema),
@@ -407,6 +414,227 @@ const SellingPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800">
+      {/* Listing Preview Dialog */}
+      <Dialog open={showPreview} onOpenChange={setShowPreview}>
+        <DialogContent className="max-w-3xl bg-white text-gray-800 p-0 overflow-auto max-h-[90vh]">
+          <DialogHeader className="bg-purple-600 text-white p-6">
+            <DialogTitle className="text-2xl font-bold">Listing Preview</DialogTitle>
+          </DialogHeader>
+          
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-lg font-medium mb-1 text-gray-900">Property Details</h3>
+                <div className="space-y-3 mt-3">
+                  <div>
+                    <p className="text-sm text-gray-500">Property Address</p>
+                    <p className="font-medium">{form.getValues("propertyAddress")}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Property Type</p>
+                    <p className="font-medium">{form.getValues("propertyType")}</p>
+                  </div>
+                </div>
+                
+                <h3 className="text-lg font-medium mt-6 mb-1 text-gray-900">Loan Details</h3>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-3 mt-3">
+                  <div>
+                    <p className="text-sm text-gray-500">Loan Amount</p>
+                    <p className="font-medium">{formatCurrency(form.getValues("loanAmount"))}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Interest Rate</p>
+                    <p className="font-medium">{form.getValues("interestRate")}%</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Loan Term</p>
+                    <p className="font-medium">{form.getValues("loanTerm")} months</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Monthly Payment</p>
+                    <p className="font-medium">{formatCurrency(form.getValues("paymentAmount"))}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Time Held</p>
+                    <p className="font-medium">{form.getValues("timeHeld")} months</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Remaining Payments</p>
+                    <p className="font-medium">{form.getValues("remainingPayments")}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-medium mb-1 text-gray-900">Listing Details</h3>
+                <div className="space-y-3 mt-3">
+                  <div>
+                    <p className="text-sm text-gray-500">Asking Price</p>
+                    <p className="text-xl font-bold text-purple-700">{formatCurrency(form.getValues("askingPrice"))}</p>
+                  </div>
+                  
+                  <div>
+                    <p className="text-sm text-gray-500">Description</p>
+                    <p className="text-sm mt-1">{form.getValues("description")}</p>
+                  </div>
+                  
+                  <div className="mt-6">
+                    <p className="text-sm text-gray-500">Potential ROI</p>
+                    <p className="font-medium text-green-600">{calculateROI(form).toFixed(2)}%</p>
+                  </div>
+                </div>
+                
+                <div className="mt-6">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-medium text-gray-900">Contact Information</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-purple-600 hover:text-purple-800 hover:bg-purple-50"
+                      onClick={() => setEditingContact(!editingContact)}
+                    >
+                      <Edit2 className="h-4 w-4 mr-2" />
+                      Edit
+                    </Button>
+                  </div>
+                  
+                  {editingContact ? (
+                    <div className="mt-3 space-y-3">
+                      <div>
+                        <label className="text-sm text-gray-500">Name</label>
+                        <Input
+                          value={contactInfo.name}
+                          onChange={(e) => setContactInfo({...contactInfo, name: e.target.value})}
+                          className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-500">Email</label>
+                        <Input
+                          value={contactInfo.email}
+                          onChange={(e) => setContactInfo({...contactInfo, email: e.target.value})}
+                          className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm text-gray-500">Phone</label>
+                        <Input
+                          value={contactInfo.phone}
+                          onChange={(e) => setContactInfo({...contactInfo, phone: e.target.value})}
+                          className="border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                        />
+                      </div>
+                      <Button 
+                        className="mt-2 bg-purple-600 hover:bg-purple-700 text-white"
+                        onClick={() => setEditingContact(false)}
+                      >
+                        Save Contact Info
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="mt-3 space-y-2">
+                      <div className="flex items-center">
+                        <p className="text-sm text-gray-500 w-20">Name:</p>
+                        <p className="font-medium">{contactInfo.name}</p>
+                      </div>
+                      <div className="flex items-center">
+                        <p className="text-sm text-gray-500 w-20">Email:</p>
+                        <p className="font-medium">{contactInfo.email}</p>
+                      </div>
+                      <div className="flex items-center">
+                        <p className="text-sm text-gray-500 w-20">Phone:</p>
+                        <p className="font-medium">{contactInfo.phone}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-8 border-t border-gray-200 pt-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                Documents
+                <span className="text-sm font-normal text-gray-500 ml-2">
+                  ({documents.length} uploaded)
+                </span>
+              </h3>
+              
+              {documents.length > 0 ? (
+                <div className="space-y-3">
+                  {documents.map((doc, index) => (
+                    <div 
+                      key={index} 
+                      className="flex items-center justify-between p-3 bg-gray-50 rounded-md border border-gray-200"
+                    >
+                      <div className="flex items-center">
+                        <FileText className="h-5 w-5 mr-3 text-purple-500" />
+                        <div>
+                          <p className="font-medium text-sm">{doc.name}</p>
+                          <p className="text-xs text-gray-500">
+                            {doc.type} • {Math.round(doc.size / 1024)} KB
+                          </p>
+                        </div>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="text-gray-500 hover:text-red-500 hover:bg-red-50"
+                        onClick={() => {
+                          const newDocs = [...documents];
+                          newDocs.splice(index, 1);
+                          setDocuments(newDocs);
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 border border-dashed border-gray-300 rounded-lg">
+                  <UploadCloud className="h-10 w-10 mx-auto text-gray-400 mb-2" />
+                  <p className="text-gray-500">No documents uploaded</p>
+                  <Button 
+                    variant="outline"
+                    className="mt-4 border-purple-500 text-purple-700 hover:bg-purple-50"
+                    onClick={() => {
+                      const fileInput = document.createElement('input');
+                      fileInput.type = 'file';
+                      fileInput.accept = '.pdf,.jpg,.jpeg,.png';
+                      fileInput.multiple = true;
+                      fileInput.onchange = handleFileInputChange;
+                      fileInput.click();
+                    }}
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload Documents
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <DialogFooter className="p-6 border-t border-gray-200">
+            <Button
+              variant="outline"
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+              onClick={() => setShowPreview(false)}
+            >
+              Close
+            </Button>
+            <Button
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+              onClick={() => {
+                setShowPreview(false);
+                onSubmit(form.getValues());
+              }}
+            >
+              Confirm & Publish
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
       <div className="container mx-auto px-4 py-16">
         <div className="space-y-12">
           <div className="text-center">
@@ -738,19 +966,31 @@ const SellingPage = () => {
                 </Form>
               </CardContent>
               
-              <CardFooter className="border-t border-purple-500/20 pt-6">
+              <CardFooter className="border-t border-gray-200 pt-6">
                 <div className="w-full flex items-center justify-between">
-                  <p className="text-sm text-gray-400">
-                    {calculateROI(form) > 0 && (
-                      <span className="text-green-400">
-                        Potential ROI: {calculateROI(form).toFixed(2)}%
-                      </span>
-                    )}
-                  </p>
+                  <div className="flex items-center space-x-4">
+                    <Button 
+                      variant="outline"
+                      className="bg-white border-purple-500 text-purple-700 hover:bg-purple-50"
+                      onClick={() => {
+                        // Handle document upload functionality
+                        const fileInput = document.createElement('input');
+                        fileInput.type = 'file';
+                        fileInput.accept = '.pdf,.jpg,.jpeg,.png';
+                        fileInput.multiple = true;
+                        fileInput.onchange = (e) => handleFileInputChange(e as any);
+                        fileInput.click();
+                      }}
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      Upload Documents
+                    </Button>
+                  </div>
+                  
                   <Button 
-                    onClick={() => onSubmit(form.getValues())}
-                    disabled={isPending || !form.formState.isValid}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 border-none"
+                    onClick={() => setShowPreview(true)}
+                    disabled={!form.formState.isValid}
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
                   >
                     {isPending ? (
                       <span className="flex items-center">
@@ -762,7 +1002,7 @@ const SellingPage = () => {
                       </span>
                     ) : (
                       <span className="flex items-center">
-                        Create Listing <ArrowRight className="ml-2 h-4 w-4" />
+                        Review <Eye className="ml-2 h-4 w-4" />
                       </span>
                     )}
                   </Button>
