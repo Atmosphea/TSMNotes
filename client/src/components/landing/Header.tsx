@@ -112,9 +112,11 @@ const Header = () => {
           <Button 
             variant="ghost" 
             className="hidden sm:flex" 
-            onClick={() => scrollToSection("features")}
+            asChild
           >
-            Learn More
+            <Link href="/marketplace">
+              Marketplace
+            </Link>
           </Button>
           <Button 
             onClick={() => scrollToSection("cta")}

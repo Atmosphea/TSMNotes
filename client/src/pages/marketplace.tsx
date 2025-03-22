@@ -65,7 +65,7 @@ export default function MarketplacePage() {
   const noteListings = data?.data || [];
 
   // Properties for filtering
-  const propertyTypes = [...new Set(noteListings.map(listing => listing.propertyType))];
+  const propertyTypes = Array.from(new Set(noteListings.map(listing => listing.propertyType)));
   
   // Filter and sort the listings
   const filteredListings = noteListings
@@ -307,10 +307,11 @@ export default function MarketplacePage() {
             <Pagination className="mt-8">
               <PaginationContent>
                 <PaginationItem>
-                  <PaginationPrevious 
-                    onClick={() => setPage(p => Math.max(1, p - 1))} 
-                    disabled={page === 1}
-                  />
+                  {page > 1 ? (
+                    <PaginationPrevious onClick={() => setPage(p => Math.max(1, p - 1))} />
+                  ) : (
+                    <PaginationPrevious className="pointer-events-none opacity-50" />
+                  )}
                 </PaginationItem>
                 
                 {Array.from({ length: totalPages }).map((_, i) => {
@@ -345,10 +346,11 @@ export default function MarketplacePage() {
                 })}
                 
                 <PaginationItem>
-                  <PaginationNext 
-                    onClick={() => setPage(p => Math.min(totalPages, p + 1))} 
-                    disabled={page === totalPages}
-                  />
+                  {page < totalPages ? (
+                    <PaginationNext onClick={() => setPage(p => Math.min(totalPages, p + 1))} />
+                  ) : (
+                    <PaginationNext className="pointer-events-none opacity-50" />
+                  )}
                 </PaginationItem>
               </PaginationContent>
             </Pagination>
