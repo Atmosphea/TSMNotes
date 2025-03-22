@@ -105,10 +105,16 @@ export default function MarketplacePage() {
     other: ["Promissory Notes", "Commercial and Industrial (C&I) Loans", "Equipment Loans", "Consumer Loans"]
   };
   
+  // Use a local loading state for the animations
+  const [isFiltering, setIsFiltering] = useState(false);
+  
   // Fetch note listings from the API
-  const { data, isLoading, error } = useQuery<{ success: boolean; data: NoteListing[] }>({
+  const { data, isLoading: apiLoading, error } = useQuery<{ success: boolean; data: NoteListing[] }>({
     queryKey: ["/api/note-listings"],
   });
+  
+  // Combined loading state (API loading or filtering animation)
+  const isLoading = apiLoading || isFiltering;
   
   // Get note listings from the data
   const noteListings = data?.data || [];
@@ -116,11 +122,19 @@ export default function MarketplacePage() {
   // Properties for filtering
   const propertyTypes = Array.from(new Set(noteListings.map(listing => listing.propertyType)));
   
-  // Handle advanced filter application
+  // Handle advanced filter application with animated transition
   const handleApplyFilters = (filters: FilterState) => {
-    setAdvancedFilters(filters);
-    // Reset to first page when applying new filters
-    setPage(1);
+    // Activate loading state to show animation
+    setIsLoading(true);
+    
+    // Use setTimeout to create a smooth visual transition
+    setTimeout(() => {
+      setAdvancedFilters(filters);
+      // Reset to first page when applying new filters
+      setPage(1);
+      // Deactivate loading state
+      setIsLoading(false);
+    }, 800); // Short delay for visual effect
   };
   
   // Filter and sort the listings
@@ -253,8 +267,18 @@ export default function MarketplacePage() {
                 type="search"
                 value={searchQuery}
                 onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setPage(1); // Reset to first page when searching
+                  // If significant change in search (more than just typing), show animation
+                  if (searchQuery.length === 0 || e.target.value.length === 0) {
+                    setIsLoading(true);
+                    setTimeout(() => {
+                      setSearchQuery(e.target.value);
+                      setPage(1); // Reset to first page when searching
+                      setIsLoading(false);
+                    }, 400);
+                  } else {
+                    setSearchQuery(e.target.value);
+                    setPage(1); // Reset to first page when searching
+                  }
                 }}
               />
             </div>
@@ -883,10 +907,39 @@ export default function MarketplacePage() {
             </form>
           </div>
           
-          {/* Loading state */}
+          {/* Loading state with enhanced animations */}
           {isLoading && (
-            <div className="flex justify-center my-12">
-              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <div className="flex flex-col items-center justify-center my-12">
+              <div className="w-12 h-12 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl">
+                {[1, 2, 3, 4, 5, 6].map((placeholder) => (
+                  <div 
+                    key={placeholder}
+                    className="rounded-lg bg-gray-800/20 h-[300px] animate-filterLoading"
+                    style={{ 
+                      animationDelay: `${placeholder * 100}ms`
+                    }}
+                  >
+                    <div className="h-full flex flex-col p-6">
+                      <div className="h-6 w-24 bg-gray-700/30 rounded mb-3"></div>
+                      <div className="h-4 w-full bg-gray-700/30 rounded mb-6"></div>
+                      <div className="flex justify-between mb-4">
+                        <div className="h-8 w-24 bg-gray-700/30 rounded"></div>
+                        <div className="h-6 w-14 bg-gray-700/30 rounded"></div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 mt-2">
+                        <div className="h-12 bg-gray-700/30 rounded"></div>
+                        <div className="h-12 bg-gray-700/30 rounded"></div>
+                        <div className="h-12 bg-gray-700/30 rounded"></div>
+                        <div className="h-12 bg-gray-700/30 rounded"></div>
+                      </div>
+                      <div className="mt-auto">
+                        <div className="h-10 w-full bg-gray-700/30 rounded-md mt-4"></div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
           
@@ -909,10 +962,18 @@ export default function MarketplacePage() {
             </div>
           )}
           
-          {/* Note listings grid */}
+          {/* Note listings grid with animated transitions */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {displayedListings.map((listing) => (
-              <Card key={listing.id} className="transition-all duration-300 hover:shadow-xl group relative hover:border-purple-400 hover:scale-[1.02] overflow-hidden">
+            {displayedListings.map((listing, index) => (
+              <Card 
+                key={listing.id} 
+                className="transition-all duration-500 hover:shadow-xl group relative hover:border-purple-400 hover:scale-[1.02] overflow-hidden animate-fadeIn"
+                style={{ 
+                  animationDelay: `${index * 100}ms`,
+                  opacity: 0,
+                  transform: 'translateY(20px)'
+                }}
+              >
                 <Link href={`/note/${listing.id}`} className="absolute inset-0 z-10">
                   <span className="sr-only">View details for {listing.propertyAddress}</span>
                 </Link>
