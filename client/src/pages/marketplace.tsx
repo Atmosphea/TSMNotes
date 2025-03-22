@@ -98,6 +98,9 @@ export default function MarketplacePage() {
   // Property type tab states
   const [activePropertyTab, setActivePropertyTab] = useState<"realEstate" | "business" | "other">("realEstate");
   
+  // Filter toggle state
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
+  
   // Property type category mapping
   const propertyTypeCategories = {
     realEstate: ["Residential Mortgages", "Commercial Mortgages", "Land Contracts"],
@@ -307,8 +310,27 @@ export default function MarketplacePage() {
             </div>
           </div>
           
-          {/* Interactive Filter Panel */}
-          <div className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-gray-900 to-purple-900 border border-purple-500/20 shadow-lg">
+          {/* Collapsible Filter Panel with Gradient Header */}
+          <div className="mb-8 rounded-2xl overflow-hidden border border-purple-500/20 shadow-lg">
+            {/* Gradient Filter Toggle Header */}
+            <div 
+              className={`bg-gradient-to-r from-purple-800 to-purple-900 transition-all duration-300 ease-in-out cursor-pointer flex items-center justify-between px-6 ${isFilterVisible ? "py-4" : "py-2.5 hover:py-5"}`}
+              onClick={() => setIsFilterVisible(!isFilterVisible)}
+            >
+              <div className="flex items-center gap-2">
+                <Filter className="h-5 w-5 text-white" />
+                <h3 className="font-medium text-white">Filter Notes</h3>
+              </div>
+              <div className={`transition-transform duration-300 ${isFilterVisible ? "rotate-180" : ""}`}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </div>
+            </div>
+            
+            {/* Filter Content - Collapsible */}
+            <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isFilterVisible ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"} bg-gradient-to-br from-gray-900 to-purple-900 p-0`}>
+              <div className="p-6">
             <form onSubmit={(e) => {
               e.preventDefault();
               // Create a new filter object from the local state
