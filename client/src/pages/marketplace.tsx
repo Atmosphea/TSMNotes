@@ -1,64 +1,61 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useLocation } from "wouter";
-import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Button } from "@/components/ui/button";
-import { Filter, X } from "lucide-react";
-import {
+import { Link } from "wouter";
+import { 
   Breadcrumb,
-  BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
+  BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator
 } from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle
+import { 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardDescription, 
+  CardContent, 
+  CardFooter 
 } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DollarSign, Filter as FilterIcon, Search, X as XIcon } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { ScrollBar } from "@/components/ui/scroll-area";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { type NoteListing } from "@shared/schema";
-import { FilterModal, FilterDrawer, FilterState } from "@/components/marketplace";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { 
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
-
+import { type NoteListing } from "@shared/schema";
+import { FilterModal, FilterDrawer, FilterState } from "@/components/marketplace";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  Filter,
+  Search,
+  Building2,
+  GalleryHorizontalEnd,
+  Calendar,
+  DollarSign,
+  Percent,
+  ArrowUpDown,
+  MoreVertical,
+  X
+} from "lucide-react";
 
 export default function MarketplacePage() {
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const isMobile = useIsMobile();
   const [page, setPage] = useState(1);
   const [sortBy, setSortBy] = useState<string>("newest");
@@ -66,25 +63,25 @@ export default function MarketplacePage() {
   const [advancedFilters, setAdvancedFilters] = useState<FilterState | null>(null);
   const [activeFilterCount, setActiveFilterCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
-
+  
   // Fetch note listings from the API
   const { data, isLoading, error } = useQuery<{ success: boolean; data: NoteListing[] }>({
     queryKey: ["/api/note-listings"],
   });
-
+  
   // Get note listings from the data
   const noteListings = data?.data || [];
 
   // Properties for filtering
   const propertyTypes = Array.from(new Set(noteListings.map(listing => listing.propertyType)));
-
+  
   // Handle advanced filter application
   const handleApplyFilters = (filters: FilterState) => {
     setAdvancedFilters(filters);
     // Reset to first page when applying new filters
     setPage(1);
   };
-
+  
   // Filter and sort the listings
   const filteredListings = noteListings
     .filter(listing => {
@@ -92,26 +89,26 @@ export default function MarketplacePage() {
       if (filterPropertyType && listing.propertyType !== filterPropertyType) {
         return false;
       }
-
+      
       // Search query filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
-        const matchesSearch =
+        const matchesSearch = 
           listing.propertyAddress.toLowerCase().includes(query) ||
           listing.propertyType.toLowerCase().includes(query) ||
           listing.description?.toLowerCase().includes(query);
-
+        
         if (!matchesSearch) return false;
       }
-
+      
       // Advanced filters
       if (advancedFilters) {
         // Property type filter from advanced filters
-        if (advancedFilters.property_type.length > 0 &&
-          !advancedFilters.property_type.includes(listing.propertyType)) {
+        if (advancedFilters.property_type.length > 0 && 
+            !advancedFilters.property_type.includes(listing.propertyType)) {
           return false;
         }
-
+        
         // Note status filter
         if (advancedFilters.note_status.length > 0) {
           const status = listing.status === 'active' ? 'Performing' : 'Non-Performing';
@@ -119,7 +116,7 @@ export default function MarketplacePage() {
             return false;
           }
         }
-
+        
         // Price range filter
         if (advancedFilters.price_min !== '' && listing.askingPrice < advancedFilters.price_min) {
           return false;
@@ -127,7 +124,7 @@ export default function MarketplacePage() {
         if (advancedFilters.price_max !== '' && listing.askingPrice > advancedFilters.price_max) {
           return false;
         }
-
+        
         // Interest rate filter
         if (advancedFilters.interest_rate_min !== '' && listing.interestRate < advancedFilters.interest_rate_min) {
           return false;
@@ -135,14 +132,14 @@ export default function MarketplacePage() {
         if (advancedFilters.interest_rate_max !== '' && listing.interestRate > advancedFilters.interest_rate_max) {
           return false;
         }
-
+        
         // Location state filter
-        if (advancedFilters.location_state &&
-          !listing.propertyAddress.includes(advancedFilters.location_state)) {
+        if (advancedFilters.location_state && 
+            !listing.propertyAddress.includes(advancedFilters.location_state)) {
           return false;
         }
       }
-
+      
       return true;
     })
     .sort((a, b) => {
@@ -161,7 +158,7 @@ export default function MarketplacePage() {
       }
       return 0;
     });
-
+    
   // Pagination logic
   const itemsPerPage = 9;
   const totalPages = Math.ceil(filteredListings.length / itemsPerPage);
@@ -169,11 +166,11 @@ export default function MarketplacePage() {
     (page - 1) * itemsPerPage,
     page * itemsPerPage
   );
-
+  
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-
+      
       <main className="flex-1">
         <div className="container px-4 py-12 mx-auto max-w-7xl">
           {/* Breadcrumb */}
@@ -188,7 +185,7 @@ export default function MarketplacePage() {
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-
+          
           {/* Page Title */}
           <div className="mb-10 text-center">
             <h1 className="mb-3 text-4xl font-bold tracking-tight lg:text-5xl">
@@ -201,13 +198,13 @@ export default function MarketplacePage() {
               Each listing is thoroughly verified for authenticity and performance.
             </p>
           </div>
-
+          
           {/* Filters and Search */}
           <div className="flex flex-col gap-4 mb-8 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-col gap-4 md:flex-row md:items-center">
               {/* Advanced Filter Component - Use either modal or drawer based on screen size */}
               {isMobile ? (
-                <FilterDrawer
+                <FilterDrawer 
                   onApplyFilters={(filters) => {
                     handleApplyFilters(filters);
                     // Count active filters
@@ -224,7 +221,7 @@ export default function MarketplacePage() {
                   buttonVariant="outline"
                 />
               ) : (
-                <FilterModal
+                <FilterModal 
                   onApplyFilters={(filters) => {
                     handleApplyFilters(filters);
                     // Count active filters
@@ -241,53 +238,53 @@ export default function MarketplacePage() {
                   buttonVariant="outline"
                 />
               )}
-
+              
               {/* Active Filter Badges */}
               {activeFilterCount > 0 && (
                 <div className="flex flex-wrap gap-2 items-center">
                   <Badge variant="outline" className="flex items-center gap-1 bg-gray-100">
                     <span>{activeFilterCount} active filters</span>
-                    <Button
-                      variant="ghost"
-                      size="icon"
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
                       className="h-4 w-4 rounded-full p-0 text-gray-500 hover:bg-gray-200"
                       onClick={() => {
                         setAdvancedFilters(null);
                         setActiveFilterCount(0);
                       }}
                     >
-                      <XIcon className="h-3 w-3" />
+                      <X className="h-3 w-3" />
                       <span className="sr-only">Clear all filters</span>
                     </Button>
                   </Badge>
-
+                  
                   {filterPropertyType && (
                     <Badge variant="outline" className="flex items-center gap-1 bg-gray-100">
                       <span>Type: {filterPropertyType}</span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
                         className="h-4 w-4 rounded-full p-0 text-gray-500 hover:bg-gray-200"
                         onClick={() => setFilterPropertyType(null)}
                       >
-                        <XIcon className="h-3 w-3" />
+                        <X className="h-3 w-3" />
                         <span className="sr-only">Clear property type filter</span>
                       </Button>
                     </Badge>
                   )}
                 </div>
               )}
-
+              
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="w-full md:w-auto">
                     <ArrowUpDown className="w-4 h-4 mr-2" />
-                    Sort: {sortBy === "newest" ? "Newest First" :
-                        sortBy === "oldest" ? "Oldest First" :
-                          sortBy === "priceHigh" ? "Price (High to Low)" :
-                            sortBy === "priceLow" ? "Price (Low to High)" :
-                              sortBy === "yieldHigh" ? "Yield (High to Low)" :
-                                "Yield (Low to High)"}
+                    Sort: {sortBy === "newest" ? "Newest First" : 
+                           sortBy === "oldest" ? "Oldest First" : 
+                           sortBy === "priceHigh" ? "Price (High to Low)" : 
+                           sortBy === "priceLow" ? "Price (Low to High)" :
+                           sortBy === "yieldHigh" ? "Yield (High to Low)" :
+                           "Yield (Low to High)"}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-56">
@@ -314,7 +311,7 @@ export default function MarketplacePage() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-
+            
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
@@ -329,14 +326,14 @@ export default function MarketplacePage() {
               />
             </div>
           </div>
-
+          
           {/* Loading state */}
           {isLoading && (
             <div className="flex justify-center my-12">
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             </div>
           )}
-
+          
           {/* Error state */}
           {error && (
             <div className="p-8 text-center">
@@ -345,7 +342,7 @@ export default function MarketplacePage() {
               </p>
             </div>
           )}
-
+          
           {/* No results state */}
           {!isLoading && displayedListings.length === 0 && (
             <div className="p-8 text-center">
@@ -355,7 +352,7 @@ export default function MarketplacePage() {
               </p>
             </div>
           )}
-
+          
           {/* Note listings grid */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {displayedListings.map((listing) => (
@@ -394,7 +391,7 @@ export default function MarketplacePage() {
                     </div>
                   </div>
                   <CardDescription className="text-sm truncate">{listing.propertyAddress}</CardDescription>
-
+                  
                   <div className="grid grid-cols-2 gap-4 mt-4">
                     <div className="flex items-center">
                       <Percent className="w-4 h-4 mr-2 text-muted-foreground" />
@@ -436,7 +433,7 @@ export default function MarketplacePage() {
               </Card>
             ))}
           </div>
-
+          
           {/* Pagination */}
           {totalPages > 1 && (
             <Pagination className="mt-8">
@@ -448,7 +445,7 @@ export default function MarketplacePage() {
                     <PaginationPrevious className="pointer-events-none opacity-50" />
                   )}
                 </PaginationItem>
-
+                
                 {Array.from({ length: totalPages }).map((_, i) => {
                   const pageNumber = i + 1;
                   // Only show the first, last, and pages around the current one
@@ -479,7 +476,7 @@ export default function MarketplacePage() {
                   }
                   return null;
                 })}
-
+                
                 <PaginationItem>
                   {page < totalPages ? (
                     <PaginationNext onClick={() => setPage(p => Math.min(totalPages, p + 1))} />
@@ -490,7 +487,7 @@ export default function MarketplacePage() {
               </PaginationContent>
             </Pagination>
           )}
-
+          
           {/* Call-to-action for sellers */}
           <div className="p-8 mt-12 text-center rounded-lg bg-muted">
             <h2 className="mb-3 text-2xl font-bold">Have notes to sell?</h2>
@@ -505,7 +502,7 @@ export default function MarketplacePage() {
           </div>
         </div>
       </main>
-
+      
       <Footer />
     </div>
   );
