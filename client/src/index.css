@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    --primary-rgb: 142, 53, 239;
+    --primary-rgb: 47, 112, 233;
   }
   
   * {
@@ -15,14 +15,12 @@
 
   body {
     @apply font-sans antialiased text-foreground;
-    background: linear-gradient(to bottom, #f5f5f5, #e8e8e8);
+    background: linear-gradient(to bottom, #1a1a1a, #2a2a2a);
     min-height: 100vh;
-    color: #333333;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif;
-    color: #222222;
   }
   
   section {
@@ -32,11 +30,11 @@
 
 @layer components {
   .section-title {
-    @apply font-serif text-3xl font-bold text-left text-gray-800;
+    @apply font-serif text-3xl font-bold text-left text-gray-100;
   }
   
   .section-description {
-    @apply mt-3 text-lg text-gray-600 text-left;
+    @apply mt-3 text-lg text-gray-300 text-left;
   }
   
   .accent-border {
@@ -48,24 +46,24 @@
   }
   
   .gradient-bg-dark {
-    background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+    background: linear-gradient(135deg, #262626 0%, #1a1a1a 100%);
   }
   
   .gradient-bg-darker {
-    background: linear-gradient(135deg, #e5e5e5 0%, #d5d5d5 100%);
+    background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
   }
   
   .gradient-bg-light {
-    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+    background: linear-gradient(135deg, #323232 0%, #222222 100%);
   }
   
   .glass-card {
-    @apply backdrop-blur-md bg-white/90 border border-gray-200 rounded-lg shadow-sm opacity-0;
+    @apply backdrop-blur-md bg-white/5 border border-white/10 rounded-lg opacity-0;
     animation: fadeIn 0.8s ease-out forwards;
   }
   
   .process-card {
-    @apply glass-card p-6 transition-all duration-300 hover:bg-purple-50;
+    @apply glass-card p-6 transition-all duration-300 hover:bg-white/10;
     animation-delay: calc(var(--card-index, 0) * 0.15s);
   }
   
@@ -104,7 +102,7 @@
   }
   
   .category-title {
-    @apply font-serif text-2xl font-black text-gray-800;
+    @apply font-serif text-2xl font-black text-gray-100;
   }
   
   .process-step-card {
@@ -236,18 +234,18 @@
   
   /* Gradient backgrounds */
   .bg-gradient-hero {
-    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+    background: linear-gradient(135deg, #10101a 0%, #1e1e2d 100%);
   }
   
   .bg-gradient-card {
-    background: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+    background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
   }
   
   /* Glass effect - stronger version */
   .glass-effect {
     backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid rgba(142, 53, 239, 0.1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   }
 }
