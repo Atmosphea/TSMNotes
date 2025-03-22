@@ -125,7 +125,7 @@ export default function MarketplacePage() {
   // Handle advanced filter application with animated transition
   const handleApplyFilters = (filters: FilterState) => {
     // Activate loading state to show animation
-    setIsLoading(true);
+    setIsFiltering(true);
     
     // Use setTimeout to create a smooth visual transition
     setTimeout(() => {
@@ -133,7 +133,7 @@ export default function MarketplacePage() {
       // Reset to first page when applying new filters
       setPage(1);
       // Deactivate loading state
-      setIsLoading(false);
+      setIsFiltering(false);
     }, 800); // Short delay for visual effect
   };
   
@@ -269,11 +269,11 @@ export default function MarketplacePage() {
                 onChange={(e) => {
                   // If significant change in search (more than just typing), show animation
                   if (searchQuery.length === 0 || e.target.value.length === 0) {
-                    setIsLoading(true);
+                    setIsFiltering(true);
                     setTimeout(() => {
                       setSearchQuery(e.target.value);
                       setPage(1); // Reset to first page when searching
-                      setIsLoading(false);
+                      setIsFiltering(false);
                     }, 400);
                   } else {
                     setSearchQuery(e.target.value);
@@ -288,7 +288,14 @@ export default function MarketplacePage() {
               <select 
                 className="px-2 py-1 border rounded-md text-sm bg-white"
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => {
+                  // Show animation when sorting changes
+                  setIsFiltering(true);
+                  setTimeout(() => {
+                    setSortBy(e.target.value as any);
+                    setIsFiltering(false);
+                  }, 300);
+                }}
               >
                 <option value="newest">Newest First</option>
                 <option value="oldest">Oldest First</option>
@@ -1068,7 +1075,13 @@ export default function MarketplacePage() {
               <PaginationContent>
                 <PaginationItem>
                   {page > 1 ? (
-                    <PaginationPrevious onClick={() => setPage(p => Math.max(1, p - 1))} />
+                    <PaginationPrevious onClick={() => {
+                      setIsFiltering(true);
+                      setTimeout(() => {
+                        setPage(p => Math.max(1, p - 1));
+                        setIsFiltering(false);
+                      }, 300);
+                    }} />
                   ) : (
                     <PaginationPrevious className="pointer-events-none opacity-50" />
                   )}
@@ -1086,7 +1099,13 @@ export default function MarketplacePage() {
                       <PaginationItem key={pageNumber}>
                         <PaginationLink
                           isActive={page === pageNumber}
-                          onClick={() => setPage(pageNumber)}
+                          onClick={() => {
+                            setIsFiltering(true);
+                            setTimeout(() => {
+                              setPage(pageNumber);
+                              setIsFiltering(false);
+                            }, 300);
+                          }}
                         >
                           {pageNumber}
                         </PaginationLink>
@@ -1107,7 +1126,13 @@ export default function MarketplacePage() {
                 
                 <PaginationItem>
                   {page < totalPages ? (
-                    <PaginationNext onClick={() => setPage(p => Math.min(totalPages, p + 1))} />
+                    <PaginationNext onClick={() => {
+                      setIsFiltering(true);
+                      setTimeout(() => {
+                        setPage(p => Math.min(totalPages, p + 1));
+                        setIsFiltering(false);
+                      }, 300);
+                    }} />
                   ) : (
                     <PaginationNext className="pointer-events-none opacity-50" />
                   )}
