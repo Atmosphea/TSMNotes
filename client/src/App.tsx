@@ -6,12 +6,14 @@ import NotFound from "@/pages/not-found";
 import LandingPage from "@/pages/landing";
 import MarketplacePage from "@/pages/marketplace";
 import NoteDetailPage from "@/pages/note-detail";
+import SellingPage from "@/pages/selling";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={LandingPage} />
       <Route path="/marketplace" component={MarketplacePage} />
+      <Route path="/selling" component={SellingPage} />
       <Route path="/note/:id" component={NoteDetailPage} />
       <Route component={NotFound} />
     </Switch>
