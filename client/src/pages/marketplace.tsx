@@ -199,7 +199,7 @@ export default function MarketplacePage() {
             </p>
           </div>
           
-          {/* Filters and Search */}
+          {/* Filters and Search Bar */}
           <div className="flex flex-col gap-4 mb-8 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-col gap-4 md:flex-row md:items-center">
               {/* Advanced Filter Component - Use either modal or drawer based on screen size */}
@@ -327,6 +327,178 @@ export default function MarketplacePage() {
             </div>
           </div>
           
+          {/* Standalone Filter Panel */}
+          <div className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-gray-900 to-purple-900 border border-purple-500/20 shadow-lg">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <div>
+                <p className="text-white text-sm font-medium mb-1">Loan Amount</p>
+                <div className="flex justify-between">
+                  <div>
+                    <p className="text-gray-300 text-xs">Min</p>
+                    <p className="text-white font-bold text-2xl">
+                      {advancedFilters?.original_amount_min || 0}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-300 text-xs">Max</p>
+                    <p className="text-white font-bold text-2xl">
+                      {advancedFilters?.original_amount_max || 160000}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <p className="text-white text-sm font-medium mb-1">Interest Rate</p>
+                <div className="flex justify-between">
+                  <div>
+                    <p className="text-gray-300 text-xs">Min %</p>
+                    <p className="text-white font-bold text-2xl">
+                      {advancedFilters?.interest_rate_min || 0}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-300 text-xs">Max %</p>
+                    <p className="text-white font-bold text-2xl">
+                      {advancedFilters?.interest_rate_max || 16}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <p className="text-white text-sm font-medium mb-1">Loan Term</p>
+                <div className="flex justify-between">
+                  <div>
+                    <p className="text-gray-300 text-xs">Min Years</p>
+                    <p className="text-white font-bold text-2xl">
+                      {advancedFilters?.loan_term_years_min || 0}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-300 text-xs">Max Years</p>
+                    <p className="text-white font-bold text-2xl">
+                      {advancedFilters?.loan_term_years_max || 16}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <p className="text-white text-sm font-medium mb-1">Asking Price</p>
+                <div className="flex justify-between">
+                  <div>
+                    <p className="text-gray-300 text-xs">Min $</p>
+                    <p className="text-white font-bold text-2xl">
+                      {advancedFilters?.price_min || 0}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-300 text-xs">Max $</p>
+                    <p className="text-white font-bold text-2xl">
+                      {advancedFilters?.price_max || 160000}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-white text-sm font-medium">Yield Range</p>
+                  <p className="text-xs text-gray-300">
+                    {advancedFilters?.interest_rate_min || 0}% - {advancedFilters?.interest_rate_max || 24}%
+                  </p>
+                </div>
+                <div className="h-1 bg-gray-700 rounded-full">
+                  <div 
+                    className="h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" 
+                    style={{ width: '75%' }}
+                  ></div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-white text-sm font-medium">Price Range</p>
+                  <p className="text-xs text-gray-300">
+                    ${advancedFilters?.price_min || 0} - ${advancedFilters?.price_max || 160000}
+                  </p>
+                </div>
+                <div className="h-1 bg-gray-700 rounded-full">
+                  <div 
+                    className="h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" 
+                    style={{ width: '65%' }}
+                  ></div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-white text-sm font-medium">Term Range</p>
+                  <p className="text-xs text-gray-300">
+                    {advancedFilters?.loan_term_years_min || 0} - {advancedFilters?.loan_term_years_max || 30} years
+                  </p>
+                </div>
+                <div className="h-1 bg-gray-700 rounded-full">
+                  <div 
+                    className="h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" 
+                    style={{ width: '50%' }}
+                  ></div>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-white text-sm font-medium">LTV Ratio</p>
+                  <p className="text-xs text-gray-300">
+                    {advancedFilters?.loan_to_value_ratio_min || 0}% - {advancedFilters?.loan_to_value_ratio_max || 95}%
+                  </p>
+                </div>
+                <div className="h-1 bg-gray-700 rounded-full">
+                  <div 
+                    className="h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" 
+                    style={{ width: '85%' }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end mt-6">
+              <div className="flex items-center gap-2">
+                <Button
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-2 rounded-full shadow-lg"
+                  onClick={() => {
+                    if (isMobile) {
+                      const filterDrawerButton = document.querySelector('[aria-label="Filter"]');
+                      if (filterDrawerButton) {
+                        (filterDrawerButton as HTMLButtonElement).click();
+                      }
+                    } else {
+                      const filterModalButton = document.querySelector('[aria-label="Filter"]');
+                      if (filterModalButton) {
+                        (filterModalButton as HTMLButtonElement).click();
+                      }
+                    }
+                  }}
+                >
+                  Filter
+                </Button>
+                <div className="flex items-center">
+                  <input 
+                    type="checkbox" 
+                    id="email-notify" 
+                    className="mr-2 h-4 w-4 accent-purple-500"
+                  />
+                  <label htmlFor="email-notify" className="text-xs text-white">
+                    Email me when a match is found
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          
           {/* Loading state */}
           {isLoading && (
             <div className="flex justify-center my-12">
@@ -356,78 +528,89 @@ export default function MarketplacePage() {
           {/* Note listings grid */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {displayedListings.map((listing) => (
-              <Card key={listing.id} className="overflow-hidden transition-all duration-300 hover:shadow-xl group relative hover:border-primary hover:scale-[1.02]">
+              <Card key={listing.id} className="transition-all duration-300 hover:shadow-xl group relative hover:border-purple-400 hover:scale-[1.02] overflow-hidden">
                 <Link href={`/note/${listing.id}`} className="absolute inset-0 z-10">
                   <span className="sr-only">View details for {listing.propertyAddress}</span>
                 </Link>
-                <CardHeader className="p-0">
-                  <div className="relative aspect-video bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                    <Building2 className="w-16 h-16 text-white opacity-75" />
-                    <div className="absolute top-4 right-4">
-                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-background text-foreground">
-                        {listing.propertyType}
-                      </span>
+                
+                {/* Card Border Gradient */}
+                <div className="absolute inset-0 rounded-lg border border-purple-500/20 pointer-events-none"></div>
+                
+                {/* Card Header with Property Type Badge */}
+                <CardHeader className="pb-0">
+                  <div className="flex items-center justify-between">
+                    <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200 font-medium">
+                      {listing.propertyType}
+                    </Badge>
+                    <div className="flex space-x-1 relative z-20">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-gray-900">
+                        <span className="sr-only">More options</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="1"></circle>
+                          <circle cx="19" cy="12" r="1"></circle>
+                          <circle cx="5" cy="12" r="1"></circle>
+                        </svg>
+                      </Button>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <CardTitle className="text-xl">
+                
+                <CardContent className="p-6 pt-4">
+                  {/* Address */}
+                  <p className="text-sm text-gray-500 mb-2 truncate">{listing.propertyAddress}</p>
+                  
+                  {/* Price and Yield */}
+                  <div className="flex items-baseline justify-between mb-4">
+                    <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-700 to-pink-600 bg-clip-text text-transparent">
                       {formatCurrency(listing.askingPrice)}
-                    </CardTitle>
-                    <div className="flex space-x-1 relative z-20">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreVertical className="h-4 w-4" />
-                            <span className="sr-only">More</span>
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>Add to Watchlist</DropdownMenuItem>
-                          <DropdownMenuItem>Share</DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                    </h3>
+                    <div className="flex items-center text-green-600 font-medium">
+                      <span className="text-xs font-bold mr-1">YIELD</span>
+                      <span>{listing.interestRate}%</span>
                     </div>
                   </div>
-                  <CardDescription className="text-sm truncate">{listing.propertyAddress}</CardDescription>
                   
-                  <div className="grid grid-cols-2 gap-4 mt-4">
-                    <div className="flex items-center">
-                      <Percent className="w-4 h-4 mr-2 text-muted-foreground" />
-                      <div>
-                        <p className="text-xs text-muted-foreground">Interest Rate</p>
-                        <p className="font-medium">{listing.interestRate}%</p>
-                      </div>
+                  {/* Loan Stats */}
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-2">
+                    <div>
+                      <p className="text-xs text-gray-500">Original Amount</p>
+                      <p className="font-medium">{formatCurrency(listing.loanAmount)}</p>
                     </div>
-                    <div className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-2 text-muted-foreground" />
-                      <div>
-                        <p className="text-xs text-muted-foreground">Remaining Term</p>
-                        <p className="font-medium">{listing.remainingPayments} months</p>
-                      </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Monthly Payment</p>
+                      <p className="font-medium">{formatCurrency(listing.paymentAmount)}</p>
                     </div>
-                    <div className="flex items-center">
-                      <DollarSign className="w-4 h-4 mr-2 text-muted-foreground" />
-                      <div>
-                        <p className="text-xs text-muted-foreground">Payment</p>
-                        <p className="font-medium">{formatCurrency(listing.paymentAmount)}</p>
-                      </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Term</p>
+                      <p className="font-medium">{Math.floor(listing.loanTerm / 12)} years</p>
                     </div>
-                    <div className="flex items-center">
-                      <GalleryHorizontalEnd className="w-4 h-4 mr-2 text-muted-foreground" />
-                      <div>
-                        <p className="text-xs text-muted-foreground">Time Held</p>
-                        <p className="font-medium">{listing.timeHeld} months</p>
+                    <div>
+                      <p className="text-xs text-gray-500">Payments Left</p>
+                      <p className="font-medium">{listing.remainingPayments}</p>
+                    </div>
+                  </div>
+                  
+                  {/* Performance Indicator */}
+                  <div className="mt-5 pt-4 border-t border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="h-2 w-2 rounded-full bg-green-500 mr-2"></div>
+                        <p className="text-xs font-medium text-green-700">Performing</p>
+                      </div>
+                      <div className="flex items-center text-gray-500 text-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        <span>{listing.timeHeld} months held</span>
                       </div>
                     </div>
                   </div>
                 </CardContent>
-                <CardFooter className="p-6 pt-0">
-                  <Button asChild className="w-full relative z-20">
-                    <Link href={`/note/${listing.id}`}>
-                      View Details
-                    </Link>
+                
+                <CardFooter className="pt-0 pb-4 px-6">
+                  <Button className="w-full relative z-20 bg-gradient-to-r from-purple-600 to-purple-800 hover:from-purple-700 hover:to-purple-900 text-white">
+                    View Investment Details
                   </Button>
                 </CardFooter>
               </Card>
