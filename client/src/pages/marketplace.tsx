@@ -227,7 +227,10 @@ export default function MarketplacePage() {
           {/* Note listings grid */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {displayedListings.map((listing) => (
-              <Card key={listing.id} className="overflow-hidden transition-all duration-300 hover:shadow-lg">
+              <Card key={listing.id} className="overflow-hidden transition-all duration-300 hover:shadow-xl group relative hover:border-primary hover:scale-[1.02]">
+                <Link href={`/note/${listing.id}`} className="absolute inset-0 z-10">
+                  <span className="sr-only">View details for {listing.propertyAddress}</span>
+                </Link>
                 <CardHeader className="p-0">
                   <div className="relative aspect-video bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
                     <Building2 className="w-16 h-16 text-white opacity-75" />
@@ -243,7 +246,7 @@ export default function MarketplacePage() {
                     <CardTitle className="text-xl">
                       {formatCurrency(listing.askingPrice)}
                     </CardTitle>
-                    <div className="flex space-x-1">
+                    <div className="flex space-x-1 relative z-20">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -292,7 +295,7 @@ export default function MarketplacePage() {
                   </div>
                 </CardContent>
                 <CardFooter className="p-6 pt-0">
-                  <Button asChild className="w-full">
+                  <Button asChild className="w-full relative z-20">
                     <Link href={`/note/${listing.id}`}>
                       View Details
                     </Link>

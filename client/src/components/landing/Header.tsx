@@ -161,6 +161,9 @@ const Header = () => {
           >
             FAQ
           </button>
+          <Link href="/marketplace" onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-primary">
+            Marketplace
+          </Link>
           <Button
             onClick={() => scrollToSection("cta")}
             className="w-full mt-2 bg-primary hover:bg-primary/90"
