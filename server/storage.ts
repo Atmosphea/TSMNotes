@@ -2,7 +2,9 @@ import {
   users, 
   waitlistEntries, 
   messages, 
-  notes, 
+  notes,
+  noteListings,
+  noteDocuments,
   type User, 
   type InsertUser, 
   type WaitlistEntry, 
@@ -10,7 +12,11 @@ import {
   type Message,
   type InsertMessage,
   type Note,
-  type InsertNote
+  type InsertNote,
+  type NoteListing,
+  type InsertNoteListing,
+  type NoteDocument,
+  type InsertNoteDocument
 } from "@shared/schema";
 
 // modify the interface with any CRUD methods
@@ -22,6 +28,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined>;
   
   // Waitlist operations
   createWaitlistEntry(entry: InsertWaitlistEntry): Promise<WaitlistEntry>;
@@ -32,7 +39,20 @@ export interface IStorage {
   createMessage(message: InsertMessage): Promise<Message>;
   getMessagesByUserId(userId: number): Promise<Message[]>;
   
-  // Note operations
+  // Note Listing operations
+  createNoteListing(listing: InsertNoteListing): Promise<NoteListing>;
+  getNoteListingById(id: number): Promise<NoteListing | undefined>;
+  getNoteListingsBySellerId(sellerId: number): Promise<NoteListing[]>;
+  getAllNoteListings(): Promise<NoteListing[]>;
+  updateNoteListing(id: number, listing: Partial<InsertNoteListing>): Promise<NoteListing | undefined>;
+  deleteNoteListing(id: number): Promise<boolean>;
+  
+  // Note Document operations
+  createNoteDocument(document: InsertNoteDocument): Promise<NoteDocument>;
+  getNoteDocumentsByListingId(noteListingId: number): Promise<NoteDocument[]>;
+  deleteNoteDocument(id: number): Promise<boolean>;
+  
+  // Legacy Note operations
   createNote(note: InsertNote): Promise<Note>;
   getNoteById(id: number): Promise<Note | undefined>;
   getNotesByUserId(userId: number): Promise<Note[]>;
@@ -45,20 +65,30 @@ export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private waitlistEntries: Map<number, WaitlistEntry>;
   private messages: Map<number, Message>;
-  private notes: Map<number, Note>;
+  private noteListings: Map<number, NoteListing>;
+  private noteDocuments: Map<number, NoteDocument>;
+  private notes: Map<number, Note>; // Legacy
+  
   private currentUserId: number;
   private currentWaitlistEntryId: number;
   private currentMessageId: number;
+  private currentNoteListingId: number;
+  private currentNoteDocumentId: number;
   private currentNoteId: number;
 
   constructor() {
     this.users = new Map();
     this.waitlistEntries = new Map();
     this.messages = new Map();
+    this.noteListings = new Map();
+    this.noteDocuments = new Map();
     this.notes = new Map();
+    
     this.currentUserId = 1;
     this.currentWaitlistEntryId = 1;
     this.currentMessageId = 1;
+    this.currentNoteListingId = 1;
+    this.currentNoteDocumentId = 1;
     this.currentNoteId = 1;
   }
 
@@ -89,10 +119,28 @@ export class MemStorage implements IStorage {
       firstName: insertUser.firstName || null,
       lastName: insertUser.lastName || null,
       role: insertUser.role || 'user',
+      phone: insertUser.phone || null,
+      company: insertUser.company || null,
       createdAt: new Date() 
     };
     this.users.set(id, user);
     return user;
+  }
+  
+  async updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined> {
+    const existingUser = this.users.get(id);
+    
+    if (!existingUser) {
+      return undefined;
+    }
+    
+    const updatedUser: User = {
+      ...existingUser,
+      ...user
+    };
+    
+    this.users.set(id, updatedUser);
+    return updatedUser;
   }
   
   // Waitlist operations
@@ -181,6 +229,77 @@ export class MemStorage implements IStorage {
   
   async deleteNote(id: number): Promise<boolean> {
     return this.notes.delete(id);
+  }
+  
+  // Note Listing operations
+  async createNoteListing(insertNoteListing: InsertNoteListing): Promise<NoteListing> {
+    const id = this.currentNoteListingId++;
+    const noteListing: NoteListing = {
+      ...insertNoteListing,
+      id,
+      status: 'active',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.noteListings.set(id, noteListing);
+    return noteListing;
+  }
+  
+  async getNoteListingById(id: number): Promise<NoteListing | undefined> {
+    return this.noteListings.get(id);
+  }
+  
+  async getNoteListingsBySellerId(sellerId: number): Promise<NoteListing[]> {
+    return Array.from(this.noteListings.values()).filter(
+      (listing) => listing.sellerId === sellerId
+    );
+  }
+  
+  async getAllNoteListings(): Promise<NoteListing[]> {
+    return Array.from(this.noteListings.values());
+  }
+  
+  async updateNoteListing(id: number, listing: Partial<InsertNoteListing>): Promise<NoteListing | undefined> {
+    const existingListing = this.noteListings.get(id);
+    
+    if (!existingListing) {
+      return undefined;
+    }
+    
+    const updatedListing: NoteListing = {
+      ...existingListing,
+      ...listing,
+      updatedAt: new Date()
+    };
+    
+    this.noteListings.set(id, updatedListing);
+    return updatedListing;
+  }
+  
+  async deleteNoteListing(id: number): Promise<boolean> {
+    return this.noteListings.delete(id);
+  }
+  
+  // Note Document operations
+  async createNoteDocument(insertDocument: InsertNoteDocument): Promise<NoteDocument> {
+    const id = this.currentNoteDocumentId++;
+    const document: NoteDocument = {
+      ...insertDocument,
+      id,
+      uploadedAt: new Date()
+    };
+    this.noteDocuments.set(id, document);
+    return document;
+  }
+  
+  async getNoteDocumentsByListingId(noteListingId: number): Promise<NoteDocument[]> {
+    return Array.from(this.noteDocuments.values()).filter(
+      (document) => document.noteListingId === noteListingId
+    );
+  }
+  
+  async deleteNoteDocument(id: number): Promise<boolean> {
+    return this.noteDocuments.delete(id);
   }
 }
 

@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, doublePrecision } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -9,7 +9,11 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   firstName: text("first_name"),
   lastName: text("last_name"),
+  // User can be "buyer", "seller", or both
   role: text("role").default('user'),
+  // Contact info for sellers
+  phone: text("phone"),
+  company: text("company"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -29,6 +33,42 @@ export const messages = pgTable("messages", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Updated to match our new requirements
+export const noteListings = pgTable("note_listings", {
+  id: serial("id").primaryKey(),
+  sellerId: integer("seller_id").notNull(),
+  
+  // Required fields from user request
+  loanAmount: doublePrecision("loan_amount").notNull(),
+  interestRate: doublePrecision("interest_rate").notNull(),
+  loanTerm: integer("loan_term").notNull(), // in months
+  paymentAmount: doublePrecision("payment_amount").notNull(),
+  timeHeld: integer("time_held").notNull(), // in months
+  remainingPayments: integer("remaining_payments").notNull(),
+  propertyAddress: text("property_address").notNull(),
+  
+  // Additional fields
+  askingPrice: doublePrecision("asking_price").notNull(),
+  propertyType: text("property_type").notNull(),
+  description: text("description"),
+  status: text("status").default('active').notNull(), // active, pending, sold
+  
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// For storing document URLs
+export const noteDocuments = pgTable("note_documents", {
+  id: serial("id").primaryKey(),
+  noteListingId: integer("note_listing_id").notNull(),
+  documentType: text("document_type").notNull(), // loan_application, credit_appraisal, title_report, note, payment_history
+  documentUrl: text("document_url").notNull(),
+  fileName: text("file_name").notNull(),
+  fileSize: integer("file_size").notNull(),
+  uploadedAt: timestamp("uploaded_at").defaultNow().notNull(),
+});
+
+// Keep the original notes table for backward compatibility
 export const notes = pgTable("notes", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
@@ -53,6 +93,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
   firstName: true,
   lastName: true,
   role: true,
+  phone: true,
+  company: true,
 });
 
 export const insertWaitlistEntrySchema = createInsertSchema(waitlistEntries).pick({
@@ -64,6 +106,28 @@ export const insertMessageSchema = createInsertSchema(messages).pick({
   senderId: true,
   receiverId: true,
   content: true,
+});
+
+export const insertNoteListingSchema = createInsertSchema(noteListings).pick({
+  sellerId: true,
+  loanAmount: true,
+  interestRate: true,
+  loanTerm: true,
+  paymentAmount: true,
+  timeHeld: true,
+  remainingPayments: true,
+  propertyAddress: true,
+  askingPrice: true,
+  propertyType: true,
+  description: true,
+});
+
+export const insertNoteDocumentSchema = createInsertSchema(noteDocuments).pick({
+  noteListingId: true,
+  documentType: true,
+  documentUrl: true,
+  fileName: true,
+  fileSize: true,
 });
 
 export const insertNoteSchema = createInsertSchema(notes).pick({
@@ -88,6 +152,12 @@ export type WaitlistEntry = typeof waitlistEntries.$inferSelect;
 
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type Message = typeof messages.$inferSelect;
+
+export type InsertNoteListing = z.infer<typeof insertNoteListingSchema>;
+export type NoteListing = typeof noteListings.$inferSelect;
+
+export type InsertNoteDocument = z.infer<typeof insertNoteDocumentSchema>;
+export type NoteDocument = typeof noteDocuments.$inferSelect;
 
 export type InsertNote = z.infer<typeof insertNoteSchema>;
 export type Note = typeof notes.$inferSelect;
