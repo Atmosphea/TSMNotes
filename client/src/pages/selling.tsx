@@ -978,7 +978,7 @@ const SellingPage = () => {
                         fileInput.type = 'file';
                         fileInput.accept = '.pdf,.jpg,.jpeg,.png';
                         fileInput.multiple = true;
-                        fileInput.onchange = (e) => handleFileInputChange(e as any);
+                        fileInput.onchange = handleFileInputChange;
                         fileInput.click();
                       }}
                     >
