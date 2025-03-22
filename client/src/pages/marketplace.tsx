@@ -64,6 +64,37 @@ export default function MarketplacePage() {
   const [activeFilterCount, setActiveFilterCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   
+  // Filter state variables
+  const [noteType, setNoteType] = useState("");
+  const [originalAmountMin, setOriginalAmountMin] = useState(0);
+  const [originalAmountMax, setOriginalAmountMax] = useState(160000);
+  const [currentAmountMin, setCurrentAmountMin] = useState(0);
+  const [currentAmountMax, setCurrentAmountMax] = useState(160000);
+  const [interestRateMin, setInterestRateMin] = useState(0);
+  const [interestRateMax, setInterestRateMax] = useState(16);
+  const [maturityDateStart, setMaturityDateStart] = useState("");
+  const [maturityDateEnd, setMaturityDateEnd] = useState("");
+  const [locationState, setLocationState] = useState("");
+  const [locationCity, setLocationCity] = useState("");
+  const [priceMin, setPriceMin] = useState(0);
+  const [priceMax, setPriceMax] = useState(160000);
+  const [selectedNoteStatus, setSelectedNoteStatus] = useState<string[]>([]);
+  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
+  const [propertyZipCode, setPropertyZipCode] = useState("");
+  const [loanTermYearsMin, setLoanTermYearsMin] = useState(0);
+  const [loanTermYearsMax, setLoanTermYearsMax] = useState(16);
+  const [loanTermMonths, setLoanTermMonths] = useState(0);
+  const [isSecured, setIsSecured] = useState(false);
+  const [collateralType, setCollateralType] = useState("");
+  const [dateOfNoteStart, setDateOfNoteStart] = useState("");
+  const [dateOfNoteEnd, setDateOfNoteEnd] = useState("");
+  const [paymentFrequency, setPaymentFrequency] = useState("");
+  const [amortizationType, setAmortizationType] = useState("");
+  const [descriptionKeywords, setDescriptionKeywords] = useState("");
+  const [propertyCounty, setPropertyCounty] = useState("");
+  const [ltvRatioMin, setLtvRatioMin] = useState(0);
+  const [ltvRatioMax, setLtvRatioMax] = useState(95);
+  
   // Fetch note listings from the API
   const { data, isLoading, error } = useQuery<{ success: boolean; data: NoteListing[] }>({
     queryKey: ["/api/note-listings"],
@@ -199,123 +230,15 @@ export default function MarketplacePage() {
             </p>
           </div>
           
-          {/* Filters and Search Bar */}
+          {/* Search Bar and Sort */}
           <div className="flex flex-col gap-4 mb-8 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center">
-              {/* Advanced Filter Component - Use either modal or drawer based on screen size */}
-              {isMobile ? (
-                <FilterDrawer 
-                  onApplyFilters={(filters) => {
-                    handleApplyFilters(filters);
-                    // Count active filters
-                    let count = 0;
-                    Object.entries(filters).forEach(([_, value]) => {
-                      if (Array.isArray(value)) {
-                        if (value.length > 0) count++;
-                      } else if (value !== '' && value !== false) {
-                        count++;
-                      }
-                    });
-                    setActiveFilterCount(count);
-                  }}
-                  buttonVariant="outline"
-                />
-              ) : (
-                <FilterModal 
-                  onApplyFilters={(filters) => {
-                    handleApplyFilters(filters);
-                    // Count active filters
-                    let count = 0;
-                    Object.entries(filters).forEach(([_, value]) => {
-                      if (Array.isArray(value)) {
-                        if (value.length > 0) count++;
-                      } else if (value !== '' && value !== false) {
-                        count++;
-                      }
-                    });
-                    setActiveFilterCount(count);
-                  }}
-                  buttonVariant="outline"
-                />
-              )}
-              
-              {/* Active Filter Badges */}
-              {activeFilterCount > 0 && (
-                <div className="flex flex-wrap gap-2 items-center">
-                  <Badge variant="outline" className="flex items-center gap-1 bg-gray-100">
-                    <span>{activeFilterCount} active filters</span>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-4 w-4 rounded-full p-0 text-gray-500 hover:bg-gray-200"
-                      onClick={() => {
-                        setAdvancedFilters(null);
-                        setActiveFilterCount(0);
-                      }}
-                    >
-                      <X className="h-3 w-3" />
-                      <span className="sr-only">Clear all filters</span>
-                    </Button>
-                  </Badge>
-                  
-                  {filterPropertyType && (
-                    <Badge variant="outline" className="flex items-center gap-1 bg-gray-100">
-                      <span>Type: {filterPropertyType}</span>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-4 w-4 rounded-full p-0 text-gray-500 hover:bg-gray-200"
-                        onClick={() => setFilterPropertyType(null)}
-                      >
-                        <X className="h-3 w-3" />
-                        <span className="sr-only">Clear property type filter</span>
-                      </Button>
-                    </Badge>
-                  )}
-                </div>
-              )}
-              
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="w-full md:w-auto">
-                    <ArrowUpDown className="w-4 h-4 mr-2" />
-                    Sort: {sortBy === "newest" ? "Newest First" : 
-                           sortBy === "oldest" ? "Oldest First" : 
-                           sortBy === "priceHigh" ? "Price (High to Low)" : 
-                           sortBy === "priceLow" ? "Price (Low to High)" :
-                           sortBy === "yieldHigh" ? "Yield (High to Low)" :
-                           "Yield (Low to High)"}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56">
-                  <DropdownMenuLabel>Sort By</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setSortBy("newest")}>
-                    Newest First
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSortBy("oldest")}>
-                    Oldest First
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSortBy("priceHigh")}>
-                    Price (High to Low)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSortBy("priceLow")}>
-                    Price (Low to High)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSortBy("yieldHigh")}>
-                    Yield (High to Low)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSortBy("yieldLow")}>
-                    Yield (Low to High)
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <div className="relative w-full md:w-64">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.3-4.3"></path>
+              </svg>
               <input
-                className="pl-10 w-full md:w-64 h-10 rounded-md border border-input bg-background ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="pl-10 w-full h-10 rounded-md border border-input bg-background ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 placeholder="Search notes..."
                 type="search"
                 value={searchQuery}
@@ -325,178 +248,436 @@ export default function MarketplacePage() {
                 }}
               />
             </div>
+            
+            <div className="flex items-center gap-2">
+              <p className="text-sm text-gray-600 whitespace-nowrap">Sort by:</p>
+              <select 
+                className="px-2 py-1 border rounded-md text-sm bg-white"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+              >
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="priceHigh">Price (High to Low)</option>
+                <option value="priceLow">Price (Low to High)</option>
+                <option value="yieldHigh">Yield (High to Low)</option>
+                <option value="yieldLow">Yield (Low to High)</option>
+              </select>
+            </div>
           </div>
           
-          {/* Standalone Filter Panel */}
+          {/* Interactive Filter Panel */}
           <div className="mb-8 p-6 rounded-2xl bg-gradient-to-br from-gray-900 to-purple-900 border border-purple-500/20 shadow-lg">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div>
-                <p className="text-white text-sm font-medium mb-1">Loan Amount</p>
-                <div className="flex justify-between">
-                  <div>
-                    <p className="text-gray-300 text-xs">Min</p>
-                    <p className="text-white font-bold text-2xl">
-                      {advancedFilters?.original_amount_min || 0}
-                    </p>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              // Create a new filter object from the local state
+              const newFilters = {
+                note_type: noteType,
+                original_amount_min: originalAmountMin,
+                original_amount_max: originalAmountMax,
+                current_amount_min: currentAmountMin,
+                current_amount_max: currentAmountMax,
+                interest_rate_min: interestRateMin,
+                interest_rate_max: interestRateMax,
+                maturity_date_start: maturityDateStart,
+                maturity_date_end: maturityDateEnd,
+                location_state: locationState,
+                location_city: locationCity,
+                price_min: priceMin,
+                price_max: priceMax,
+                note_status: selectedNoteStatus,
+                property_type: selectedPropertyTypes,
+                property_zip_code: propertyZipCode,
+                loan_term_years_min: loanTermYearsMin,
+                loan_term_years_max: loanTermYearsMax,
+                loan_term_months: loanTermMonths,
+                is_secured: isSecured,
+                collateral_type: collateralType,
+                date_of_note_start: dateOfNoteStart,
+                date_of_note_end: dateOfNoteEnd,
+                payment_frequency: paymentFrequency,
+                amortization_type: amortizationType,
+                description: descriptionKeywords,
+                property_county: propertyCounty,
+                loan_to_value_ratio_min: ltvRatioMin,
+                loan_to_value_ratio_max: ltvRatioMax,
+              };
+              
+              handleApplyFilters(newFilters);
+              
+              // Count active filters
+              let count = 0;
+              Object.entries(newFilters).forEach(([_, value]) => {
+                if (Array.isArray(value)) {
+                  if (value.length > 0) count++;
+                } else if (value !== '' && value !== false) {
+                  count++;
+                }
+              });
+              setActiveFilterCount(count);
+            }}>
+              {/* Top Row with Main Numeric Filters */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div>
+                  <p className="text-white text-sm font-medium mb-1">Loan Amount</p>
+                  <div className="flex justify-between gap-2">
+                    <div className="flex-1">
+                      <p className="text-gray-300 text-xs">Min</p>
+                      <input 
+                        type="number" 
+                        className="w-full p-1 bg-gray-800 border border-gray-700 rounded text-white text-xl"
+                        value={originalAmountMin}
+                        onChange={(e) => setOriginalAmountMin(Number(e.target.value) || 0)}
+                        min="0"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-gray-300 text-xs">Max</p>
+                      <input 
+                        type="number"
+                        className="w-full p-1 bg-gray-800 border border-gray-700 rounded text-white text-xl"
+                        value={originalAmountMax}
+                        onChange={(e) => setOriginalAmountMax(Number(e.target.value) || 0)}
+                        min="0"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-gray-300 text-xs">Max</p>
-                    <p className="text-white font-bold text-2xl">
-                      {advancedFilters?.original_amount_max || 160000}
-                    </p>
+                </div>
+                
+                <div>
+                  <p className="text-white text-sm font-medium mb-1">Interest Rate</p>
+                  <div className="flex justify-between gap-2">
+                    <div className="flex-1">
+                      <p className="text-gray-300 text-xs">Min %</p>
+                      <input 
+                        type="number" 
+                        className="w-full p-1 bg-gray-800 border border-gray-700 rounded text-white text-xl"
+                        value={interestRateMin}
+                        onChange={(e) => setInterestRateMin(Number(e.target.value) || 0)}
+                        min="0"
+                        max="100"
+                        step="0.1"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-gray-300 text-xs">Max %</p>
+                      <input 
+                        type="number"
+                        className="w-full p-1 bg-gray-800 border border-gray-700 rounded text-white text-xl"
+                        value={interestRateMax}
+                        onChange={(e) => setInterestRateMax(Number(e.target.value) || 0)}
+                        min="0"
+                        max="100"
+                        step="0.1"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <p className="text-white text-sm font-medium mb-1">Loan Term</p>
+                  <div className="flex justify-between gap-2">
+                    <div className="flex-1">
+                      <p className="text-gray-300 text-xs">Min Years</p>
+                      <input 
+                        type="number"
+                        className="w-full p-1 bg-gray-800 border border-gray-700 rounded text-white text-xl"
+                        value={loanTermYearsMin}
+                        onChange={(e) => setLoanTermYearsMin(Number(e.target.value) || 0)}
+                        min="0"
+                        max="40"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-gray-300 text-xs">Max Years</p>
+                      <input 
+                        type="number" 
+                        className="w-full p-1 bg-gray-800 border border-gray-700 rounded text-white text-xl"
+                        value={loanTermYearsMax}
+                        onChange={(e) => setLoanTermYearsMax(Number(e.target.value) || 0)}
+                        min="0"
+                        max="40"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <p className="text-white text-sm font-medium mb-1">Asking Price</p>
+                  <div className="flex justify-between gap-2">
+                    <div className="flex-1">
+                      <p className="text-gray-300 text-xs">Min $</p>
+                      <input 
+                        type="number" 
+                        className="w-full p-1 bg-gray-800 border border-gray-700 rounded text-white text-xl"
+                        value={priceMin}
+                        onChange={(e) => setPriceMin(Number(e.target.value) || 0)}
+                        min="0"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-gray-300 text-xs">Max $</p>
+                      <input 
+                        type="number" 
+                        className="w-full p-1 bg-gray-800 border border-gray-700 rounded text-white text-xl"
+                        value={priceMax}
+                        onChange={(e) => setPriceMax(Number(e.target.value) || 0)}
+                        min="0"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
               
-              <div>
-                <p className="text-white text-sm font-medium mb-1">Interest Rate</p>
-                <div className="flex justify-between">
-                  <div>
-                    <p className="text-gray-300 text-xs">Min %</p>
-                    <p className="text-white font-bold text-2xl">
-                      {advancedFilters?.interest_rate_min || 0}
+              {/* Sliders for ranges */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-white text-sm font-medium">Yield Range (%)</p>
+                    <p className="text-xs text-gray-300">
+                      {interestRateMin}% - {interestRateMax}%
                     </p>
                   </div>
-                  <div>
-                    <p className="text-gray-300 text-xs">Max %</p>
-                    <p className="text-white font-bold text-2xl">
-                      {advancedFilters?.interest_rate_max || 16}
+                  <div className="relative h-2 bg-gray-700 rounded-full">
+                    <input
+                      type="range"
+                      className="absolute w-full h-2 appearance-none bg-transparent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-500"
+                      min="0"
+                      max="24"
+                      value={interestRateMax}
+                      onChange={(e) => setInterestRateMax(Number(e.target.value))}
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-white text-sm font-medium">Price Range ($)</p>
+                    <p className="text-xs text-gray-300">
+                      ${priceMin} - ${priceMax}
                     </p>
+                  </div>
+                  <div className="relative h-2 bg-gray-700 rounded-full">
+                    <input
+                      type="range"
+                      className="absolute w-full h-2 appearance-none bg-transparent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-500"
+                      min="0"
+                      max="300000"
+                      step="5000"
+                      value={priceMax}
+                      onChange={(e) => setPriceMax(Number(e.target.value))}
+                    />
                   </div>
                 </div>
               </div>
               
-              <div>
-                <p className="text-white text-sm font-medium mb-1">Loan Term</p>
-                <div className="flex justify-between">
-                  <div>
-                    <p className="text-gray-300 text-xs">Min Years</p>
-                    <p className="text-white font-bold text-2xl">
-                      {advancedFilters?.loan_term_years_min || 0}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-300 text-xs">Max Years</p>
-                    <p className="text-white font-bold text-2xl">
-                      {advancedFilters?.loan_term_years_max || 16}
-                    </p>
-                  </div>
+              {/* Dropdown Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
+                <div className="space-y-1">
+                  <label className="text-white text-sm">Note Type</label>
+                  <select 
+                    className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white"
+                    value={noteType}
+                    onChange={(e) => setNoteType(e.target.value)}
+                  >
+                    <option value="">Any Type</option>
+                    <option value="Promissory">Promissory</option>
+                    <option value="Mortgage">Mortgage</option>
+                    <option value="Business">Business</option>
+                    <option value="Land Contract">Land Contract</option>
+                  </select>
+                </div>
+                
+                <div className="space-y-1">
+                  <label className="text-white text-sm">Payment Frequency</label>
+                  <select 
+                    className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white"
+                    value={paymentFrequency}
+                    onChange={(e) => setPaymentFrequency(e.target.value)}
+                  >
+                    <option value="">Any Frequency</option>
+                    <option value="Monthly">Monthly</option>
+                    <option value="Quarterly">Quarterly</option>
+                    <option value="Annually">Annually</option>
+                    <option value="Biweekly">Biweekly</option>
+                  </select>
+                </div>
+                
+                <div className="space-y-1">
+                  <label className="text-white text-sm">Amortization Type</label>
+                  <select 
+                    className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white"
+                    value={amortizationType}
+                    onChange={(e) => setAmortizationType(e.target.value)}
+                  >
+                    <option value="">Any Type</option>
+                    <option value="Fixed">Fixed</option>
+                    <option value="Adjustable">Adjustable</option>
+                    <option value="Interest-Only">Interest-Only</option>
+                    <option value="Balloon">Balloon</option>
+                  </select>
                 </div>
               </div>
               
-              <div>
-                <p className="text-white text-sm font-medium mb-1">Asking Price</p>
-                <div className="flex justify-between">
-                  <div>
-                    <p className="text-gray-300 text-xs">Min $</p>
-                    <p className="text-white font-bold text-2xl">
-                      {advancedFilters?.price_min || 0}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-300 text-xs">Max $</p>
-                    <p className="text-white font-bold text-2xl">
-                      {advancedFilters?.price_max || 160000}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-white text-sm font-medium">Yield Range</p>
-                  <p className="text-xs text-gray-300">
-                    {advancedFilters?.interest_rate_min || 0}% - {advancedFilters?.interest_rate_max || 24}%
-                  </p>
-                </div>
-                <div className="h-1 bg-gray-700 rounded-full">
-                  <div 
-                    className="h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" 
-                    style={{ width: '75%' }}
-                  ></div>
+              {/* Checkboxes for Property Type */}
+              <div className="mt-6">
+                <p className="text-white text-sm mb-2">Property Type</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {['Single Family', 'Multi-Family', 'Commercial', 'Land'].map(type => (
+                    <label key={type} className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 accent-purple-500"
+                        checked={selectedPropertyTypes.includes(type)}
+                        onChange={() => {
+                          if (selectedPropertyTypes.includes(type)) {
+                            setSelectedPropertyTypes(selectedPropertyTypes.filter(t => t !== type));
+                          } else {
+                            setSelectedPropertyTypes([...selectedPropertyTypes, type]);
+                          }
+                        }}
+                      />
+                      <span className="text-white text-sm">{type}</span>
+                    </label>
+                  ))}
                 </div>
               </div>
               
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-white text-sm font-medium">Price Range</p>
-                  <p className="text-xs text-gray-300">
-                    ${advancedFilters?.price_min || 0} - ${advancedFilters?.price_max || 160000}
-                  </p>
-                </div>
-                <div className="h-1 bg-gray-700 rounded-full">
-                  <div 
-                    className="h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" 
-                    style={{ width: '65%' }}
-                  ></div>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-white text-sm font-medium">Term Range</p>
-                  <p className="text-xs text-gray-300">
-                    {advancedFilters?.loan_term_years_min || 0} - {advancedFilters?.loan_term_years_max || 30} years
-                  </p>
-                </div>
-                <div className="h-1 bg-gray-700 rounded-full">
-                  <div 
-                    className="h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" 
-                    style={{ width: '50%' }}
-                  ></div>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-white text-sm font-medium">LTV Ratio</p>
-                  <p className="text-xs text-gray-300">
-                    {advancedFilters?.loan_to_value_ratio_min || 0}% - {advancedFilters?.loan_to_value_ratio_max || 95}%
-                  </p>
-                </div>
-                <div className="h-1 bg-gray-700 rounded-full">
-                  <div 
-                    className="h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" 
-                    style={{ width: '85%' }}
-                  ></div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex justify-end mt-6">
-              <div className="flex items-center gap-2">
-                <Button
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-2 rounded-full shadow-lg"
-                  onClick={() => {
-                    if (isMobile) {
-                      const filterDrawerButton = document.querySelector('[aria-label="Filter"]');
-                      if (filterDrawerButton) {
-                        (filterDrawerButton as HTMLButtonElement).click();
-                      }
-                    } else {
-                      const filterModalButton = document.querySelector('[aria-label="Filter"]');
-                      if (filterModalButton) {
-                        (filterModalButton as HTMLButtonElement).click();
-                      }
-                    }
-                  }}
-                >
-                  Filter
-                </Button>
+              {/* Toggle for Secured */}
+              <div className="mt-6">
                 <div className="flex items-center">
-                  <input 
-                    type="checkbox" 
-                    id="email-notify" 
-                    className="mr-2 h-4 w-4 accent-purple-500"
-                  />
-                  <label htmlFor="email-notify" className="text-xs text-white">
-                    Email me when a match is found
+                  <label className="flex items-center cursor-pointer">
+                    <div className="relative">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only" 
+                        checked={isSecured}
+                        onChange={(e) => setIsSecured(e.target.checked)}
+                      />
+                      <div className={`block w-10 h-6 rounded-full ${isSecured ? 'bg-purple-500' : 'bg-gray-600'}`}></div>
+                      <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition ${isSecured ? 'transform translate-x-4' : ''}`}></div>
+                    </div>
+                    <span className="ml-3 text-white text-sm">Secured Note</span>
                   </label>
                 </div>
+                
+                {isSecured && (
+                  <div className="mt-3 ml-6">
+                    <label className="text-white text-sm">Collateral Type</label>
+                    <select 
+                      className="w-full mt-1 p-2 bg-gray-800 border border-gray-700 rounded text-white"
+                      value={collateralType}
+                      onChange={(e) => setCollateralType(e.target.value)}
+                    >
+                      <option value="">Select Collateral</option>
+                      <option value="Real Estate">Real Estate</option>
+                      <option value="Equipment">Equipment</option>
+                      <option value="Vehicle">Vehicle</option>
+                      <option value="Business Assets">Business Assets</option>
+                    </select>
+                  </div>
+                )}
               </div>
-            </div>
+              
+              {/* Location Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
+                <div className="space-y-1">
+                  <label className="text-white text-sm">State</label>
+                  <input 
+                    type="text" 
+                    className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white"
+                    placeholder="e.g. CA, TX"
+                    value={locationState}
+                    onChange={(e) => setLocationState(e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-1">
+                  <label className="text-white text-sm">City</label>
+                  <input 
+                    type="text" 
+                    className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white"
+                    placeholder="e.g. San Francisco"
+                    value={locationCity}
+                    onChange={(e) => setLocationCity(e.target.value)}
+                  />
+                </div>
+                
+                <div className="space-y-1">
+                  <label className="text-white text-sm">ZIP Code</label>
+                  <input 
+                    type="text"
+                    className="w-full p-2 bg-gray-800 border border-gray-700 rounded text-white"
+                    placeholder="e.g. 94103"
+                    value={propertyZipCode}
+                    onChange={(e) => setPropertyZipCode(e.target.value)}
+                  />
+                </div>
+              </div>
+              
+              {/* Filter and Email Notification */}
+              <div className="flex justify-between items-center mt-6">
+                <button 
+                  type="button" 
+                  className="text-purple-300 underline text-sm"
+                  onClick={() => {
+                    // Reset all filters to default values
+                    setNoteType('');
+                    setOriginalAmountMin(0);
+                    setOriginalAmountMax(160000);
+                    setCurrentAmountMin(0);
+                    setCurrentAmountMax(160000);
+                    setInterestRateMin(0);
+                    setInterestRateMax(16);
+                    setMaturityDateStart('');
+                    setMaturityDateEnd('');
+                    setLocationState('');
+                    setLocationCity('');
+                    setPriceMin(0);
+                    setPriceMax(160000);
+                    setSelectedNoteStatus([]);
+                    setSelectedPropertyTypes([]);
+                    setPropertyZipCode('');
+                    setLoanTermYearsMin(0);
+                    setLoanTermYearsMax(16);
+                    setLoanTermMonths(0);
+                    setIsSecured(false);
+                    setCollateralType('');
+                    setDateOfNoteStart('');
+                    setDateOfNoteEnd('');
+                    setPaymentFrequency('');
+                    setAmortizationType('');
+                    setDescriptionKeywords('');
+                    setPropertyCounty('');
+                    setLtvRatioMin(0);
+                    setLtvRatioMax(95);
+                    setAdvancedFilters(null);
+                    setActiveFilterCount(0);
+                  }}
+                >
+                  Reset All Filters
+                </button>
+                
+                <div className="flex items-center gap-2">
+                  <button
+                    type="submit"
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-8 py-2 rounded-full shadow-lg"
+                  >
+                    Apply Filters
+                  </button>
+                  <div className="flex items-center">
+                    <input 
+                      type="checkbox" 
+                      id="email-notify" 
+                      className="mr-2 h-4 w-4 accent-purple-500"
+                    />
+                    <label htmlFor="email-notify" className="text-xs text-white">
+                      Email me when a match is found
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </form>
           </div>
           
           {/* Loading state */}
