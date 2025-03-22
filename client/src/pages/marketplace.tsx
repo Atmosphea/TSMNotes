@@ -202,26 +202,78 @@ export default function MarketplacePage() {
           {/* Filters and Search */}
           <div className="flex flex-col gap-4 mb-8 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-col gap-4 md:flex-row md:items-center">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="w-full md:w-auto">
-                    <Filter className="w-4 h-4 mr-2" />
-                    Filter
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56">
-                  <DropdownMenuLabel>Property Type</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setFilterPropertyType(null)}>
-                    All Properties
-                  </DropdownMenuItem>
-                  {propertyTypes.map((type) => (
-                    <DropdownMenuItem key={type} onClick={() => setFilterPropertyType(type)}>
-                      {type}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* Advanced Filter Component - Use either modal or drawer based on screen size */}
+              {isMobile ? (
+                <FilterDrawer 
+                  onApplyFilters={(filters) => {
+                    handleApplyFilters(filters);
+                    // Count active filters
+                    let count = 0;
+                    Object.entries(filters).forEach(([_, value]) => {
+                      if (Array.isArray(value)) {
+                        if (value.length > 0) count++;
+                      } else if (value !== '' && value !== false) {
+                        count++;
+                      }
+                    });
+                    setActiveFilterCount(count);
+                  }}
+                  buttonVariant="outline"
+                />
+              ) : (
+                <FilterModal 
+                  onApplyFilters={(filters) => {
+                    handleApplyFilters(filters);
+                    // Count active filters
+                    let count = 0;
+                    Object.entries(filters).forEach(([_, value]) => {
+                      if (Array.isArray(value)) {
+                        if (value.length > 0) count++;
+                      } else if (value !== '' && value !== false) {
+                        count++;
+                      }
+                    });
+                    setActiveFilterCount(count);
+                  }}
+                  buttonVariant="outline"
+                />
+              )}
+              
+              {/* Active Filter Badges */}
+              {activeFilterCount > 0 && (
+                <div className="flex flex-wrap gap-2 items-center">
+                  <Badge variant="outline" className="flex items-center gap-1 bg-gray-100">
+                    <span>{activeFilterCount} active filters</span>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-4 w-4 rounded-full p-0 text-gray-500 hover:bg-gray-200"
+                      onClick={() => {
+                        setAdvancedFilters(null);
+                        setActiveFilterCount(0);
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                      <span className="sr-only">Clear all filters</span>
+                    </Button>
+                  </Badge>
+                  
+                  {filterPropertyType && (
+                    <Badge variant="outline" className="flex items-center gap-1 bg-gray-100">
+                      <span>Type: {filterPropertyType}</span>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-4 w-4 rounded-full p-0 text-gray-500 hover:bg-gray-200"
+                        onClick={() => setFilterPropertyType(null)}
+                      >
+                        <X className="h-3 w-3" />
+                        <span className="sr-only">Clear property type filter</span>
+                      </Button>
+                    </Badge>
+                  )}
+                </div>
+              )}
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -266,6 +318,11 @@ export default function MarketplacePage() {
                 className="pl-10 w-full md:w-64 h-10 rounded-md border border-input bg-background ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                 placeholder="Search notes..."
                 type="search"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setPage(1); // Reset to first page when searching
+                }}
               />
             </div>
           </div>
