@@ -688,54 +688,52 @@ export default function MarketplacePage() {
                 </div>
               </div>
               
-              {/* Tabbed Property Type Selector */}
-              <div className="mt-10 bg-black/10 p-6 rounded-xl">
-                <p className="text-white text-sm font-semibold mb-4">Property Type</p>
-                
-                {/* Tab Navigation */}
-                <div className="flex border-b border-gray-700/30 mb-5">
+              {/* Tabbed Property Type Selector - Simplified */}
+              <div className="bg-black/10 p-3 rounded-xl">
+                {/* Tab Navigation - Centered */}
+                <div className="flex justify-center border-b border-gray-700/30 mb-3">
                   <button
                     type="button"
-                    className={`px-5 py-3 text-sm font-medium transition-all duration-200 border-b-2 focus:outline-none ${
+                    className={`px-4 py-2 text-sm font-medium transition-all duration-200 border-b-2 focus:outline-none ${
                       activePropertyTab === "realEstate" 
                         ? "text-white border-purple-500" 
                         : "text-gray-400 border-transparent hover:text-gray-200 hover:border-gray-600"
                     }`}
                     onClick={() => setActivePropertyTab("realEstate")}
                   >
-                    Real Estate Loans
+                    Real Estate
                   </button>
                   <button
                     type="button"
-                    className={`px-5 py-3 text-sm font-medium transition-all duration-200 border-b-2 focus:outline-none ${
+                    className={`px-4 py-2 text-sm font-medium transition-all duration-200 border-b-2 focus:outline-none ${
                       activePropertyTab === "business" 
                         ? "text-white border-purple-500" 
                         : "text-gray-400 border-transparent hover:text-gray-200 hover:border-gray-600"
                     }`}
                     onClick={() => setActivePropertyTab("business")}
                   >
-                    Business Loans
+                    Business
                   </button>
                   <button
                     type="button"
-                    className={`px-5 py-3 text-sm font-medium transition-all duration-200 border-b-2 focus:outline-none ${
+                    className={`px-4 py-2 text-sm font-medium transition-all duration-200 border-b-2 focus:outline-none ${
                       activePropertyTab === "other" 
                         ? "text-white border-purple-500" 
                         : "text-gray-400 border-transparent hover:text-gray-200 hover:border-gray-600"
                     }`}
                     onClick={() => setActivePropertyTab("other")}
                   >
-                    Other Loan Types
+                    Other
                   </button>
                 </div>
                 
-                {/* Tab Content */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {/* Tab Content - Condensed and equal spacing */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 px-2">
                   {propertyTypeCategories[activePropertyTab].map(type => (
                     <button
                       key={type}
                       type="button"
-                      className={`py-2 px-4 rounded-md text-sm text-left transition-all duration-200 ${
+                      className={`py-1.5 px-3 rounded-md text-xs text-left transition-all duration-200 w-auto ${
                         selectedPropertyTypes.includes(type)
                           ? "bg-purple-600 text-white font-medium shadow-lg"
                           : "bg-gray-800/20 text-gray-300 hover:bg-gray-800/40"
@@ -752,28 +750,6 @@ export default function MarketplacePage() {
                     </button>
                   ))}
                 </div>
-                
-                {/* Selected Types Summary */}
-                {selectedPropertyTypes.length > 0 && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <p className="text-xs text-gray-400 mr-2 mt-1">Selected:</p>
-                    {selectedPropertyTypes.map(type => (
-                      <div key={type} className="flex items-center bg-purple-800/30 text-purple-200 text-xs rounded-full px-3 py-1">
-                        <span>{type}</span>
-                        <button 
-                          type="button" 
-                          className="ml-1 text-purple-200 hover:text-white"
-                          onClick={() => setSelectedPropertyTypes(selectedPropertyTypes.filter(t => t !== type))}
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M18 6 6 18"></path>
-                            <path d="m6 6 12 12"></path>
-                          </svg>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </div>
               
               {/* Toggle for Secured */}
