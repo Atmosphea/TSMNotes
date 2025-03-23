@@ -7,6 +7,8 @@ import LandingPage from "@/pages/landing";
 import MarketplacePage from "@/pages/marketplace_new";
 import NoteDetailPage from "@/pages/note-detail";
 import SellingPage from "@/pages/selling";
+import ProfilePage from "@/pages/profile";
+import AdminPage from "@/pages/admin";
 
 function Router() {
   return (
@@ -15,6 +17,8 @@ function Router() {
       <Route path="/marketplace" component={MarketplacePage} />
       <Route path="/selling" component={SellingPage} />
       <Route path="/note/:id" component={NoteDetailPage} />
+      <Route path="/profile" component={ProfilePage} />
+      <Route path="/admin" component={AdminPage} />
       <Route component={NotFound} />
     </Switch>
   );
