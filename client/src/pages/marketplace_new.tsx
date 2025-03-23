@@ -55,6 +55,17 @@ import {
   X
 } from "lucide-react";
 
+// Available US states for dropdown
+const states = [
+  "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", 
+  "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", 
+  "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", 
+  "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", 
+  "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", 
+  "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", 
+  "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
+];
+
 export default function MarketplacePage() {
   const isMobile = useIsMobile();
   const [page, setPage] = useState(1);
@@ -388,81 +399,28 @@ export default function MarketplacePage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     {/* Left side - Payment options */}
                     <div className="space-y-4">
-                      {/* Payment Frequency */}
-                      <div>
-                        <label className="text-white text-xs font-medium">Payment Frequency</label>
-                        <select 
-                          className="w-full mt-1 p-1.5 bg-gray-800 border border-gray-700 rounded text-white text-sm"
-                          value={paymentFrequency}
-                          onChange={(e) => setPaymentFrequency(e.target.value)}
-                        >
-                          <option value="">Any Frequency</option>
-                          <option value="Monthly">Monthly</option>
-                          <option value="Bi-Weekly">Bi-Weekly</option>
-                          <option value="Weekly">Weekly</option>
-                          <option value="Quarterly">Quarterly</option>
-                          <option value="Annually">Annually</option>
-                        </select>
-                      </div>
+                      {/* We've removed Payment Frequency and Amortization Type */}
                       
-                      {/* Amortization Type */}
-                      <div>
-                        <label className="text-white text-xs font-medium">Amortization Type</label>
-                        <select 
-                          className="w-full mt-1 p-1.5 bg-gray-800 border border-gray-700 rounded text-white text-sm"
-                          value={amortizationType}
-                          onChange={(e) => setAmortizationType(e.target.value)}
-                        >
-                          <option value="">Any Type</option>
-                          <option value="Fixed">Fixed</option>
-                          <option value="Adjustable">Adjustable</option>
-                          <option value="Interest-Only">Interest-Only</option>
-                          <option value="Balloon">Balloon</option>
-                        </select>
-                      </div>
-                      
-                      {/* Tabbed Property Type Selector - Simplified */}
+                      {/* Note Type Selector with expand/collapse */}
                       <div className="bg-black/10 p-3 rounded-xl">
-                        {/* Tab Navigation - Centered */}
-                        <div className="flex justify-center border-b border-gray-700/30 mb-2">
-                          <button
-                            type="button"
-                            className={`px-4 py-1.5 text-xs font-medium transition-all duration-200 border-b-2 focus:outline-none ${
-                              activePropertyTab === "realEstate" 
-                                ? "text-white border-purple-500" 
-                                : "text-gray-400 border-transparent hover:text-gray-200 hover:border-gray-600"
-                            }`}
-                            onClick={() => setActivePropertyTab("realEstate")}
-                          >
-                            Real Estate
-                          </button>
-                          <button
-                            type="button"
-                            className={`px-4 py-1.5 text-xs font-medium transition-all duration-200 border-b-2 focus:outline-none ${
-                              activePropertyTab === "business" 
-                                ? "text-white border-purple-500" 
-                                : "text-gray-400 border-transparent hover:text-gray-200 hover:border-gray-600"
-                            }`}
-                            onClick={() => setActivePropertyTab("business")}
-                          >
-                            Business
-                          </button>
-                          <button
-                            type="button"
-                            className={`px-4 py-1.5 text-xs font-medium transition-all duration-200 border-b-2 focus:outline-none ${
-                              activePropertyTab === "other" 
-                                ? "text-white border-purple-500" 
-                                : "text-gray-400 border-transparent hover:text-gray-200 hover:border-gray-600"
-                            }`}
-                            onClick={() => setActivePropertyTab("other")}
-                          >
-                            Other
-                          </button>
+                        {/* Note Type Toggle Header */}
+                        <div 
+                          className="flex items-center justify-between px-2 py-2 cursor-pointer border-b border-gray-700/30 mb-2"
+                          onClick={() => setIsNoteTypeExpanded(!isNoteTypeExpanded)}
+                        >
+                          <span className="text-white text-sm font-medium">Note Type</span>
+                          <div className={`transition-transform duration-200 ${isNoteTypeExpanded ? "rotate-90" : ""}`}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                              <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                          </div>
                         </div>
                         
-                        {/* Tab Content - Condensed and equal spacing */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 px-2">
-                          {propertyTypeCategories[activePropertyTab].map(type => (
+                        {/* Expandable Checkbox Grid */}
+                        <div className={`grid grid-cols-2 md:grid-cols-3 gap-2 px-2 overflow-hidden transition-all duration-300 ${
+                          isNoteTypeExpanded ? "max-h-96 opacity-100 pt-2" : "max-h-0 opacity-0"
+                        }`}>
+                          {noteTypeOptions.map(type => (
                             <button
                               key={type}
                               type="button"
@@ -485,9 +443,10 @@ export default function MarketplacePage() {
                         </div>
                       </div>
                       
-                      {/* Toggle for Secured */}
-                      <div>
-                        <div className="flex items-center">
+                      {/* Toggle row for Secured and Performing */}
+                      <div className="flex items-center gap-4">
+                        {/* Secured Note Toggle */}
+                        <div>
                           <label className="flex items-center cursor-pointer">
                             <div className="relative">
                               <input 
@@ -503,22 +462,67 @@ export default function MarketplacePage() {
                           </label>
                         </div>
                         
-                        {isSecured && (
-                          <div className="mt-2 ml-5">
-                            <label className="text-white text-xs">Collateral Type</label>
-                            <select 
-                              className="w-full mt-1 p-1 bg-gray-800 border border-gray-700 rounded text-white text-xs"
-                              value={collateralType}
-                              onChange={(e) => setCollateralType(e.target.value)}
-                            >
-                              <option value="">Select Collateral</option>
-                              <option value="Real Estate">Real Estate</option>
-                              <option value="Equipment">Equipment</option>
-                              <option value="Vehicle">Vehicle</option>
-                              <option value="Business Assets">Business Assets</option>
-                            </select>
-                          </div>
-                        )}
+                        {/* Performing Note Toggle */}
+                        <div>
+                          <label className="flex items-center cursor-pointer">
+                            <div className="relative">
+                              <input 
+                                type="checkbox" 
+                                className="sr-only" 
+                                checked={isPerforming}
+                                onChange={(e) => {
+                                  setIsPerforming(e.target.checked);
+                                  // Update the note status array based on the toggle
+                                  if (e.target.checked) {
+                                    if (!selectedNoteStatus.includes('Performing')) {
+                                      setSelectedNoteStatus([...selectedNoteStatus.filter(s => s !== 'Non-Performing'), 'Performing']);
+                                    }
+                                  } else {
+                                    if (!selectedNoteStatus.includes('Non-Performing')) {
+                                      setSelectedNoteStatus([...selectedNoteStatus.filter(s => s !== 'Performing'), 'Non-Performing']);
+                                    }
+                                  }
+                                }}
+                              />
+                              <div className={`block w-8 h-4 rounded-full ${isPerforming ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                              <div className={`dot absolute left-0.5 top-0.5 bg-white w-3 h-3 rounded-full transition ${isPerforming ? 'transform translate-x-4' : ''}`}></div>
+                            </div>
+                            <span className="ml-2 text-white text-xs">{isPerforming ? 'Performing' : 'Non-Performing'}</span>
+                          </label>
+                        </div>
+                      </div>
+                      
+                      {/* Collateral Type (conditional) */}
+                      {isSecured && (
+                        <div className="mt-2 ml-5">
+                          <label className="text-white text-xs">Collateral Type</label>
+                          <select 
+                            className="w-full mt-1 p-1 bg-gray-800 border border-gray-700 rounded text-white text-xs"
+                            value={collateralType}
+                            onChange={(e) => setCollateralType(e.target.value)}
+                          >
+                            <option value="">Select Collateral</option>
+                            <option value="Real Estate">Real Estate</option>
+                            <option value="Equipment">Equipment</option>
+                            <option value="Vehicle">Vehicle</option>
+                            <option value="Business Assets">Business Assets</option>
+                          </select>
+                        </div>
+                      )}
+                      
+                      {/* State Dropdown */}
+                      <div>
+                        <label className="text-white text-xs font-medium">Property State</label>
+                        <select 
+                          className="w-full mt-1 p-1.5 bg-gray-800 border border-gray-700 rounded text-white text-sm"
+                          value={locationState}
+                          onChange={(e) => setLocationState(e.target.value)}
+                        >
+                          <option value="">Any State</option>
+                          {states.map(state => (
+                            <option key={state} value={state}>{state}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                     
@@ -660,9 +664,9 @@ export default function MarketplacePage() {
                         </div>
                       </div>
                       
-                      {/* Loan Term Range Slider */}
+                      {/* Renamed to Unpaid Principal Balance */}
                       <div>
-                        <p className="text-white text-xs font-medium mb-1">Term (Years)</p>
+                        <p className="text-white text-xs font-medium mb-1">Unpaid Principal Balance ($)</p>
                         <div className="flex flex-col space-y-2">
                           <div className="relative h-2 bg-gray-700 rounded-full">
                             <div 
@@ -867,7 +871,7 @@ export default function MarketplacePage() {
                         setPropertyCounty('');
                         setLtvRatioMin(0);
                         setLtvRatioMax(95);
-                        setActivePropertyTab("realEstate");
+                        setIsNoteTypeExpanded(false);
                         setAdvancedFilters(null);
                         setActiveFilterCount(0);
                       }}
