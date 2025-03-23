@@ -212,6 +212,26 @@ export default function MarketplacePage() {
             !listing.propertyAddress.includes(advancedFilters.location_state)) {
           return false;
         }
+        
+        // LTV ratio filter
+        if (advancedFilters.loan_to_value_ratio_min !== '' && 
+            listing.loanToValueRatio < advancedFilters.loan_to_value_ratio_min) {
+          return false;
+        }
+        if (advancedFilters.loan_to_value_ratio_max !== '' && 
+            listing.loanToValueRatio > advancedFilters.loan_to_value_ratio_max) {
+          return false;
+        }
+        
+        // Property value filter
+        if (advancedFilters.property_value_min !== '' && 
+            listing.propertyValue < advancedFilters.property_value_min) {
+          return false;
+        }
+        if (advancedFilters.property_value_max !== '' && 
+            listing.propertyValue > advancedFilters.property_value_max) {
+          return false;
+        }
       }
       
       return true;
