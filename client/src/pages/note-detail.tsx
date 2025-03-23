@@ -37,6 +37,7 @@ import {
 import { type NoteDocument, type NoteListing, type User } from "@shared/schema";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
+import { InquiryForm, InquiryList } from "@/components/inquiries";
 import { 
   BarChart3,
   Building2, 
@@ -49,6 +50,7 @@ import {
   LayoutDashboard, 
   Lock, 
   MapPin, 
+  MessageCircle,
   Percent,
   PiggyBank,
   User as UserIcon
@@ -243,7 +245,7 @@ export default function NoteDetailPage() {
               
               {/* Tabs for details */}
               <Tabs defaultValue="overview" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="overview">
                     <LayoutDashboard className="w-4 h-4 mr-2" />
                     Overview
@@ -255,6 +257,10 @@ export default function NoteDetailPage() {
                   <TabsTrigger value="location">
                     <MapPin className="w-4 h-4 mr-2" />
                     Location
+                  </TabsTrigger>
+                  <TabsTrigger value="inquiries">
+                    <MessageCircle className="w-4 h-4 mr-2" />
+                    Inquiries
                   </TabsTrigger>
                 </TabsList>
                 
@@ -404,6 +410,28 @@ export default function NoteDetailPage() {
                     <p className="text-muted-foreground">{listing.propertyAddress}</p>
                   </div>
                 </TabsContent>
+                
+                <TabsContent value="inquiries" className="p-4 border rounded-lg mt-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold">Inquiries and Offers</h3>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-2"
+                      onClick={() => setIsContactDialogOpen(true)}
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      Send Inquiry
+                    </Button>
+                  </div>
+                  
+                  {/* Using the InquiryList component */}
+                  <InquiryList 
+                    listingId={listing.id}
+                    isSeller={seller?.id === 1} // In a real app, compare to the logged-in user ID
+                    maxHeight="500px"
+                  />
+                </TabsContent>
               </Tabs>
             </div>
             
@@ -539,34 +567,19 @@ export default function NoteDetailPage() {
       
       <Footer />
       
-      {/* Contact Dialog */}
+      {/* Inquiry Form Dialog */}
       <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Contact the Seller</DialogTitle>
-            <DialogDescription>
-              Send a message to the seller of this note. They will respond to your inquiry directly.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                Your message
-              </label>
-              <textarea
-                className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="I'm interested in this note. Please provide more information about..."
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsContactDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleContactSeller}>
-              Send Message
-            </Button>
-          </DialogFooter>
+        <DialogContent className="sm:max-w-[500px]">
+          {listing && (
+            <InquiryForm
+              isOpen={isContactDialogOpen}
+              onClose={() => setIsContactDialogOpen(false)}
+              noteListingId={listing.id}
+              buyerId={1} // In a real app, this would be the logged-in user's ID
+              noteName={listing.title || `Note ${listing.id}`}
+              askingPrice={listing.askingPrice}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>
