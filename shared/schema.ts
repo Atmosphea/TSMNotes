@@ -138,6 +138,8 @@ export const insertNoteListingSchema = createInsertSchema(noteListings).pick({
   propertyType: true,
   description: true,
   status: true,
+  loanToValueRatio: true,
+  propertyValue: true,
 });
 
 export const insertNoteDocumentSchema = createInsertSchema(noteDocuments).pick({

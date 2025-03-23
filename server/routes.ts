@@ -44,6 +44,8 @@ async function addSampleListings() {
       propertyAddress: "123 Oak Lane, Austin, TX 78701",
       askingPrice: 125000,
       status: "active",
+      loanToValueRatio: 65,
+      propertyValue: 230770, // Calculated as loanAmount * (100 / loanToValueRatio)
       description: "Well-performing note with a strong payment history. Property is in an excellent neighborhood with rising property values."
     } as any);
     
@@ -59,6 +61,8 @@ async function addSampleListings() {
       propertyAddress: "456 Pine Street #302, Seattle, WA 98101",
       askingPrice: 70000,
       status: "active",
+      loanToValueRatio: 70,
+      propertyValue: 121428, // Calculated as loanAmount * (100 / loanToValueRatio)
       description: "Seasoned note backed by a renovated condo in downtown Seattle. Borrower has excellent credit and perfect payment history."
     } as any);
     
@@ -74,6 +78,8 @@ async function addSampleListings() {
       propertyAddress: "789 Maple Ave, Chicago, IL 60611",
       askingPrice: 195000,
       status: "active",
+      loanToValueRatio: 75,
+      propertyValue: 300000, // Calculated as loanAmount * (100 / loanToValueRatio)
       description: "High-yield note secured by a well-maintained duplex in a rapidly appreciating area of Chicago. Strong rental income supports payments."
     } as any);
     
@@ -468,8 +474,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Don't return password hash or other sensitive information
-      const { passwordHash, ...safeUser } = user;
+      // Don't return password or other sensitive information
+      const { password, ...safeUser } = user;
       
       return res.status(200).json({ 
         success: true, 

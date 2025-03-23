@@ -34,4 +34,6 @@ export interface FilterState {
   property_county: string;
   loan_to_value_ratio_min: number | '';
   loan_to_value_ratio_max: number | '';
+  property_value_min: number | '';
+  property_value_max: number | '';
 }

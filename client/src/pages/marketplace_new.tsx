@@ -215,21 +215,29 @@ export default function MarketplacePage() {
         
         // LTV ratio filter
         if (advancedFilters.loan_to_value_ratio_min !== '' && 
-            listing.loanToValueRatio < advancedFilters.loan_to_value_ratio_min) {
+            (listing.loanToValueRatio === undefined || listing.loanToValueRatio === null || 
+             listing.loanToValueRatio < advancedFilters.loan_to_value_ratio_min)) {
           return false;
         }
         if (advancedFilters.loan_to_value_ratio_max !== '' && 
+            listing.loanToValueRatio !== undefined && listing.loanToValueRatio !== null && 
             listing.loanToValueRatio > advancedFilters.loan_to_value_ratio_max) {
           return false;
         }
         
         // Property value filter
+        const estimatedPropertyValue = listing.propertyValue || 
+           (listing.loanAmount && listing.loanToValueRatio ? 
+            listing.loanAmount * (100 / listing.loanToValueRatio) : null);
+            
         if (advancedFilters.property_value_min !== '' && 
-            listing.propertyValue < advancedFilters.property_value_min) {
+            (estimatedPropertyValue === null || 
+             estimatedPropertyValue < advancedFilters.property_value_min)) {
           return false;
         }
         if (advancedFilters.property_value_max !== '' && 
-            listing.propertyValue > advancedFilters.property_value_max) {
+            estimatedPropertyValue !== null && 
+            estimatedPropertyValue > advancedFilters.property_value_max) {
           return false;
         }
       }
