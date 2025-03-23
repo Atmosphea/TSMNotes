@@ -95,18 +95,23 @@ export default function MarketplacePage() {
   const [ltvRatioMin, setLtvRatioMin] = useState(0);
   const [ltvRatioMax, setLtvRatioMax] = useState(95);
   
-  // Property type tab states
-  const [activePropertyTab, setActivePropertyTab] = useState<"realEstate" | "business" | "other">("realEstate");
+  // Note type collapse state
+  const [isNoteTypeExpanded, setIsNoteTypeExpanded] = useState(false);
   
   // Filter toggle state
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   
-  // Property type category mapping
-  const propertyTypeCategories = {
-    realEstate: ["Residential Mortgages", "Commercial Mortgages", "Land Contracts"],
-    business: ["Small Business Loans"],
-    other: ["Promissory Notes", "Commercial and Industrial (C&I) Loans", "Equipment Loans", "Consumer Loans"]
-  };
+  // Note type options
+  const noteTypeOptions = ["Residential Mortgages", "Commercial Mortgages", "Land Contracts", 
+                         "Small Business Loans", "Promissory Notes", "Commercial and Industrial (C&I) Loans", 
+                         "Equipment Loans", "Consumer Loans"];
+                         
+  // Performing status
+  const [isPerforming, setIsPerforming] = useState(true);
+  
+  // Property value range
+  const [propertyValueMin, setPropertyValueMin] = useState(0);
+  const [propertyValueMax, setPropertyValueMax] = useState(500000);
   
   // Use a local loading state for the animations
   const [isFiltering, setIsFiltering] = useState(false);
