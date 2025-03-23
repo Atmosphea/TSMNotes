@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, doublePrecision, date, jsonb, primaryKey, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, doublePrecision, date, jsonb, primaryKey, varchar, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -193,11 +193,10 @@ export const favoriteListings = pgTable("favorite_listings", {
   notes: text("notes"), // Private notes from the user about this listing
   createdAt: timestamp("created_at").defaultNow().notNull(),
   // Define a unique constraint to prevent duplicate favorites
-  // primary key doesn't handle this easily, so we'll define a unique constraint
 }, (table) => {
   return {
     // Ensure a user can only favorite a listing once
-    uniqueFavorite: primaryKey({ columns: [table.userId, table.noteListingId] }),
+    uniqueFavorite: unique({ columns: [table.userId, table.noteListingId] }),
   };
 });
 

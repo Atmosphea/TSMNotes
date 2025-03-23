@@ -5,6 +5,11 @@ import {
   notes,
   noteListings,
   noteDocuments,
+  investorPreferences,
+  savedSearches,
+  favoriteListings,
+  inquiries,
+  transactions,
   type User, 
   type InsertUser, 
   type WaitlistEntry, 
@@ -16,8 +21,20 @@ import {
   type NoteListing,
   type InsertNoteListing,
   type NoteDocument,
-  type InsertNoteDocument
+  type InsertNoteDocument,
+  type InvestorPreferences,
+  type InsertInvestorPreferences,
+  type SavedSearch,
+  type InsertSavedSearch,
+  type FavoriteListing,
+  type InsertFavoriteListing,
+  type Inquiry,
+  type InsertInquiry,
+  type Transaction,
+  type InsertTransaction
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, or, desc, asc, sql, ilike } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -328,4 +345,252 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  // User operations
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+  
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    // Set default values for the new schema fields that might not be in insertUser
+    const userWithDefaults = {
+      ...insertUser,
+      status: insertUser.status || 'active',
+      bio: insertUser.bio || null,
+      website: insertUser.website || null,
+      location: insertUser.location || null,
+      profileImageUrl: insertUser.profileImageUrl || null,
+      emailNotifications: insertUser.emailNotifications ?? true,
+      smsNotifications: insertUser.smsNotifications ?? false,
+      marketingEmails: insertUser.marketingEmails ?? true,
+      isAccreditedInvestor: insertUser.isAccreditedInvestor ?? false,
+      accreditationProofUrl: insertUser.accreditationProofUrl || null,
+      updatedAt: new Date()
+    };
+
+    const [user] = await db
+      .insert(users)
+      .values(userWithDefaults)
+      .returning();
+    return user;
+  }
+  
+  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User | undefined> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({
+        ...userData,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, id))
+      .returning();
+    
+    return updatedUser;
+  }
+  
+  // Waitlist operations
+  async createWaitlistEntry(entry: InsertWaitlistEntry): Promise<WaitlistEntry> {
+    const [waitlistEntry] = await db
+      .insert(waitlistEntries)
+      .values(entry)
+      .returning();
+    return waitlistEntry;
+  }
+  
+  async getWaitlistEntryByEmail(email: string): Promise<WaitlistEntry | undefined> {
+    const [entry] = await db
+      .select()
+      .from(waitlistEntries)
+      .where(eq(waitlistEntries.email, email));
+    return entry;
+  }
+  
+  async getAllWaitlistEntries(): Promise<WaitlistEntry[]> {
+    return await db.select().from(waitlistEntries);
+  }
+  
+  // Message operations
+  async createMessage(message: InsertMessage): Promise<Message> {
+    const [newMessage] = await db
+      .insert(messages)
+      .values(message)
+      .returning();
+    return newMessage;
+  }
+  
+  async getMessagesByUserId(userId: number): Promise<Message[]> {
+    return await db
+      .select()
+      .from(messages)
+      .where(
+        or(
+          eq(messages.senderId, userId),
+          eq(messages.receiverId, userId)
+        )
+      );
+  }
+  
+  // Note Listing operations
+  async createNoteListing(listing: InsertNoteListing): Promise<NoteListing> {
+    // Prepare listing with proper defaults for our new schema fields
+    const listingWithDefaults = {
+      ...listing,
+      // Set defaults for any fields not provided
+      title: listing.title || `Property Note in ${listing.propertyState || 'Unknown Location'}`,
+      status: listing.status || 'active',
+      isPublic: listing.isPublic ?? true,
+      featured: listing.featured ?? false,
+      dueDiligenceCompleted: listing.dueDiligenceCompleted ?? false,
+      viewCount: 0,
+      favoriteCount: 0,
+      inquiryCount: 0,
+      listedAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const [noteListing] = await db
+      .insert(noteListings)
+      .values(listingWithDefaults)
+      .returning();
+    return noteListing;
+  }
+  
+  async getNoteListingById(id: number): Promise<NoteListing | undefined> {
+    const [listing] = await db
+      .select()
+      .from(noteListings)
+      .where(eq(noteListings.id, id));
+    return listing;
+  }
+  
+  async getNoteListingsBySellerId(sellerId: number): Promise<NoteListing[]> {
+    return await db
+      .select()
+      .from(noteListings)
+      .where(eq(noteListings.sellerId, sellerId));
+  }
+  
+  async getAllNoteListings(): Promise<NoteListing[]> {
+    return await db
+      .select()
+      .from(noteListings)
+      .orderBy(desc(noteListings.createdAt));
+  }
+  
+  async updateNoteListing(id: number, listingData: Partial<InsertNoteListing>): Promise<NoteListing | undefined> {
+    const [updatedListing] = await db
+      .update(noteListings)
+      .set({
+        ...listingData,
+        updatedAt: new Date()
+      })
+      .where(eq(noteListings.id, id))
+      .returning();
+    
+    return updatedListing;
+  }
+  
+  async deleteNoteListing(id: number): Promise<boolean> {
+    const result = await db
+      .delete(noteListings)
+      .where(eq(noteListings.id, id));
+    
+    return result.rowCount !== null && result.rowCount > 0;
+  }
+  
+  // Note Document operations
+  async createNoteDocument(document: InsertNoteDocument): Promise<NoteDocument> {
+    // Add default values for fields that might not be in the input
+    const documentWithDefaults = {
+      ...document,
+      isPublic: document.isPublic ?? false,
+      description: document.description || null,
+      verificationStatus: document.verificationStatus || 'pending'
+    };
+
+    const [newDocument] = await db
+      .insert(noteDocuments)
+      .values(documentWithDefaults)
+      .returning();
+    return newDocument;
+  }
+  
+  async getNoteDocumentsByListingId(noteListingId: number): Promise<NoteDocument[]> {
+    return await db
+      .select()
+      .from(noteDocuments)
+      .where(eq(noteDocuments.noteListingId, noteListingId));
+  }
+  
+  async deleteNoteDocument(id: number): Promise<boolean> {
+    const result = await db
+      .delete(noteDocuments)
+      .where(eq(noteDocuments.id, id));
+    
+    return result.rowCount !== null && result.rowCount > 0;
+  }
+  
+  // Legacy Note operations
+  async createNote(note: InsertNote): Promise<Note> {
+    const [newNote] = await db
+      .insert(notes)
+      .values(note)
+      .returning();
+    return newNote;
+  }
+  
+  async getNoteById(id: number): Promise<Note | undefined> {
+    const [note] = await db
+      .select()
+      .from(notes)
+      .where(eq(notes.id, id));
+    return note;
+  }
+  
+  async getNotesByUserId(userId: number): Promise<Note[]> {
+    return await db
+      .select()
+      .from(notes)
+      .where(eq(notes.userId, userId));
+  }
+  
+  async getAllNotes(): Promise<Note[]> {
+    return await db
+      .select()
+      .from(notes)
+      .orderBy(desc(notes.createdAt));
+  }
+  
+  async updateNote(id: number, noteData: Partial<InsertNote>): Promise<Note | undefined> {
+    const [updatedNote] = await db
+      .update(notes)
+      .set(noteData)
+      .where(eq(notes.id, id))
+      .returning();
+    
+    return updatedNote;
+  }
+  
+  async deleteNote(id: number): Promise<boolean> {
+    const result = await db
+      .delete(notes)
+      .where(eq(notes.id, id));
+    
+    return result.rowCount !== null && result.rowCount > 0;
+  }
+}
+
+// Replace MemStorage with DatabaseStorage to use PostgreSQL database
+export const storage = new DatabaseStorage();

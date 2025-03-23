@@ -18,68 +18,85 @@ async function addSampleListings() {
   
   // Only add sample data if there are no listings yet
   if (listings.length === 0) {
-    // Create a sample user first
-    // Using type assertion to work around schema constraints for sample data
-    const sampleUser = await storage.createUser({
-      username: "sample_investor",
-      email: "investor@notetrade.com",
-      password: await bcrypt.hash("password123", 10),
-      firstName: "Jane",
-      lastName: "Smith",
-      company: "Investment Partners LLC",
-      phone: "555-123-4567",
-      role: "seller"
-    } as any);
+    // Check if sample user already exists
+    let sampleUser = await storage.getUserByUsername("sample_investor");
+    
+    // Create sample user if it doesn't exist
+    if (!sampleUser) {
+      sampleUser = await storage.createUser({
+        username: "sample_investor",
+        email: "investor@notetrade.com",
+        password: await bcrypt.hash("password123", 10),
+        firstName: "Jane",
+        lastName: "Smith",
+        company: "Investment Partners LLC",
+        phone: "555-123-4567",
+        role: "seller",
+        status: "active"
+      } as any);
+    }
     
     // Create some sample note listings with type assertion
     await storage.createNoteListing({
       sellerId: sampleUser.id,
-      loanAmount: 150000,
+      title: "Single Family Home in Austin",
+      noteType: "Mortgage Note",
+      performanceStatus: "performing",
+      originalLoanAmount: 150000,
+      currentLoanAmount: 145000,
       interestRate: 7.25,
-      loanTerm: 360,
-      paymentAmount: 1023.12,
-      timeHeld: 18,
-      remainingPayments: 342,
-      propertyType: "Single Family",
+      originalLoanTerm: 360,
+      remainingLoanTerm: 342,
+      monthlyPaymentAmount: 1023.12,
       propertyAddress: "123 Oak Lane, Austin, TX 78701",
+      propertyState: "TX",
+      propertyType: "Single Family",
+      propertyValue: 230770,
+      loanToValueRatio: 65,
       askingPrice: 125000,
       status: "active",
-      loanToValueRatio: 65,
-      propertyValue: 230770, // Calculated as loanAmount * (100 / loanToValueRatio)
       description: "Well-performing note with a strong payment history. Property is in an excellent neighborhood with rising property values."
     } as any);
     
     await storage.createNoteListing({
       sellerId: sampleUser.id,
-      loanAmount: 85000,
+      title: "Condo in Downtown Seattle",
+      noteType: "Deed of Trust",
+      performanceStatus: "performing",
+      originalLoanAmount: 85000,
+      currentLoanAmount: 78000,
       interestRate: 6.5,
-      loanTerm: 240,
-      paymentAmount: 635.75,
-      timeHeld: 24,
-      remainingPayments: 216,
-      propertyType: "Condo",
+      originalLoanTerm: 240,
+      remainingLoanTerm: 216,
+      monthlyPaymentAmount: 635.75,
       propertyAddress: "456 Pine Street #302, Seattle, WA 98101",
+      propertyState: "WA",
+      propertyType: "Condo",
+      propertyValue: 121428,
+      loanToValueRatio: 70,
       askingPrice: 70000,
       status: "active",
-      loanToValueRatio: 70,
-      propertyValue: 121428, // Calculated as loanAmount * (100 / loanToValueRatio)
       description: "Seasoned note backed by a renovated condo in downtown Seattle. Borrower has excellent credit and perfect payment history."
     } as any);
     
     await storage.createNoteListing({
       sellerId: sampleUser.id,
-      loanAmount: 225000,
+      title: "Multi-Family Property in Chicago",
+      noteType: "Commercial Mortgage",
+      performanceStatus: "performing",
+      originalLoanAmount: 225000,
+      currentLoanAmount: 215000,
       interestRate: 8.1,
-      loanTerm: 300,
-      paymentAmount: 1560.42,
-      timeHeld: 36,
-      remainingPayments: 264,
-      propertyType: "Multi-Family",
+      originalLoanTerm: 300,
+      remainingLoanTerm: 264,
+      monthlyPaymentAmount: 1560.42,
       propertyAddress: "789 Maple Ave, Chicago, IL 60611",
+      propertyState: "IL",
+      propertyType: "Multi-Family",
+      propertyValue: 300000,
+      loanToValueRatio: 75,
       askingPrice: 195000,
       status: "active",
-      loanToValueRatio: 75,
-      propertyValue: 300000, // Calculated as loanAmount * (100 / loanToValueRatio)
       description: "High-yield note secured by a well-maintained duplex in a rapidly appreciating area of Chicago. Strong rental income supports payments."
     } as any);
     
@@ -90,7 +107,10 @@ async function addSampleListings() {
       fileSize: 2048,
       documentType: "Loan Agreement",
       documentUrl: "https://example.com/docs/loan_agreement.pdf",
-      uploadedById: sampleUser.id
+      uploadedById: sampleUser.id,
+      isPublic: false,
+      verificationStatus: "pending",
+      description: "Original loan agreement document"
     } as any);
     
     await storage.createNoteDocument({
@@ -99,7 +119,10 @@ async function addSampleListings() {
       fileSize: 4096,
       documentType: "Appraisal",
       documentUrl: "https://example.com/docs/appraisal.pdf",
-      uploadedById: sampleUser.id
+      uploadedById: sampleUser.id,
+      isPublic: true,
+      verificationStatus: "verified",
+      description: "Property appraisal showing current market value"
     } as any);
   }
 }
