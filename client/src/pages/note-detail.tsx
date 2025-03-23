@@ -304,7 +304,7 @@ export default function NoteDetailPage() {
                       </div>
                       
                       <div className="text-center bg-gray-50 rounded-lg py-4 shadow-sm">
-                        <div className="text-3xl font-bold">67%</div>
+                        <div className="text-3xl font-bold">{listing.loanToValueRatio || '75'}%</div>
                         <div className="text-gray-600 text-sm mt-1">LTV</div>
                       </div>
                     </div>
@@ -334,6 +334,11 @@ export default function NoteDetailPage() {
                       <div className="flex justify-between border-b pb-2">
                         <div className="text-gray-600 font-medium">Escrow</div>
                         <div className="font-semibold">$0</div>
+                      </div>
+                      
+                      <div className="flex justify-between border-b pb-2">
+                        <div className="text-gray-600 font-medium">Property Value</div>
+                        <div className="font-semibold">{formatCurrency(listing.propertyValue || (listing.loanAmount * (100 / (listing.loanToValueRatio || 75))))}</div>
                       </div>
                       
                       <div className="flex justify-between border-b pb-2">
@@ -430,6 +435,10 @@ export default function NoteDetailPage() {
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Remaining Term</span>
                     <span className="font-semibold">{listing.remainingPayments} months</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">LTV Ratio</span>
+                    <span className="font-semibold">{listing.loanToValueRatio || '75'}%</span>
                   </div>
                 </CardContent>
                 <CardFooter>
