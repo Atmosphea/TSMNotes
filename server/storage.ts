@@ -187,10 +187,21 @@ export class MemStorage implements IStorage {
       email: insertUser.email,
       firstName: insertUser.firstName || null,
       lastName: insertUser.lastName || null,
-      role: insertUser.role || 'user',
+      role: insertUser.role || 'investor',
+      status: insertUser.status || 'active',
+      bio: insertUser.bio || null,
       phone: insertUser.phone || null,
       company: insertUser.company || null,
-      createdAt: new Date() 
+      website: insertUser.website || null,
+      location: insertUser.location || null,
+      profileImageUrl: insertUser.profileImageUrl || null,
+      emailNotifications: insertUser.emailNotifications ?? true,
+      smsNotifications: insertUser.smsNotifications ?? false,
+      marketingEmails: insertUser.marketingEmails ?? true,
+      isAccreditedInvestor: insertUser.isAccreditedInvestor ?? false,
+      accreditationProofUrl: insertUser.accreditationProofUrl || null,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     this.users.set(id, user);
     return user;
@@ -306,17 +317,46 @@ export class MemStorage implements IStorage {
     const noteListing: NoteListing = {
       id,
       sellerId: insertNoteListing.sellerId,
-      loanAmount: insertNoteListing.loanAmount,
+      title: insertNoteListing.title || `Property Note in ${insertNoteListing.propertyState || 'Unknown Location'}`,
+      noteType: insertNoteListing.noteType,
+      performanceStatus: insertNoteListing.performanceStatus,
+      originalLoanAmount: insertNoteListing.originalLoanAmount,
+      currentLoanAmount: insertNoteListing.currentLoanAmount,
       interestRate: insertNoteListing.interestRate,
-      loanTerm: insertNoteListing.loanTerm,
-      paymentAmount: insertNoteListing.paymentAmount,
-      timeHeld: insertNoteListing.timeHeld,
-      remainingPayments: insertNoteListing.remainingPayments,
+      originalLoanTerm: insertNoteListing.originalLoanTerm,
+      remainingLoanTerm: insertNoteListing.remainingLoanTerm,
+      monthlyPaymentAmount: insertNoteListing.monthlyPaymentAmount,
+      loanOriginationDate: insertNoteListing.loanOriginationDate || null,
+      loanMaturityDate: insertNoteListing.loanMaturityDate || null,
+      paymentHistory: insertNoteListing.paymentHistory || null,
       propertyAddress: insertNoteListing.propertyAddress,
-      askingPrice: insertNoteListing.askingPrice,
+      propertyCity: insertNoteListing.propertyCity || null,
+      propertyState: insertNoteListing.propertyState,
+      propertyZipCode: insertNoteListing.propertyZipCode || null,
+      propertyCounty: insertNoteListing.propertyCounty || null,
       propertyType: insertNoteListing.propertyType,
+      propertyValue: insertNoteListing.propertyValue || null,
+      loanToValueRatio: insertNoteListing.loanToValueRatio || 75,
+      propertyDescription: insertNoteListing.propertyDescription || null,
+      isSecured: insertNoteListing.isSecured ?? true,
+      collateralType: insertNoteListing.collateralType || null,
+      askingPrice: insertNoteListing.askingPrice,
+      expectedYield: insertNoteListing.expectedYield || null,
+      amortizationType: insertNoteListing.amortizationType || null,
+      paymentFrequency: insertNoteListing.paymentFrequency || 'monthly',
+      status: insertNoteListing.status || 'active',
+      featured: insertNoteListing.featured ?? false,
+      isPublic: insertNoteListing.isPublic ?? true,
+      verificationStatus: insertNoteListing.verificationStatus || 'pending',
       description: insertNoteListing.description || null,
-      status: 'active',
+      specialNotes: insertNoteListing.specialNotes || null,
+      dueDiligenceCompleted: insertNoteListing.dueDiligenceCompleted ?? false,
+      dueDiligenceNotes: insertNoteListing.dueDiligenceNotes || null,
+      viewCount: 0,
+      favoriteCount: 0,
+      inquiryCount: 0,
+      listedAt: new Date(),
+      expiresAt: null,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -345,20 +385,26 @@ export class MemStorage implements IStorage {
       return undefined;
     }
     
-    // Handle description field correctly
+    // Create updated listing with all the existing fields first
     const updatedListing: NoteListing = {
       ...existingListing,
+      // Update with new values if provided or keep existing ones
       sellerId: listing.sellerId ?? existingListing.sellerId,
-      loanAmount: listing.loanAmount ?? existingListing.loanAmount,
+      title: listing.title ?? existingListing.title,
+      noteType: listing.noteType ?? existingListing.noteType,
+      performanceStatus: listing.performanceStatus ?? existingListing.performanceStatus,
+      originalLoanAmount: listing.originalLoanAmount ?? existingListing.originalLoanAmount,
+      currentLoanAmount: listing.currentLoanAmount ?? existingListing.currentLoanAmount,
       interestRate: listing.interestRate ?? existingListing.interestRate,
-      loanTerm: listing.loanTerm ?? existingListing.loanTerm,
-      paymentAmount: listing.paymentAmount ?? existingListing.paymentAmount,
-      timeHeld: listing.timeHeld ?? existingListing.timeHeld,
-      remainingPayments: listing.remainingPayments ?? existingListing.remainingPayments,
+      originalLoanTerm: listing.originalLoanTerm ?? existingListing.originalLoanTerm,
+      remainingLoanTerm: listing.remainingLoanTerm ?? existingListing.remainingLoanTerm,
+      monthlyPaymentAmount: listing.monthlyPaymentAmount ?? existingListing.monthlyPaymentAmount,
       propertyAddress: listing.propertyAddress ?? existingListing.propertyAddress,
-      askingPrice: listing.askingPrice ?? existingListing.askingPrice,
+      propertyState: listing.propertyState ?? existingListing.propertyState,
       propertyType: listing.propertyType ?? existingListing.propertyType,
+      askingPrice: listing.askingPrice ?? existingListing.askingPrice,
       description: listing.description !== undefined ? (listing.description || null) : existingListing.description,
+      // Always update the timestamp when editing
       updatedAt: new Date()
     };
     
