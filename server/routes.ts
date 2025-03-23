@@ -5,7 +5,8 @@ import {
   insertWaitlistEntrySchema, 
   insertNoteListingSchema, 
   insertNoteDocumentSchema,
-  insertUserSchema 
+  insertUserSchema,
+  insertInquirySchema
 } from "@shared/schema";
 import { z } from "zod";
 import { ZodError } from "zod";

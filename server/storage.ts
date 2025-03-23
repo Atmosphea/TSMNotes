@@ -133,6 +133,7 @@ export class MemStorage implements IStorage {
   private noteListings: Map<number, NoteListing>;
   private noteDocuments: Map<number, NoteDocument>;
   private notes: Map<number, Note>; // Legacy
+  private inquiries: Map<number, Inquiry>;
   
   private currentUserId: number;
   private currentWaitlistEntryId: number;
@@ -140,6 +141,7 @@ export class MemStorage implements IStorage {
   private currentNoteListingId: number;
   private currentNoteDocumentId: number;
   private currentNoteId: number;
+  private currentInquiryId: number;
 
   constructor() {
     this.users = new Map();
@@ -148,6 +150,7 @@ export class MemStorage implements IStorage {
     this.noteListings = new Map();
     this.noteDocuments = new Map();
     this.notes = new Map();
+    this.inquiries = new Map();
     
     this.currentUserId = 1;
     this.currentWaitlistEntryId = 1;
@@ -155,6 +158,7 @@ export class MemStorage implements IStorage {
     this.currentNoteListingId = 1;
     this.currentNoteDocumentId = 1;
     this.currentNoteId = 1;
+    this.currentInquiryId = 1;
   }
 
   // User operations
@@ -390,6 +394,170 @@ export class MemStorage implements IStorage {
   
   async deleteNoteDocument(id: number): Promise<boolean> {
     return this.noteDocuments.delete(id);
+  }
+  
+  // Inquiry operations
+  async createInquiry(insertInquiry: InsertInquiry): Promise<Inquiry> {
+    const id = this.currentInquiryId++;
+    const inquiry: Inquiry = {
+      ...insertInquiry,
+      id,
+      status: insertInquiry.status || 'pending',
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.inquiries.set(id, inquiry);
+    
+    // Update the note listing inquiry count if we were using a real database
+    // But since this is in-memory, we don't need to do that
+    
+    return inquiry;
+  }
+  
+  async getInquiryById(id: number): Promise<Inquiry | undefined> {
+    return this.inquiries.get(id);
+  }
+  
+  async getInquiriesByNoteListingId(noteListingId: number): Promise<Inquiry[]> {
+    return Array.from(this.inquiries.values()).filter(
+      (inquiry) => inquiry.noteListingId === noteListingId
+    );
+  }
+  
+  async getInquiriesByBuyerId(buyerId: number): Promise<Inquiry[]> {
+    return Array.from(this.inquiries.values()).filter(
+      (inquiry) => inquiry.buyerId === buyerId
+    );
+  }
+  
+  async updateInquiry(id: number, inquiryData: Partial<InsertInquiry>): Promise<Inquiry | undefined> {
+    const existingInquiry = this.inquiries.get(id);
+    
+    if (!existingInquiry) {
+      return undefined;
+    }
+    
+    const updatedInquiry: Inquiry = {
+      ...existingInquiry,
+      ...inquiryData,
+      updatedAt: new Date()
+    };
+    
+    this.inquiries.set(id, updatedInquiry);
+    return updatedInquiry;
+  }
+  
+  async deleteInquiry(id: number): Promise<boolean> {
+    return this.inquiries.delete(id);
+  }
+  
+  // SearchNoteListings implementation for MemStorage
+  async searchNoteListings(
+    filters: SearchFilters,
+    sort?: SortOptions,
+    limit: number = 20,
+    offset: number = 0
+  ): Promise<{ listings: NoteListing[], total: number }> {
+    let listings = Array.from(this.noteListings.values());
+    
+    // Apply filters
+    if (filters) {
+      if (filters.noteType) {
+        listings = listings.filter(listing => listing.noteType === filters.noteType);
+      }
+      
+      if (filters.performanceStatus && filters.performanceStatus.length > 0) {
+        listings = listings.filter(listing => filters.performanceStatus!.includes(listing.performanceStatus));
+      }
+      
+      if (filters.minOriginalAmount !== undefined) {
+        listings = listings.filter(listing => listing.originalLoanAmount >= filters.minOriginalAmount!);
+      }
+      
+      if (filters.maxOriginalAmount !== undefined) {
+        listings = listings.filter(listing => listing.originalLoanAmount <= filters.maxOriginalAmount!);
+      }
+      
+      if (filters.minInterestRate !== undefined) {
+        listings = listings.filter(listing => listing.interestRate >= filters.minInterestRate!);
+      }
+      
+      if (filters.maxInterestRate !== undefined) {
+        listings = listings.filter(listing => listing.interestRate <= filters.maxInterestRate!);
+      }
+      
+      if (filters.propertyState) {
+        listings = listings.filter(listing => listing.propertyState === filters.propertyState);
+      }
+      
+      if (filters.propertyCity) {
+        listings = listings.filter(listing => listing.propertyCity === filters.propertyCity);
+      }
+      
+      if (filters.propertyType && filters.propertyType.length > 0) {
+        listings = listings.filter(listing => filters.propertyType!.includes(listing.propertyType));
+      }
+      
+      if (filters.minAskingPrice !== undefined) {
+        listings = listings.filter(listing => listing.askingPrice >= filters.minAskingPrice!);
+      }
+      
+      if (filters.maxAskingPrice !== undefined) {
+        listings = listings.filter(listing => listing.askingPrice <= filters.maxAskingPrice!);
+      }
+      
+      if (filters.status && filters.status.length > 0) {
+        listings = listings.filter(listing => filters.status!.includes(listing.status));
+      }
+      
+      // Simple keyword search implementation
+      if (filters.keyword) {
+        const keyword = filters.keyword.toLowerCase();
+        listings = listings.filter(listing => 
+          listing.title?.toLowerCase().includes(keyword) || 
+          listing.description?.toLowerCase().includes(keyword) || 
+          listing.propertyAddress?.toLowerCase().includes(keyword)
+        );
+      }
+    }
+    
+    // Apply sorting
+    if (sort) {
+      listings.sort((a, b) => {
+        // Handle common fields
+        if (sort.field === 'askingPrice') {
+          return sort.direction === 'asc' 
+            ? a.askingPrice - b.askingPrice 
+            : b.askingPrice - a.askingPrice;
+        }
+        
+        if (sort.field === 'interestRate') {
+          return sort.direction === 'asc' 
+            ? a.interestRate - b.interestRate 
+            : b.interestRate - a.interestRate;
+        }
+        
+        if (sort.field === 'createdAt') {
+          return sort.direction === 'asc' 
+            ? a.createdAt.getTime() - b.createdAt.getTime() 
+            : b.createdAt.getTime() - a.createdAt.getTime();
+        }
+        
+        // Default sort by creation date
+        return sort.direction === 'asc' 
+          ? a.createdAt.getTime() - b.createdAt.getTime() 
+          : b.createdAt.getTime() - a.createdAt.getTime();
+      });
+    } else {
+      // Default sort by creation date, newest first
+      listings.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    }
+    
+    // Apply pagination
+    const total = listings.length;
+    listings = listings.slice(offset, offset + limit);
+    
+    return { listings, total };
   }
 }
 
