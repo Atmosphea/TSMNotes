@@ -48,6 +48,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import {
   User,
   Phone,
@@ -196,6 +197,9 @@ export default function ProfilePage() {
         variant: "destructive",
       });
     },
+    meta: {
+      invalidates: ['/api/users/current'],
+    },
   });
 
   function onProfileSubmit(values: ProfileFormValues) {
@@ -223,6 +227,9 @@ export default function ProfilePage() {
         description: "There was a problem updating your notification settings.",
         variant: "destructive",
       });
+    },
+    meta: {
+      invalidates: ['/api/users/notifications'],
     },
   });
 

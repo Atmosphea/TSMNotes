@@ -176,6 +176,9 @@ export default function AdminDashboard() {
         variant: "destructive",
       });
     },
+    meta: {
+      invalidates: ['/api/admin/users'],
+    },
   });
 
   // Delete user mutation
@@ -199,6 +202,9 @@ export default function AdminDashboard() {
         description: "There was a problem deleting the user.",
         variant: "destructive",
       });
+    },
+    meta: {
+      invalidates: ['/api/admin/users'],
     },
   });
 
