@@ -38,16 +38,19 @@ import { type NoteDocument, type NoteListing, type User } from "@shared/schema";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
 import { 
+  BarChart3,
   Building2, 
   Calendar, 
   DollarSign, 
   FileText, 
   GalleryHorizontalEnd, 
   History, 
+  Home,
   LayoutDashboard, 
   Lock, 
   MapPin, 
-  Percent, 
+  Percent,
+  PiggyBank,
   User as UserIcon
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -193,7 +196,7 @@ export default function NoteDetailPage() {
               </div>
               
               {/* Quick stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
                 <Card>
                   <CardContent className="p-4 flex flex-col items-center text-center">
                     <Percent className="w-8 h-8 text-primary mb-2" />
@@ -204,8 +207,29 @@ export default function NoteDetailPage() {
                 <Card>
                   <CardContent className="p-4 flex flex-col items-center text-center">
                     <DollarSign className="w-8 h-8 text-primary mb-2" />
-                    <p className="text-xs text-muted-foreground">Payment</p>
+                    <p className="text-xs text-muted-foreground">Unpaid Principal</p>
+                    <p className="text-lg font-semibold">{formatCurrency(listing.loanAmount)}</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 flex flex-col items-center text-center">
+                    <PiggyBank className="w-8 h-8 text-primary mb-2" />
+                    <p className="text-xs text-muted-foreground">Monthly Payment</p>
                     <p className="text-lg font-semibold">{formatCurrency(listing.paymentAmount)}</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 flex flex-col items-center text-center">
+                    <BarChart3 className="w-8 h-8 text-primary mb-2" />
+                    <p className="text-xs text-muted-foreground">LTV Ratio</p>
+                    <p className="text-lg font-semibold">{listing.loanToValueRatio || '75'}%</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="p-4 flex flex-col items-center text-center">
+                    <Home className="w-8 h-8 text-primary mb-2" />
+                    <p className="text-xs text-muted-foreground">Property Value</p>
+                    <p className="text-lg font-semibold">{formatCurrency(listing.propertyValue || listing.loanAmount * (100 / (listing.loanToValueRatio || 75)))}</p>
                   </CardContent>
                 </Card>
                 <Card>
@@ -213,13 +237,6 @@ export default function NoteDetailPage() {
                     <Calendar className="w-8 h-8 text-primary mb-2" />
                     <p className="text-xs text-muted-foreground">Remaining</p>
                     <p className="text-lg font-semibold">{listing.remainingPayments} months</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardContent className="p-4 flex flex-col items-center text-center">
-                    <History className="w-8 h-8 text-primary mb-2" />
-                    <p className="text-xs text-muted-foreground">Time Held</p>
-                    <p className="text-lg font-semibold">{listing.timeHeld} months</p>
                   </CardContent>
                 </Card>
               </div>

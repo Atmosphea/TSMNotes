@@ -53,6 +53,10 @@ export const noteListings = pgTable("note_listings", {
   description: text("description"),
   status: text("status").default('active').notNull(), // active, pending, sold
   
+  // New fields for filters
+  loanToValueRatio: doublePrecision("loan_to_value_ratio").default(75),
+  propertyValue: doublePrecision("property_value"),
+  
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
