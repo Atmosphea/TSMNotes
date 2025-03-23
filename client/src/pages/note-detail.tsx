@@ -242,44 +242,91 @@ export default function NoteDetailPage() {
                 </TabsList>
                 
                 <TabsContent value="overview" className="p-4 border rounded-lg mt-4">
-                  <h3 className="text-lg font-semibold mb-4">Note Details</h3>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Original Loan Amount</span>
-                      <span className="font-medium">{formatCurrency(listing.loanAmount)}</span>
+                  {/* Main details grid layout based on screenshot */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-10 mb-8">
+                    {/* Left column - first row */}
+                    <div>
+                      <div className="text-gray-600 text-sm">Unpaid Principal Balance</div>
+                      <div className="text-3xl font-bold">{formatCurrency(listing.loanAmount - (listing.loanAmount * (listing.timeHeld / listing.loanTerm)))}</div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Interest Rate</span>
-                      <span className="font-medium">{listing.interestRate}%</span>
+                    
+                    {/* Right column - first row */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                      <div>
+                        <div className="text-gray-600 text-sm">Monthly Payment</div>
+                        <div className="text-xl font-bold">${listing.paymentAmount.toFixed(0)}</div>
+                      </div>
+                      <div>
+                        <div className="text-gray-600 text-sm">Principle & Interest</div>
+                        <div className="text-xl font-bold">${listing.paymentAmount.toFixed(0)}</div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Loan Term</span>
-                      <span className="font-medium">{listing.loanTerm} months</span>
+                    
+                    {/* Left column - second row */}
+                    <div>
+                      <div className="text-gray-600 text-sm">Original Balance</div>
+                      <div className="text-3xl font-bold">{formatCurrency(listing.loanAmount)}</div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Monthly Payment</span>
-                      <span className="font-medium">{formatCurrency(listing.paymentAmount)}</span>
+                    
+                    {/* Right column - second row */}
+                    <div>
+                      <div className="text-gray-600 text-sm">Total Payoff</div>
+                      <div className="text-3xl font-bold">{formatCurrency(listing.paymentAmount * listing.remainingPayments)}</div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Time Held</span>
-                      <span className="font-medium">{listing.timeHeld} months</span>
+                    
+                    {/* Stats row with 3 columns */}
+                    <div className="md:col-span-2 grid grid-cols-3 gap-4 mt-4">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold">1st</div>
+                        <div className="text-gray-600 text-sm">Lien Position</div>
+                      </div>
+                      
+                      <div className="text-center">
+                        <div className="text-3xl font-bold">{listing.interestRate}%</div>
+                        <div className="text-gray-600 text-sm">Interest Rate</div>
+                      </div>
+                      
+                      <div className="text-center">
+                        <div className="text-3xl font-bold">67%</div>
+                        <div className="text-gray-600 text-sm">LTV</div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Remaining Payments</span>
-                      <span className="font-medium">{listing.remainingPayments} months</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Property Type</span>
-                      <span className="font-medium">{listing.propertyType}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Asking Price</span>
-                      <span className="font-medium">{formatCurrency(listing.askingPrice)}</span>
+                    
+                    {/* Bottom grid for dates and additional info */}
+                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-4 mt-4">
+                      <div className="flex justify-between">
+                        <div className="text-gray-600">Origination</div>
+                        <div>Oct 18, 2022</div>
+                      </div>
+                      
+                      <div className="flex justify-between">
+                        <div className="text-gray-600">Accrued Late Charges</div>
+                        <div>$53,291.26</div>
+                      </div>
+                      
+                      <div className="flex justify-between">
+                        <div className="text-gray-600">Maturity</div>
+                        <div>Oct 17, 2023</div>
+                      </div>
+                      
+                      <div className="flex justify-between">
+                        <div className="text-gray-600">Last Payment Received</div>
+                        <div>No data</div>
+                      </div>
+                      
+                      <div className="flex justify-between">
+                        <div className="text-gray-600">Escrow</div>
+                        <div>$0</div>
+                      </div>
+                      
+                      <div className="flex justify-between">
+                        <div className="text-gray-600">Next Payment Date</div>
+                        <div>No data</div>
+                      </div>
                     </div>
                   </div>
                   
-                  <Separator className="my-4" />
+                  <Separator className="my-6" />
                   
                   <h3 className="text-lg font-semibold mb-4">Description</h3>
                   <p className="text-muted-foreground">
