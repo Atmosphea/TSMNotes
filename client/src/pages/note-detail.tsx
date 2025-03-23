@@ -241,87 +241,87 @@ export default function NoteDetailPage() {
                   </TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="overview" className="p-4 border rounded-lg mt-4">
-                  {/* Main details grid layout based on screenshot */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-8 gap-x-10 mb-8">
+                <TabsContent value="overview" className="p-5 border rounded-lg mt-4">
+                  {/* Main details grid layout based on screenshot with improved formatting */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-14 mb-8">
                     {/* Left column - first row */}
                     <div>
-                      <div className="text-gray-600 text-sm">Unpaid Principal Balance</div>
+                      <div className="text-gray-600 text-sm font-medium mb-1.5">Unpaid Principal Balance</div>
                       <div className="text-3xl font-bold">{formatCurrency(listing.loanAmount - (listing.loanAmount * (listing.timeHeld / listing.loanTerm)))}</div>
                     </div>
                     
                     {/* Right column - first row */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                       <div>
-                        <div className="text-gray-600 text-sm">Monthly Payment</div>
+                        <div className="text-gray-600 text-sm font-medium mb-1.5">Monthly Payment</div>
                         <div className="text-xl font-bold">${listing.paymentAmount.toFixed(0)}</div>
                       </div>
                       <div>
-                        <div className="text-gray-600 text-sm">Principle & Interest</div>
+                        <div className="text-gray-600 text-sm font-medium mb-1.5">Principle & Interest</div>
                         <div className="text-xl font-bold">${listing.paymentAmount.toFixed(0)}</div>
                       </div>
                     </div>
                     
                     {/* Left column - second row */}
                     <div>
-                      <div className="text-gray-600 text-sm">Original Balance</div>
+                      <div className="text-gray-600 text-sm font-medium mb-1.5">Original Balance</div>
                       <div className="text-3xl font-bold">{formatCurrency(listing.loanAmount)}</div>
                     </div>
                     
                     {/* Right column - second row */}
                     <div>
-                      <div className="text-gray-600 text-sm">Total Payoff</div>
+                      <div className="text-gray-600 text-sm font-medium mb-1.5">Total Payoff</div>
                       <div className="text-3xl font-bold">{formatCurrency(listing.paymentAmount * listing.remainingPayments)}</div>
                     </div>
                     
                     {/* Stats row with 3 columns */}
-                    <div className="md:col-span-2 grid grid-cols-3 gap-4 mt-4">
-                      <div className="text-center">
+                    <div className="md:col-span-2 grid grid-cols-3 gap-4 my-6">
+                      <div className="text-center bg-gray-50 rounded-lg py-4 shadow-sm">
                         <div className="text-3xl font-bold">1st</div>
-                        <div className="text-gray-600 text-sm">Lien Position</div>
+                        <div className="text-gray-600 text-sm mt-1">Lien Position</div>
                       </div>
                       
-                      <div className="text-center">
+                      <div className="text-center bg-gray-50 rounded-lg py-4 shadow-sm">
                         <div className="text-3xl font-bold">{listing.interestRate}%</div>
-                        <div className="text-gray-600 text-sm">Interest Rate</div>
+                        <div className="text-gray-600 text-sm mt-1">Interest Rate</div>
                       </div>
                       
-                      <div className="text-center">
+                      <div className="text-center bg-gray-50 rounded-lg py-4 shadow-sm">
                         <div className="text-3xl font-bold">67%</div>
-                        <div className="text-gray-600 text-sm">LTV</div>
+                        <div className="text-gray-600 text-sm mt-1">LTV</div>
                       </div>
                     </div>
                     
                     {/* Bottom grid for dates and additional info */}
-                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-y-4 gap-x-4 mt-4">
-                      <div className="flex justify-between">
-                        <div className="text-gray-600">Origination</div>
-                        <div>Oct 18, 2022</div>
+                    <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-y-5 gap-x-6 mt-4">
+                      <div className="flex justify-between border-b pb-2">
+                        <div className="text-gray-600 font-medium">Origination</div>
+                        <div className="font-semibold">Oct 18, 2022</div>
                       </div>
                       
-                      <div className="flex justify-between">
-                        <div className="text-gray-600">Accrued Late Charges</div>
-                        <div>$53,291.26</div>
+                      <div className="flex justify-between border-b pb-2">
+                        <div className="text-gray-600 font-medium">Accrued Late Charges</div>
+                        <div className="font-semibold">$53,291.26</div>
                       </div>
                       
-                      <div className="flex justify-between">
-                        <div className="text-gray-600">Maturity</div>
-                        <div>Oct 17, 2023</div>
+                      <div className="flex justify-between border-b pb-2">
+                        <div className="text-gray-600 font-medium">Maturity</div>
+                        <div className="font-semibold">Oct 17, 2023</div>
                       </div>
                       
-                      <div className="flex justify-between">
-                        <div className="text-gray-600">Last Payment Received</div>
-                        <div>No data</div>
+                      <div className="flex justify-between border-b pb-2">
+                        <div className="text-gray-600 font-medium">Last Payment Received</div>
+                        <div className="font-semibold text-gray-500">No data</div>
                       </div>
                       
-                      <div className="flex justify-between">
-                        <div className="text-gray-600">Escrow</div>
-                        <div>$0</div>
+                      <div className="flex justify-between border-b pb-2">
+                        <div className="text-gray-600 font-medium">Escrow</div>
+                        <div className="font-semibold">$0</div>
                       </div>
                       
-                      <div className="flex justify-between">
-                        <div className="text-gray-600">Next Payment Date</div>
-                        <div>No data</div>
+                      <div className="flex justify-between border-b pb-2">
+                        <div className="text-gray-600 font-medium">Next Payment Date</div>
+                        <div className="font-semibold text-gray-500">No data</div>
                       </div>
                     </div>
                   </div>
