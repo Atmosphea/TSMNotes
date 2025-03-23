@@ -747,6 +747,175 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Respond to an inquiry (specific endpoint for sellers)
+  app.post("/api/inquiries/:id/respond", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Invalid inquiry ID" 
+        });
+      }
+      
+      // Parse required fields for a response
+      const responseSchema = z.object({
+        responseMessage: z.string().min(1, "Response message is required"),
+        status: z.enum(["pending", "accepted", "rejected", "countered", "withdrawn", "expired"])
+      });
+      
+      const { responseMessage, status } = responseSchema.parse(req.body);
+      
+      // Get the existing inquiry
+      const inquiry = await storage.getInquiryById(id);
+      if (!inquiry) {
+        return res.status(404).json({ 
+          success: false, 
+          message: "Inquiry not found" 
+        });
+      }
+      
+      // Update the inquiry with response information
+      const updatedInquiry = await storage.updateInquiry(id, {
+        responseMessage,
+        status,
+        // The respondedAt field is automatically set in the storage layer when 
+        // the status changes to accepted or rejected
+      });
+      
+      return res.status(200).json({ 
+        success: true, 
+        message: "Response to inquiry sent successfully", 
+        data: updatedInquiry 
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ 
+          success: false, 
+          message: validationError.message 
+        });
+      }
+      
+      console.error("Error responding to inquiry:", error);
+      return res.status(500).json({ 
+        success: false, 
+        message: "An error occurred while responding to the inquiry" 
+      });
+    }
+  });
+  
+  // Get all inquiries for a seller (across all their listings)
+  app.get("/api/inquiries/seller/:sellerId", async (req, res) => {
+    try {
+      const sellerId = parseInt(req.params.sellerId);
+      if (isNaN(sellerId)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Invalid seller ID" 
+        });
+      }
+      
+      // First, get all listings for this seller
+      const listings = await storage.getNoteListingsBySellerId(sellerId);
+      
+      if (!listings || listings.length === 0) {
+        return res.status(200).json({ 
+          success: true, 
+          data: [] 
+        });
+      }
+      
+      // Then get inquiries for each listing and combine them
+      const inquiriesPromises = listings.map(listing => 
+        storage.getInquiriesByNoteListingId(listing.id)
+      );
+      
+      const inquiriesArrays = await Promise.all(inquiriesPromises);
+      
+      // Flatten the array of arrays into a single array of inquiries
+      const inquiries = inquiriesArrays.flat();
+      
+      return res.status(200).json({ 
+        success: true, 
+        data: inquiries 
+      });
+    } catch (error) {
+      console.error("Error getting seller's inquiries:", error);
+      return res.status(500).json({ 
+        success: false, 
+        message: "An error occurred while fetching seller's inquiries" 
+      });
+    }
+  });
+  
+  // Get inquiry statistics
+  app.get("/api/inquiries/stats", async (req, res) => {
+    try {
+      // Get all inquiries
+      const listings = await storage.getAllNoteListings();
+      const inquiriesPromises = listings.map(listing => 
+        storage.getInquiriesByNoteListingId(listing.id)
+      );
+      
+      const inquiriesArrays = await Promise.all(inquiriesPromises);
+      const allInquiries = inquiriesArrays.flat();
+      
+      // Calculate statistics
+      const stats = {
+        total: allInquiries.length,
+        byStatus: {
+          pending: allInquiries.filter(inq => inq.status === 'pending').length,
+          accepted: allInquiries.filter(inq => inq.status === 'accepted').length,
+          rejected: allInquiries.filter(inq => inq.status === 'rejected').length,
+          countered: allInquiries.filter(inq => inq.status === 'countered').length,
+          withdrawn: allInquiries.filter(inq => inq.status === 'withdrawn').length,
+          expired: allInquiries.filter(inq => inq.status === 'expired').length
+        },
+        avgResponseTime: calculateAvgResponseTime(allInquiries),
+        recentActivity: getRecentInquiryActivity(allInquiries, 7) // Activity in last 7 days
+      };
+      
+      return res.status(200).json({ 
+        success: true, 
+        data: stats 
+      });
+    } catch (error) {
+      console.error("Error getting inquiry statistics:", error);
+      return res.status(500).json({ 
+        success: false, 
+        message: "An error occurred while fetching inquiry statistics" 
+      });
+    }
+  });
+  
+  // Helper function to calculate average response time
+  function calculateAvgResponseTime(inquiries) {
+    const respondedInquiries = inquiries.filter(inq => 
+      inq.respondedAt !== null && inq.createdAt
+    );
+    
+    if (respondedInquiries.length === 0) {
+      return null;
+    }
+    
+    const totalResponseTimeMs = respondedInquiries.reduce((sum, inq) => {
+      const responseTime = new Date(inq.respondedAt).getTime() - new Date(inq.createdAt).getTime();
+      return sum + responseTime;
+    }, 0);
+    
+    // Return average response time in hours
+    return totalResponseTimeMs / respondedInquiries.length / (1000 * 60 * 60);
+  }
+  
+  // Helper function to get recent inquiry activity
+  function getRecentInquiryActivity(inquiries, days) {
+    const now = new Date();
+    const cutoff = new Date(now.setDate(now.getDate() - days));
+    
+    return inquiries.filter(inq => new Date(inq.createdAt) >= cutoff);
+  }
+  
   // User API Routes
   
   // Get user by ID
