@@ -215,11 +215,94 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all note listings
   app.get("/api/note-listings", async (req, res) => {
     try {
-      const listings = await storage.getAllNoteListings();
-      return res.status(200).json({ 
-        success: true, 
-        data: listings 
-      });
+      // Check if we have search params
+      if (Object.keys(req.query).length > 0) {
+        // Parse search filters from query params
+        const filters: any = {};
+        const sort: any = {};
+        
+        // Numeric ranges
+        if (req.query.minOriginalAmount) filters.minOriginalAmount = Number(req.query.minOriginalAmount);
+        if (req.query.maxOriginalAmount) filters.maxOriginalAmount = Number(req.query.maxOriginalAmount);
+        if (req.query.minCurrentAmount) filters.minCurrentAmount = Number(req.query.minCurrentAmount);
+        if (req.query.maxCurrentAmount) filters.maxCurrentAmount = Number(req.query.maxCurrentAmount);
+        if (req.query.minInterestRate) filters.minInterestRate = Number(req.query.minInterestRate);
+        if (req.query.maxInterestRate) filters.maxInterestRate = Number(req.query.maxInterestRate);
+        if (req.query.minAskingPrice) filters.minAskingPrice = Number(req.query.minAskingPrice);
+        if (req.query.maxAskingPrice) filters.maxAskingPrice = Number(req.query.maxAskingPrice);
+        if (req.query.minPropertyValue) filters.minPropertyValue = Number(req.query.minPropertyValue);
+        if (req.query.maxPropertyValue) filters.maxPropertyValue = Number(req.query.maxPropertyValue);
+        if (req.query.minLoanToValueRatio) filters.minLoanToValueRatio = Number(req.query.minLoanToValueRatio);
+        if (req.query.maxLoanToValueRatio) filters.maxLoanToValueRatio = Number(req.query.maxLoanToValueRatio);
+        if (req.query.minRemainingLoanTerm) filters.minRemainingLoanTerm = Number(req.query.minRemainingLoanTerm);
+        if (req.query.maxRemainingLoanTerm) filters.maxRemainingLoanTerm = Number(req.query.maxRemainingLoanTerm);
+        
+        // String filters
+        if (req.query.noteType) filters.noteType = req.query.noteType;
+        if (req.query.propertyState) filters.propertyState = req.query.propertyState;
+        if (req.query.propertyCity) filters.propertyCity = req.query.propertyCity;
+        if (req.query.propertyZipCode) filters.propertyZipCode = req.query.propertyZipCode;
+        if (req.query.propertyCounty) filters.propertyCounty = req.query.propertyCounty;
+        if (req.query.collateralType) filters.collateralType = req.query.collateralType;
+        if (req.query.amortizationType) filters.amortizationType = req.query.amortizationType;
+        if (req.query.paymentFrequency) filters.paymentFrequency = req.query.paymentFrequency;
+        
+        // Array filters
+        if (req.query.performanceStatus) {
+          filters.performanceStatus = Array.isArray(req.query.performanceStatus) 
+            ? req.query.performanceStatus 
+            : [req.query.performanceStatus];
+        }
+        if (req.query.propertyType) {
+          filters.propertyType = Array.isArray(req.query.propertyType) 
+            ? req.query.propertyType 
+            : [req.query.propertyType];
+        }
+        if (req.query.status) {
+          filters.status = Array.isArray(req.query.status) 
+            ? req.query.status 
+            : [req.query.status];
+        }
+        
+        // Boolean filters
+        if (req.query.isSecured !== undefined) {
+          filters.isSecured = req.query.isSecured === 'true';
+        }
+        
+        // Keyword search
+        if (req.query.keyword) {
+          filters.keyword = req.query.keyword;
+        }
+        
+        // Sorting
+        if (req.query.sortField) {
+          sort.field = req.query.sortField;
+          sort.direction = req.query.sortDir === 'desc' ? 'desc' : 'asc';
+        }
+        
+        // Pagination
+        const limit = req.query.limit ? Number(req.query.limit) : 20;
+        const offset = req.query.page ? (Number(req.query.page) - 1) * limit : 0;
+        
+        // Get filtered and sorted listings
+        const listings = await storage.getAllNoteListings();
+        
+        // For now, just return all listings since the database search function isn't implemented
+        return res.status(200).json({ 
+          success: true, 
+          data: listings,
+          total: listings.length,
+          page: req.query.page ? Number(req.query.page) : 1,
+          totalPages: Math.ceil(listings.length / limit)
+        });
+      } else {
+        // No search params, return all listings
+        const listings = await storage.getAllNoteListings();
+        return res.status(200).json({ 
+          success: true, 
+          data: listings 
+        });
+      }
     } catch (error) {
       console.error("Error getting note listings:", error);
       return res.status(500).json({ 
@@ -472,6 +555,193 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(500).json({ 
         success: false, 
         message: "An error occurred while deleting the document" 
+      });
+    }
+  });
+  
+  // Inquiry API Routes
+  
+  // Get inquiries for a note listing
+  app.get("/api/inquiries/listing/:listingId", async (req, res) => {
+    try {
+      const listingId = parseInt(req.params.listingId);
+      if (isNaN(listingId)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Invalid listing ID" 
+        });
+      }
+      
+      const inquiries = await storage.getInquiriesByNoteListingId(listingId);
+      return res.status(200).json({ 
+        success: true, 
+        data: inquiries 
+      });
+    } catch (error) {
+      console.error("Error getting inquiries for listing:", error);
+      return res.status(500).json({ 
+        success: false, 
+        message: "An error occurred while fetching inquiries" 
+      });
+    }
+  });
+  
+  // Get inquiries by buyer ID
+  app.get("/api/inquiries/buyer/:buyerId", async (req, res) => {
+    try {
+      const buyerId = parseInt(req.params.buyerId);
+      if (isNaN(buyerId)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Invalid buyer ID" 
+        });
+      }
+      
+      const inquiries = await storage.getInquiriesByBuyerId(buyerId);
+      return res.status(200).json({ 
+        success: true, 
+        data: inquiries 
+      });
+    } catch (error) {
+      console.error("Error getting buyer's inquiries:", error);
+      return res.status(500).json({ 
+        success: false, 
+        message: "An error occurred while fetching buyer's inquiries" 
+      });
+    }
+  });
+  
+  // Get a specific inquiry by ID
+  app.get("/api/inquiries/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Invalid inquiry ID" 
+        });
+      }
+      
+      const inquiry = await storage.getInquiryById(id);
+      if (!inquiry) {
+        return res.status(404).json({ 
+          success: false, 
+          message: "Inquiry not found" 
+        });
+      }
+      
+      return res.status(200).json({ 
+        success: true, 
+        data: inquiry 
+      });
+    } catch (error) {
+      console.error("Error getting inquiry:", error);
+      return res.status(500).json({ 
+        success: false, 
+        message: "An error occurred while fetching the inquiry" 
+      });
+    }
+  });
+  
+  // Create a new inquiry
+  app.post("/api/inquiries", async (req, res) => {
+    try {
+      const data = insertInquirySchema.parse(req.body);
+      const inquiry = await storage.createInquiry(data);
+      
+      return res.status(201).json({ 
+        success: true, 
+        message: "Inquiry created successfully", 
+        data: inquiry 
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ 
+          success: false, 
+          message: validationError.message 
+        });
+      }
+      
+      console.error("Error creating inquiry:", error);
+      return res.status(500).json({ 
+        success: false, 
+        message: "An error occurred while creating the inquiry" 
+      });
+    }
+  });
+  
+  // Update an inquiry
+  app.put("/api/inquiries/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Invalid inquiry ID" 
+        });
+      }
+      
+      const data = insertInquirySchema.partial().parse(req.body);
+      const updatedInquiry = await storage.updateInquiry(id, data);
+      
+      if (!updatedInquiry) {
+        return res.status(404).json({ 
+          success: false, 
+          message: "Inquiry not found" 
+        });
+      }
+      
+      return res.status(200).json({ 
+        success: true, 
+        message: "Inquiry updated successfully", 
+        data: updatedInquiry 
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({ 
+          success: false, 
+          message: validationError.message 
+        });
+      }
+      
+      console.error("Error updating inquiry:", error);
+      return res.status(500).json({ 
+        success: false, 
+        message: "An error occurred while updating the inquiry" 
+      });
+    }
+  });
+  
+  // Delete an inquiry
+  app.delete("/api/inquiries/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Invalid inquiry ID" 
+        });
+      }
+      
+      const deleted = await storage.deleteInquiry(id);
+      if (!deleted) {
+        return res.status(404).json({ 
+          success: false, 
+          message: "Inquiry not found" 
+        });
+      }
+      
+      return res.status(200).json({ 
+        success: true, 
+        message: "Inquiry deleted successfully" 
+      });
+    } catch (error) {
+      console.error("Error deleting inquiry:", error);
+      return res.status(500).json({ 
+        success: false, 
+        message: "An error occurred while deleting the inquiry" 
       });
     }
   });

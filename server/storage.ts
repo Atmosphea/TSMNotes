@@ -34,10 +34,49 @@ import {
   type InsertTransaction
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, or, desc, asc, sql, ilike } from "drizzle-orm";
+import { eq, and, or, desc, asc, sql, like, gte, lte, inArray } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
+
+export interface SearchFilters {
+  noteType?: string;
+  performanceStatus?: string[];
+  minOriginalAmount?: number;
+  maxOriginalAmount?: number;
+  minCurrentAmount?: number;
+  maxCurrentAmount?: number;
+  minInterestRate?: number;
+  maxInterestRate?: number;
+  propertyState?: string;
+  propertyCity?: string;
+  propertyZipCode?: string;
+  propertyCounty?: string;
+  propertyType?: string[];
+  minAskingPrice?: number;
+  maxAskingPrice?: number;
+  minPropertyValue?: number;
+  maxPropertyValue?: number;
+  minLoanToValueRatio?: number;
+  maxLoanToValueRatio?: number;
+  isSecured?: boolean;
+  collateralType?: string;
+  amortizationType?: string;
+  paymentFrequency?: string;
+  status?: string[];
+  minLoanOriginationDate?: Date;
+  maxLoanOriginationDate?: Date;
+  minLoanMaturityDate?: Date;
+  maxLoanMaturityDate?: Date;
+  minRemainingLoanTerm?: number;
+  maxRemainingLoanTerm?: number;
+  keyword?: string;
+}
+
+export interface SortOptions {
+  field: string;
+  direction: 'asc' | 'desc';
+}
 
 export interface IStorage {
   // User operations
@@ -61,6 +100,7 @@ export interface IStorage {
   getNoteListingById(id: number): Promise<NoteListing | undefined>;
   getNoteListingsBySellerId(sellerId: number): Promise<NoteListing[]>;
   getAllNoteListings(): Promise<NoteListing[]>;
+  searchNoteListings(filters: SearchFilters, sort?: SortOptions, limit?: number, offset?: number): Promise<{listings: NoteListing[], total: number}>;
   updateNoteListing(id: number, listing: Partial<InsertNoteListing>): Promise<NoteListing | undefined>;
   deleteNoteListing(id: number): Promise<boolean>;
   
@@ -68,6 +108,14 @@ export interface IStorage {
   createNoteDocument(document: InsertNoteDocument): Promise<NoteDocument>;
   getNoteDocumentsByListingId(noteListingId: number): Promise<NoteDocument[]>;
   deleteNoteDocument(id: number): Promise<boolean>;
+  
+  // Inquiry operations
+  createInquiry(inquiry: InsertInquiry): Promise<Inquiry>;
+  getInquiryById(id: number): Promise<Inquiry | undefined>;
+  getInquiriesByNoteListingId(noteListingId: number): Promise<Inquiry[]>;
+  getInquiriesByBuyerId(buyerId: number): Promise<Inquiry[]>;
+  updateInquiry(id: number, inquiry: Partial<InsertInquiry>): Promise<Inquiry | undefined>;
+  deleteInquiry(id: number): Promise<boolean>;
   
   // Legacy Note operations
   createNote(note: InsertNote): Promise<Note>;
@@ -590,7 +638,252 @@ export class DatabaseStorage implements IStorage {
     
     return result.rowCount !== null && result.rowCount > 0;
   }
+  
+  // Implement search functionality for note listings
+  async searchNoteListings(
+    filters: SearchFilters,
+    sort?: SortOptions,
+    limit: number = 20,
+    offset: number = 0
+  ): Promise<{ listings: NoteListing[], total: number }> {
+    // Start with a base query
+    let query = db.select().from(noteListings);
+    
+    // Apply filters
+    if (filters) {
+      // Note type filter
+      if (filters.noteType) {
+        query = query.where(eq(noteListings.noteType, filters.noteType));
+      }
+      
+      // Performance status filter (array)
+      if (filters.performanceStatus && filters.performanceStatus.length > 0) {
+        query = query.where(inArray(noteListings.performanceStatus, filters.performanceStatus));
+      }
+      
+      // Original loan amount range
+      if (filters.minOriginalAmount !== undefined) {
+        query = query.where(gte(noteListings.originalLoanAmount, filters.minOriginalAmount));
+      }
+      if (filters.maxOriginalAmount !== undefined) {
+        query = query.where(lte(noteListings.originalLoanAmount, filters.maxOriginalAmount));
+      }
+      
+      // Current loan amount range
+      if (filters.minCurrentAmount !== undefined) {
+        query = query.where(gte(noteListings.currentLoanAmount, filters.minCurrentAmount));
+      }
+      if (filters.maxCurrentAmount !== undefined) {
+        query = query.where(lte(noteListings.currentLoanAmount, filters.maxCurrentAmount));
+      }
+      
+      // Interest rate range
+      if (filters.minInterestRate !== undefined) {
+        query = query.where(gte(noteListings.interestRate, filters.minInterestRate));
+      }
+      if (filters.maxInterestRate !== undefined) {
+        query = query.where(lte(noteListings.interestRate, filters.maxInterestRate));
+      }
+      
+      // Property location filters
+      if (filters.propertyState) {
+        query = query.where(eq(noteListings.propertyState, filters.propertyState));
+      }
+      if (filters.propertyCity) {
+        query = query.where(eq(noteListings.propertyCity, filters.propertyCity));
+      }
+      if (filters.propertyZipCode) {
+        query = query.where(eq(noteListings.propertyZipCode, filters.propertyZipCode));
+      }
+      if (filters.propertyCounty) {
+        query = query.where(eq(noteListings.propertyCounty, filters.propertyCounty));
+      }
+      
+      // Property type filter (array)
+      if (filters.propertyType && filters.propertyType.length > 0) {
+        query = query.where(inArray(noteListings.propertyType, filters.propertyType));
+      }
+      
+      // Asking price range
+      if (filters.minAskingPrice !== undefined) {
+        query = query.where(gte(noteListings.askingPrice, filters.minAskingPrice));
+      }
+      if (filters.maxAskingPrice !== undefined) {
+        query = query.where(lte(noteListings.askingPrice, filters.maxAskingPrice));
+      }
+      
+      // Property value range
+      if (filters.minPropertyValue !== undefined) {
+        query = query.where(gte(noteListings.propertyValue, filters.minPropertyValue));
+      }
+      if (filters.maxPropertyValue !== undefined) {
+        query = query.where(lte(noteListings.propertyValue, filters.maxPropertyValue));
+      }
+      
+      // Loan to value ratio range
+      if (filters.minLoanToValueRatio !== undefined) {
+        query = query.where(gte(noteListings.loanToValueRatio, filters.minLoanToValueRatio));
+      }
+      if (filters.maxLoanToValueRatio !== undefined) {
+        query = query.where(lte(noteListings.loanToValueRatio, filters.maxLoanToValueRatio));
+      }
+      
+      // Security and collateral filters
+      if (filters.isSecured !== undefined) {
+        query = query.where(eq(noteListings.isSecured, filters.isSecured));
+      }
+      if (filters.collateralType) {
+        query = query.where(eq(noteListings.collateralType, filters.collateralType));
+      }
+      
+      // Amortization and payment frequency
+      if (filters.amortizationType) {
+        query = query.where(eq(noteListings.amortizationType, filters.amortizationType));
+      }
+      if (filters.paymentFrequency) {
+        query = query.where(eq(noteListings.paymentFrequency, filters.paymentFrequency));
+      }
+      
+      // Listing status filter (array)
+      if (filters.status && filters.status.length > 0) {
+        query = query.where(inArray(noteListings.status, filters.status));
+      } else {
+        // Default to active listings only if no status filter is provided
+        query = query.where(eq(noteListings.status, 'active'));
+      }
+      
+      // Loan date range filters
+      if (filters.minLoanOriginationDate) {
+        query = query.where(gte(noteListings.loanOriginationDate, filters.minLoanOriginationDate));
+      }
+      if (filters.maxLoanOriginationDate) {
+        query = query.where(lte(noteListings.loanOriginationDate, filters.maxLoanOriginationDate));
+      }
+      if (filters.minLoanMaturityDate) {
+        query = query.where(gte(noteListings.loanMaturityDate, filters.minLoanMaturityDate));
+      }
+      if (filters.maxLoanMaturityDate) {
+        query = query.where(lte(noteListings.loanMaturityDate, filters.maxLoanMaturityDate));
+      }
+      
+      // Remaining loan term range
+      if (filters.minRemainingLoanTerm !== undefined) {
+        query = query.where(gte(noteListings.remainingLoanTerm, filters.minRemainingLoanTerm));
+      }
+      if (filters.maxRemainingLoanTerm !== undefined) {
+        query = query.where(lte(noteListings.remainingLoanTerm, filters.maxRemainingLoanTerm));
+      }
+      
+      // Keyword search (search in title and description)
+      if (filters.keyword) {
+        const keywordPattern = `%${filters.keyword}%`;
+        query = query.where(
+          or(
+            like(noteListings.title, keywordPattern),
+            like(noteListings.description || '', keywordPattern),
+            like(noteListings.propertyAddress, keywordPattern)
+          )
+        );
+      }
+    }
+    
+    // Get the total count of matching listings (for pagination)
+    const countQuery = db.select({ count: sql`count(*)` }).from(noteListings);
+    const [countResult] = await countQuery;
+    const total = Number(countResult.count);
+    
+    // Apply sorting
+    if (sort) {
+      const sortColumn = noteListings[sort.field as keyof typeof noteListings];
+      if (sortColumn) {
+        if (sort.direction === 'asc') {
+          query = query.orderBy(asc(sortColumn));
+        } else {
+          query = query.orderBy(desc(sortColumn));
+        }
+      }
+    } else {
+      // Default sort by created date (newest first)
+      query = query.orderBy(desc(noteListings.createdAt));
+    }
+    
+    // Apply pagination
+    query = query.limit(limit).offset(offset);
+    
+    // Execute the query
+    const listings = await query;
+    
+    return { listings, total };
+  }
+  
+  // Inquiry operations
+  async createInquiry(inquiry: InsertInquiry): Promise<Inquiry> {
+    const [newInquiry] = await db
+      .insert(inquiries)
+      .values(inquiry)
+      .returning();
+    
+    // Increment the inquiry count for the corresponding note listing
+    await db
+      .update(noteListings)
+      .set({
+        inquiryCount: sql`${noteListings.inquiryCount} + 1`,
+        updatedAt: new Date()
+      })
+      .where(eq(noteListings.id, inquiry.noteListingId));
+    
+    return newInquiry;
+  }
+  
+  async getInquiryById(id: number): Promise<Inquiry | undefined> {
+    const [inquiry] = await db
+      .select()
+      .from(inquiries)
+      .where(eq(inquiries.id, id));
+    return inquiry;
+  }
+  
+  async getInquiriesByNoteListingId(noteListingId: number): Promise<Inquiry[]> {
+    return await db
+      .select()
+      .from(inquiries)
+      .where(eq(inquiries.noteListingId, noteListingId))
+      .orderBy(desc(inquiries.createdAt));
+  }
+  
+  async getInquiriesByBuyerId(buyerId: number): Promise<Inquiry[]> {
+    return await db
+      .select()
+      .from(inquiries)
+      .where(eq(inquiries.buyerId, buyerId))
+      .orderBy(desc(inquiries.createdAt));
+  }
+  
+  async updateInquiry(id: number, inquiryData: Partial<InsertInquiry>): Promise<Inquiry | undefined> {
+    // If status is being set to responded, add the response timestamp
+    const updateData = {
+      ...inquiryData,
+      ...(inquiryData.status === 'accepted' || inquiryData.status === 'rejected'
+        ? { respondedAt: new Date() }
+        : {})
+    };
+    
+    const [updatedInquiry] = await db
+      .update(inquiries)
+      .set(updateData)
+      .where(eq(inquiries.id, id))
+      .returning();
+    
+    return updatedInquiry;
+  }
+  
+  async deleteInquiry(id: number): Promise<boolean> {
+    const result = await db
+      .delete(inquiries)
+      .where(eq(inquiries.id, id));
+    
+    return result.rowCount > 0;
+  }
 }
 
-// Replace MemStorage with DatabaseStorage to use PostgreSQL database
 export const storage = new DatabaseStorage();
