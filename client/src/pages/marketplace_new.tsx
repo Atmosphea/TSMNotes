@@ -96,6 +96,7 @@ export default function MarketplacePage() {
   const [loanTermYearsMax, setLoanTermYearsMax] = useState(16);
   const [loanTermMonths, setLoanTermMonths] = useState(0);
   const [isSecured, setIsSecured] = useState(false);
+  const [isPerforming, setIsPerforming] = useState(true);
   const [collateralType, setCollateralType] = useState("");
   const [dateOfNoteStart, setDateOfNoteStart] = useState("");
   const [dateOfNoteEnd, setDateOfNoteEnd] = useState("");
@@ -117,8 +118,7 @@ export default function MarketplacePage() {
                          "Small Business Loans", "Promissory Notes", "Commercial and Industrial (C&I) Loans", 
                          "Equipment Loans", "Consumer Loans"];
                          
-  // Performing status
-  const [isPerforming, setIsPerforming] = useState(true);
+  // Performing status already defined above
   
   // Property value range
   const [propertyValueMin, setPropertyValueMin] = useState(0);
@@ -380,6 +380,8 @@ export default function MarketplacePage() {
                     property_county: propertyCounty,
                     loan_to_value_ratio_min: ltvRatioMin,
                     loan_to_value_ratio_max: ltvRatioMax,
+                    property_value_min: propertyValueMin,
+                    property_value_max: propertyValueMax,
                   };
                   
                   handleApplyFilters(newFilters);
