@@ -180,6 +180,7 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
+    const now = new Date();
     const user: User = { 
       id,
       username: insertUser.username,
@@ -200,8 +201,9 @@ export class MemStorage implements IStorage {
       marketingEmails: insertUser.marketingEmails ?? true,
       isAccreditedInvestor: insertUser.isAccreditedInvestor ?? false,
       accreditationProofUrl: insertUser.accreditationProofUrl || null,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      lastLoginAt: null,
+      createdAt: now,
+      updatedAt: now
     };
     this.users.set(id, user);
     return user;
@@ -426,6 +428,10 @@ export class MemStorage implements IStorage {
       documentUrl: insertDocument.documentUrl,
       fileName: insertDocument.fileName,
       fileSize: insertDocument.fileSize,
+      isPublic: insertDocument.isPublic ?? false,
+      verificationStatus: insertDocument.verificationStatus || 'pending',
+      description: insertDocument.description || null,
+      uploadedById: insertDocument.uploadedById || null,
       uploadedAt: new Date()
     };
     this.noteDocuments.set(id, document);
@@ -445,12 +451,19 @@ export class MemStorage implements IStorage {
   // Inquiry operations
   async createInquiry(insertInquiry: InsertInquiry): Promise<Inquiry> {
     const id = this.currentInquiryId++;
+    const now = new Date();
     const inquiry: Inquiry = {
-      ...insertInquiry,
       id,
+      buyerId: insertInquiry.buyerId,
+      noteListingId: insertInquiry.noteListingId,
+      message: insertInquiry.message,
+      offerAmount: insertInquiry.offerAmount || null,
       status: insertInquiry.status || 'pending',
-      createdAt: new Date(),
-      updatedAt: new Date()
+      responseMessage: insertInquiry.responseMessage || null,
+      respondedAt: null,
+      expiresAt: insertInquiry.expiresAt || null,
+      createdAt: now,
+      updatedAt: now
     };
     this.inquiries.set(id, inquiry);
     
@@ -483,9 +496,25 @@ export class MemStorage implements IStorage {
       return undefined;
     }
     
+    // Check if the status is being updated to "accepted" or "rejected" 
+    // and set the respondedAt timestamp accordingly
+    let respondedAt = existingInquiry.respondedAt;
+    if (inquiryData.status === 'accepted' || inquiryData.status === 'rejected') {
+      if (!existingInquiry.respondedAt) {
+        respondedAt = new Date();
+      }
+    }
+    
     const updatedInquiry: Inquiry = {
       ...existingInquiry,
-      ...inquiryData,
+      buyerId: inquiryData.buyerId ?? existingInquiry.buyerId,
+      noteListingId: inquiryData.noteListingId ?? existingInquiry.noteListingId,
+      message: inquiryData.message ?? existingInquiry.message,
+      offerAmount: inquiryData.offerAmount ?? existingInquiry.offerAmount,
+      status: inquiryData.status ?? existingInquiry.status,
+      responseMessage: inquiryData.responseMessage ?? existingInquiry.responseMessage,
+      expiresAt: inquiryData.expiresAt ?? existingInquiry.expiresAt,
+      respondedAt: respondedAt,
       updatedAt: new Date()
     };
     

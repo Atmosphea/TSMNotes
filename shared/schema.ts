@@ -215,6 +215,7 @@ export const inquiries = pgTable("inquiries", {
   responseMessage: text("response_message"), // Seller's response
   
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
   respondedAt: timestamp("responded_at"),
   expiresAt: timestamp("expires_at"),
 });
@@ -396,6 +397,7 @@ export const insertInquirySchema = createInsertSchema(inquiries).pick({
   status: true,
   responseMessage: true,
   expiresAt: true,
+  updatedAt: true,
 });
 
 export const insertTransactionSchema = createInsertSchema(transactions).pick({
