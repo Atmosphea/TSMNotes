@@ -463,6 +463,7 @@ export default function MarketplacePage() {
                         </div>
                         
                         {/* Performing Note Toggle */}
+
                         <div>
                           <label className="flex items-center cursor-pointer">
                             <div className="relative">
@@ -638,8 +639,12 @@ export default function MarketplacePage() {
                               <input 
                                 type="text"
                                 className="w-full p-1 bg-gray-800/5 border border-gray-700/20 rounded text-white text-sm opacity-80 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
-                                value={`${interestRateMin}%`}
+                                value={interestRateMin === 0 ? '-∞' : `${interestRateMin}%`}
                                 onChange={(e) => {
+                                  if (e.target.value === '-∞') {
+                                    setInterestRateMin(0);
+                                    return;
+                                  }
                                   const value = Number(e.target.value.replace(/[^0-9.]/g, ''));
                                   if (!isNaN(value)) {
                                     setInterestRateMin(value);
@@ -651,11 +656,167 @@ export default function MarketplacePage() {
                               <input 
                                 type="text"
                                 className="w-full p-1 bg-gray-800/5 border border-gray-700/20 rounded text-white text-sm opacity-80 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
-                                value={`${interestRateMax}%`}
+                                value={interestRateMax === 30 ? '∞' : `${interestRateMax}%`}
                                 onChange={(e) => {
+                                  if (e.target.value === '∞') {
+                                    setInterestRateMax(30);
+                                    return;
+                                  }
                                   const value = Number(e.target.value.replace(/[^0-9.]/g, ''));
                                   if (!isNaN(value) && value > interestRateMin) {
                                     setInterestRateMax(value);
+                                  }
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* LTV Ratio Range Slider */}
+                      <div>
+                        <p className="text-white text-xs font-medium mb-1">LTV Ratio (%)</p>
+                        <div className="flex flex-col space-y-2">
+                          <div className="relative h-2 bg-gray-700 rounded-full">
+                            <div 
+                              className="absolute h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full pointer-events-none" 
+                              style={{ 
+                                left: `${(ltvRatioMin / 100) * 100}%`, 
+                                right: `${100 - (ltvRatioMax / 100) * 100}%` 
+                              }}
+                            ></div>
+                            <input
+                              type="range"
+                              className="absolute w-full h-2 appearance-none bg-transparent cursor-pointer z-10 pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                              min="0"
+                              max="100"
+                              step="1"
+                              value={ltvRatioMin}
+                              onChange={(e) => setLtvRatioMin(Number(e.target.value))}
+                            />
+                            <input
+                              type="range"
+                              className="absolute w-full h-2 appearance-none bg-transparent cursor-pointer z-20 pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-pink-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                              min="0"
+                              max="100"
+                              step="1"
+                              value={ltvRatioMax}
+                              onChange={(e) => {
+                                const value = Number(e.target.value);
+                                if (value > ltvRatioMin) {
+                                  setLtvRatioMax(value);
+                                }
+                              }}
+                            />
+                          </div>
+                          
+                          <div className="flex justify-between gap-2">
+                            <div className="w-1/2">
+                              <input 
+                                type="text"
+                                className="w-full p-1 bg-gray-800/5 border border-gray-700/20 rounded text-white text-sm opacity-80 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
+                                value={ltvRatioMin === 0 ? '-∞' : `${ltvRatioMin}%`}
+                                onChange={(e) => {
+                                  if (e.target.value === '-∞') {
+                                    setLtvRatioMin(0);
+                                    return;
+                                  }
+                                  const value = Number(e.target.value.replace(/[^0-9.]/g, ''));
+                                  if (!isNaN(value)) {
+                                    setLtvRatioMin(value);
+                                  }
+                                }}
+                              />
+                            </div>
+                            <div className="w-1/2">
+                              <input 
+                                type="text"
+                                className="w-full p-1 bg-gray-800/5 border border-gray-700/20 rounded text-white text-sm opacity-80 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
+                                value={ltvRatioMax === 100 ? '∞' : `${ltvRatioMax}%`}
+                                onChange={(e) => {
+                                  if (e.target.value === '∞') {
+                                    setLtvRatioMax(100);
+                                    return;
+                                  }
+                                  const value = Number(e.target.value.replace(/[^0-9.]/g, ''));
+                                  if (!isNaN(value) && value > ltvRatioMin) {
+                                    setLtvRatioMax(value);
+                                  }
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Property Value Range Slider */}
+                      <div>
+                        <p className="text-white text-xs font-medium mb-1">Property Value ($)</p>
+                        <div className="flex flex-col space-y-2">
+                          <div className="relative h-2 bg-gray-700 rounded-full">
+                            <div 
+                              className="absolute h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full pointer-events-none" 
+                              style={{ 
+                                left: `${(propertyValueMin / 2000000) * 100}%`, 
+                                right: `${100 - (propertyValueMax / 2000000) * 100}%` 
+                              }}
+                            ></div>
+                            <input
+                              type="range"
+                              className="absolute w-full h-2 appearance-none bg-transparent cursor-pointer z-10 pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-purple-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                              min="0"
+                              max="2000000"
+                              step="5000"
+                              value={propertyValueMin}
+                              onChange={(e) => setPropertyValueMin(Number(e.target.value))}
+                            />
+                            <input
+                              type="range"
+                              className="absolute w-full h-2 appearance-none bg-transparent cursor-pointer z-20 pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-pink-500 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-lg"
+                              min="0"
+                              max="2000000"
+                              step="5000"
+                              value={propertyValueMax}
+                              onChange={(e) => {
+                                const value = Number(e.target.value);
+                                if (value > propertyValueMin) {
+                                  setPropertyValueMax(value);
+                                }
+                              }}
+                            />
+                          </div>
+                          
+                          <div className="flex justify-between gap-2">
+                            <div className="w-1/2">
+                              <input 
+                                type="text"
+                                className="w-full p-1 bg-gray-800/5 border border-gray-700/20 rounded text-white text-sm opacity-80 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
+                                value={propertyValueMin === 0 ? '-∞' : formatCurrency(propertyValueMin)}
+                                onChange={(e) => {
+                                  if (e.target.value === '-∞') {
+                                    setPropertyValueMin(0);
+                                    return;
+                                  }
+                                  const value = Number(e.target.value.replace(/[^0-9]/g, ''));
+                                  if (!isNaN(value)) {
+                                    setPropertyValueMin(value);
+                                  }
+                                }}
+                              />
+                            </div>
+                            <div className="w-1/2">
+                              <input 
+                                type="text"
+                                className="w-full p-1 bg-gray-800/5 border border-gray-700/20 rounded text-white text-sm opacity-80 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
+                                value={propertyValueMax === 2000000 ? '∞' : formatCurrency(propertyValueMax)}
+                                onChange={(e) => {
+                                  if (e.target.value === '∞') {
+                                    setPropertyValueMax(2000000);
+                                    return;
+                                  }
+                                  const value = Number(e.target.value.replace(/[^0-9]/g, ''));
+                                  if (!isNaN(value) && value > propertyValueMin) {
+                                    setPropertyValueMax(value);
                                   }
                                 }}
                               />
@@ -706,11 +867,15 @@ export default function MarketplacePage() {
                               <input 
                                 type="text" 
                                 className="w-full p-1 bg-gray-800/5 border border-gray-700/20 rounded text-white text-sm opacity-80 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
-                                value={`${loanTermYearsMin} yrs`}
+                                value={loanTermYearsMin === 0 ? '-∞' : formatCurrency(loanTermYearsMin * 5000)}
                                 onChange={(e) => {
+                                  if (e.target.value === '-∞') {
+                                    setLoanTermYearsMin(0);
+                                    return;
+                                  }
                                   const value = Number(e.target.value.replace(/[^0-9]/g, ''));
                                   if (!isNaN(value)) {
-                                    setLoanTermYearsMin(value);
+                                    setLoanTermYearsMin(Math.floor(value / 5000));
                                   }
                                 }}
                               />
@@ -719,11 +884,15 @@ export default function MarketplacePage() {
                               <input 
                                 type="text"
                                 className="w-full p-1 bg-gray-800/5 border border-gray-700/20 rounded text-white text-sm opacity-80 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
-                                value={`${loanTermYearsMax} yrs`}
+                                value={loanTermYearsMax === 50 ? '∞' : formatCurrency(loanTermYearsMax * 5000)}
                                 onChange={(e) => {
+                                  if (e.target.value === '∞') {
+                                    setLoanTermYearsMax(50);
+                                    return;
+                                  }
                                   const value = Number(e.target.value.replace(/[^0-9]/g, ''));
-                                  if (!isNaN(value) && value > loanTermYearsMin) {
-                                    setLoanTermYearsMax(value);
+                                  if (!isNaN(value) && Math.floor(value / 5000) > loanTermYearsMin) {
+                                    setLoanTermYearsMax(Math.floor(value / 5000));
                                   }
                                 }}
                               />
@@ -774,8 +943,12 @@ export default function MarketplacePage() {
                               <input 
                                 type="text" 
                                 className="w-full p-1 bg-gray-800/5 border border-gray-700/20 rounded text-white text-sm opacity-80 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
-                                value={formatCurrency(priceMin)}
+                                value={priceMin === 0 ? '-∞' : formatCurrency(priceMin)}
                                 onChange={(e) => {
+                                  if (e.target.value === '-∞') {
+                                    setPriceMin(0);
+                                    return;
+                                  }
                                   const value = Number(e.target.value.replace(/[^0-9]/g, ''));
                                   if (!isNaN(value)) {
                                     setPriceMin(value);
@@ -787,8 +960,12 @@ export default function MarketplacePage() {
                               <input 
                                 type="text"
                                 className="w-full p-1 bg-gray-800/5 border border-gray-700/20 rounded text-white text-sm opacity-80 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
-                                value={formatCurrency(priceMax)}
+                                value={priceMax >= 50000000 ? '∞' : formatCurrency(priceMax)}
                                 onChange={(e) => {
+                                  if (e.target.value === '∞') {
+                                    setPriceMax(50000000);
+                                    return;
+                                  }
                                   const value = Number(e.target.value.replace(/[^0-9]/g, ''));
                                   if (!isNaN(value) && value > priceMin) {
                                     setPriceMax(value);
