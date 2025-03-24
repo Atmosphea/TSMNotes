@@ -128,7 +128,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onApply, onClose, isDrawer 
     field: 'note_status' | 'property_type' | 'note_type' | 'legal_status' | 'state_classifications', 
     value: string
   ) => {
-    const current = filters[field];
+    const current = filters[field] as string[];
     const updated = current.includes(value)
       ? current.filter((item) => item !== value)
       : [...current, value];
@@ -283,7 +283,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onApply, onClose, isDrawer 
                 <input
                   type="checkbox"
                   id={`note-type-${type.value}`}
-                  checked={filters.note_type.includes(type.value)}
+                  checked={(filters.note_type as string[]).includes(type.value)}
                   onChange={() => handleCheckboxChange('note_type', type.value)}
                   className="mr-2 h-4 w-4 accent-purple-500"
                 />
@@ -419,7 +419,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onApply, onClose, isDrawer 
                 <input
                   type="checkbox"
                   id={`property-${type.value}`}
-                  checked={filters.property_type.includes(type.value)}
+                  checked={(filters.property_type as string[]).includes(type.value)}
                   onChange={() => handleCheckboxChange('property_type', type.value)}
                   className="mr-2 h-4 w-4 accent-purple-500"
                 />
@@ -440,7 +440,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onApply, onClose, isDrawer 
                 <input
                   type="checkbox"
                   id={`status-${status}`}
-                  checked={filters.note_status.includes(status)}
+                  checked={(filters.note_status as string[]).includes(status)}
                   onChange={() => handleCheckboxChange('note_status', status)}
                   className="mr-2 h-4 w-4 accent-purple-500"
                 />
@@ -537,7 +537,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onApply, onClose, isDrawer 
                 <input
                   type="checkbox"
                   id={`legal-status-${status.value}`}
-                  checked={filters.legal_status.includes(status.value)}
+                  checked={(filters.legal_status as string[]).includes(status.value)}
                   onChange={() => handleCheckboxChange('legal_status', status.value)}
                   className="mr-2 h-4 w-4 accent-purple-500"
                 />
@@ -558,7 +558,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onApply, onClose, isDrawer 
                 <input
                   type="checkbox"
                   id={`state-classification-${classification.value}`}
-                  checked={filters.state_classifications.includes(classification.value)}
+                  checked={(filters.state_classifications as string[]).includes(classification.value)}
                   onChange={() => handleCheckboxChange('state_classifications', classification.value)}
                   className="mr-2 h-4 w-4 accent-purple-500"
                 />
