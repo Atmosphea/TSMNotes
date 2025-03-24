@@ -474,11 +474,11 @@ export default function NoteDetailPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Monthly Income</span>
-                    <span className="font-semibold">{formatCurrency(listing.paymentAmount)}</span>
+                    <span className="font-semibold">{formatCurrency(listing.monthlyPaymentAmount)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Remaining Term</span>
-                    <span className="font-semibold">{listing.remainingPayments} months</span>
+                    <span className="font-semibold">{listing.remainingLoanTerm} months</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">LTV Ratio</span>
