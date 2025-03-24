@@ -1,0 +1,99 @@
+{
+  "filters": {
+    "availability": {
+      "type": "radio",
+      "options": ["All", "Available", "Pending Sale"]
+    },
+    "listingType": {
+      "type": "radio",
+      "options": ["All", "Single Asset", "Asset Pool"]
+    },
+    "lienPosition": {
+      "type": "radio",
+      "options": ["All", "1st", "2nd"]
+    },
+    "performance": {
+      "type": "radio",
+      "options": ["All", "Performing", "Non-Performing"]
+    },
+    "noteType": {
+      "type": "checkbox",
+      "options": [
+        {"label": "Deed of Trust", "value": 76}, 
+        {"label": "Mortgage", "value": 58},
+        {"label": "Contract For Deed (CFD)", "value": 30}
+      ]
+    },
+    "state": {
+      "type": "select",
+      "placeholder": "Select a State"
+    },
+    "listPrice": {
+      "type": "slider",
+      "minMax": true,
+      "unit": "currency"
+    },
+   "propertyValue": {
+      "type": "slider",
+      "minMax": true,
+      "unit": "currency"
+    },
+    "propertyType": {
+        "type": "checkbox",
+        "options": [
+            {"label": "Commercial", "value": 6},
+            {"label":"Condominium", "value": 7},
+            {"label":"Land", "value": 61},
+            {"label":"Multi-Family", "value": 5},
+            {"label":"Other", "value": 9},
+            {"label":"Single Family", "value": 92}
+        ],
+        "selectAll": true
+      },
+      "unpaidPrincipalBalance": {
+         "type": "slider",
+         "minMax": true,
+          "unit": "currency"
+       },
+    "interestRate": {
+      "type": "slider",
+      "minMax": true,
+      "unit": "percentage"
+    },
+     "investmentToBalance": {
+      "type": "slider",
+       "minMax": true,
+       "unit": "percentage"
+     },
+       "investmentToValue": {
+       "type": "slider",
+        "minMax": true,
+        "unit": "percentage"
+      },
+    "loanToValue": {
+     "type": "slider",
+     "minMax": true,
+      "unit": "percentage"
+    },
+   "legalStatus": {
+       "type": "checkbox",
+      "options": [
+         {"label":"Foreclosure", "value": 9},
+         {"label": "None", "value": 155}
+       ],
+      "selectAll": true
+   },
+    "paymentsRemaining": {
+     "type": "slider",
+     "minMax": true,
+     "unit": "number"
+    },
+   "stateClassifications": {
+      "type": "checkbox",
+        "options":[
+            {"label":"Judicial State", "value": 148},
+            {"label":"Non-Judicial State", "value": 104}
+        ]
+    }
+  }
+}
