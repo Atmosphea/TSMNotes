@@ -9,16 +9,40 @@ import NoteDetailPage from "@/pages/note-detail";
 import SellingPage from "@/pages/selling";
 import ProfilePage from "@/pages/profile";
 import AdminPage from "@/pages/admin";
+import LoginPage from "@/pages/login";
+import SignupPage from "@/pages/signup";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={LandingPage} />
       <Route path="/marketplace" component={MarketplacePage} />
-      <Route path="/selling" component={SellingPage} />
+      <Route path="/login" component={LoginPage} />
+      <Route path="/signup" component={SignupPage} />
       <Route path="/note/:id" component={NoteDetailPage} />
-      <Route path="/profile" component={ProfilePage} />
-      <Route path="/admin" component={AdminPage} />
+      <Route path="/selling">
+        {() => (
+          <ProtectedRoute>
+            <SellingPage />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path="/profile">
+        {() => (
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        )}
+      </Route>
+      <Route path="/admin">
+        {() => (
+          <ProtectedRoute>
+            <AdminPage />
+          </ProtectedRoute>
+        )}
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
@@ -27,8 +51,10 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
-      <Toaster />
+      <AuthProvider>
+        <Router />
+        <Toaster />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

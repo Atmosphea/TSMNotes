@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, getQueryFn } from '@/lib/queryClient';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 type User = {
   id: number;
@@ -24,89 +25,142 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Check if user is already logged in
-  useEffect(() => {
-    const checkAuth = async () => {
+  const { 
+    data: userData,
+    isLoading: loading,
+    error
+  } = useQuery({
+    queryKey: ['/api/auth/me'],
+    queryFn: async () => {
       try {
-        const response = await apiRequest('/api/auth/me', {
+        const response = await fetch('/api/auth/me', {
           method: 'GET',
           credentials: 'include',
         });
         
-        if (response.success) {
-          setUser(response.data);
-          setIsAuthenticated(true);
+        if (!response.ok) {
+          throw new Error('Not authenticated');
         }
+        
+        const data = await response.json();
+        return data.data;
       } catch (error) {
-        // User is not authenticated
-        setUser(null);
-        setIsAuthenticated(false);
-      } finally {
-        setLoading(false);
+        console.error('Auth check error:', error);
+        throw error;
       }
-    };
+    },
+    retry: false
+  });
+  
+  // Update user state when data changes
+  useEffect(() => {
+    if (userData) {
+      setUser(userData);
+      setIsAuthenticated(true);
+    } else if (error) {
+      setUser(null);
+      setIsAuthenticated(false);
+    }
+  }, [userData, error]);
 
-    checkAuth();
-  }, []);
-
-  const login = async (username: string, password: string) => {
-    try {
-      setLoading(true);
-      const response = await apiRequest('/api/auth/login', {
+  const loginMutation = useMutation({
+    mutationFn: async ({ username, password }: { username: string; password: string }) => {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ username, password }),
       });
-
-      if (response.success) {
-        setUser(response.data);
-        setIsAuthenticated(true);
-        return true;
+      
+      if (!response.ok) {
+        throw new Error('Login failed');
       }
-      return false;
+      
+      const data = await response.json();
+      return data.data;
+    },
+    onSuccess: (data) => {
+      setUser(data);
+      setIsAuthenticated(true);
+    }
+  });
+
+  const signupMutation = useMutation({
+    mutationFn: async ({ username, email, password, inviteKey }: { 
+      username: string; 
+      email: string; 
+      password: string; 
+      inviteKey: string 
+    }) => {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ username, email, password, inviteKey }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Signup failed');
+      }
+      
+      const data = await response.json();
+      return data.data;
+    },
+    onSuccess: (data) => {
+      setUser(data);
+      setIsAuthenticated(true);
+    }
+  });
+
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Logout failed');
+      }
+      
+      return await response.json();
+    },
+    onSuccess: () => {
+      setUser(null);
+      setIsAuthenticated(false);
+    }
+  });
+
+  const login = async (username: string, password: string) => {
+    try {
+      await loginMutation.mutateAsync({ username, password });
+      return true;
     } catch (error) {
+      console.error('Login error:', error);
       return false;
-    } finally {
-      setLoading(false);
     }
   };
 
   const signup = async (username: string, email: string, password: string, inviteKey: string) => {
     try {
-      setLoading(true);
-      const response = await apiRequest('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, email, password, inviteKey }),
-      });
-
-      if (response.success) {
-        setUser(response.data);
-        setIsAuthenticated(true);
-        return true;
-      }
-      return false;
+      await signupMutation.mutateAsync({ username, email, password, inviteKey });
+      return true;
     } catch (error) {
+      console.error('Signup error:', error);
       return false;
-    } finally {
-      setLoading(false);
     }
   };
 
   const logout = async () => {
     try {
-      await apiRequest('/api/auth/logout', {
-        method: 'POST',
-      });
-      setUser(null);
-      setIsAuthenticated(false);
+      await logoutMutation.mutateAsync();
     } catch (error) {
       console.error('Logout error:', error);
     }
