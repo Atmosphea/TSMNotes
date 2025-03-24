@@ -9,14 +9,25 @@ import {
   ShoppingBag, 
   FileText, 
   HelpCircle, 
-  ChevronDown 
+  ChevronDown,
+  User,
+  LogOut
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [location] = useLocation();
   const isLandingPage = location === "/";
+  const { user, isAuthenticated, logout } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -136,12 +147,59 @@ const Header = () => {
         </nav>
         
         <div className="flex items-center space-x-4">
-          <Button 
-            onClick={() => scrollToSection("cta")}
-            className="bg-primary hover:bg-primary/90"
-          >
-            Join Waitlist <ChevronRight className="ml-1 h-4 w-4" />
-          </Button>
+          {isAuthenticated ? (
+            // User is logged in - show profile dropdown
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={user?.profileImageUrl} alt={user?.username} />
+                    <AvatarFallback>
+                      {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0) || user?.username?.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end">
+                <div className="flex items-center justify-start gap-2 p-2">
+                  <div className="flex flex-col space-y-0.5 leading-none">
+                    <p className="font-medium text-sm">
+                      {user?.firstName} {user?.lastName || user?.username}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate w-40">
+                      {user?.email}
+                    </p>
+                  </div>
+                </div>
+                <DropdownMenuItem asChild>
+                  <Link href="/profile" className="w-full cursor-pointer">
+                    <User className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={logout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            // User is not logged in - show login/waitlist buttons
+            <div className="hidden md:flex items-center space-x-3">
+              <Link href="/login">
+                <Button variant="ghost" className="text-white hover:text-primary">
+                  Login
+                </Button>
+              </Link>
+              <Button 
+                onClick={() => isLandingPage ? scrollToSection("cta") : null}
+                className="bg-primary hover:bg-primary/90"
+              >
+                {isLandingPage ? "Join Waitlist" : "Sign Up"}
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
+            </div>
+          )}
           <button 
             className="md:hidden p-2" 
             onClick={toggleMenu}
@@ -242,14 +300,61 @@ const Header = () => {
               </div>
             </div>
             
-            <div className="pt-6">
-              <Button
-                onClick={() => scrollToSection("cta")}
-                className="w-full h-14 text-lg bg-primary hover:bg-primary/90"
-              >
-                Join the Waitlist <ChevronRight className="ml-2 h-5 w-5" />
-              </Button>
-            </div>
+            {isAuthenticated ? (
+              // Auth section for logged in users
+              <div className="space-y-6">
+                <h3 className="text-xs uppercase tracking-wider text-gray-400 font-semibold">Account</h3>
+                <div className="space-y-4 pl-2">
+                  <Link 
+                    href="/profile" 
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      document.body.style.overflow = "";
+                    }}
+                    className="flex w-full items-center text-xl font-medium hover:text-primary transition-colors"
+                  >
+                    <User className="h-5 w-5 mr-2" />
+                    Profile
+                    <ChevronRight className="ml-auto h-5 w-5 opacity-60" />
+                  </Link>
+                  <button 
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      document.body.style.overflow = "";
+                      logout();
+                    }}
+                    className="flex w-full items-center text-xl font-medium hover:text-primary transition-colors"
+                  >
+                    <LogOut className="h-5 w-5 mr-2" />
+                    Log Out
+                    <ChevronRight className="ml-auto h-5 w-5 opacity-60" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              // Auth section for non-logged in users
+              <div className="pt-6 space-y-4">
+                <Link href="/login">
+                  <Button variant="outline" className="w-full h-12 text-lg">
+                    Login
+                  </Button>
+                </Link>
+                <Button
+                  onClick={() => {
+                    if (isLandingPage) {
+                      scrollToSection("cta");
+                    } else {
+                      setIsMenuOpen(false);
+                      document.body.style.overflow = "";
+                      window.location.href = "/signup";
+                    }
+                  }}
+                  className="w-full h-14 text-lg bg-primary hover:bg-primary/90"
+                >
+                  {isLandingPage ? "Join the Waitlist" : "Sign Up"} <ChevronRight className="ml-2 h-5 w-5" />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}
