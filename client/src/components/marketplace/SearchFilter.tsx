@@ -1,78 +1,118 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { X, Sliders, Filter } from 'lucide-react';
-
-interface FilterState {
-  note_type: string;
-  original_amount_min: number | '';
-  original_amount_max: number | '';
-  current_amount_min: number | '';
-  current_amount_max: number | '';
-  interest_rate_min: number | '';
-  interest_rate_max: number | '';
-  maturity_date_start: string;
-  maturity_date_end: string;
-  location_state: string;
-  location_city: string;
-  price_min: number | '';
-  price_max: number | '';
-  note_status: string[];
-  property_type: string[];
-  property_zip_code: string;
-  loan_term_years_min: number | '';
-  loan_term_years_max: number | '';
-  loan_term_months: number | '';
-  is_secured: boolean;
-  collateral_type: string;
-  date_of_note_start: string;
-  date_of_note_end: string;
-  payment_frequency: string;
-  amortization_type: string;
-  description: string;
-  property_county: string;
-  loan_to_value_ratio_min: number | '';
-  loan_to_value_ratio_max: number | '';
-}
+import { FilterState } from './index';
 
 const initialFilterState: FilterState = {
-  note_type: '',
+  // Basic filtering options
+  availability: 'All',
+  listingType: 'All',
+  lienPosition: 'All',
+  performance: 'All',
+  
+  // Note type filtering
+  note_type: [],
+  
+  // Price & balance ranges
   original_amount_min: '',
   original_amount_max: '',
   current_amount_min: '',
   current_amount_max: '',
-  interest_rate_min: '',
-  interest_rate_max: '',
-  maturity_date_start: '',
-  maturity_date_end: '',
-  location_state: '',
-  location_city: '',
+  unpaid_balance_min: '',
+  unpaid_balance_max: '',
   price_min: '',
   price_max: '',
-  note_status: [],
+  
+  // Property filtering
   property_type: [],
+  property_value_min: '',
+  property_value_max: '',
+  
+  // Interest & investment ratios
+  interest_rate_min: '',
+  interest_rate_max: '',
+  investment_to_balance_min: '',
+  investment_to_balance_max: '',
+  investment_to_value_min: '',
+  investment_to_value_max: '',
+  loan_to_value_min: '',
+  loan_to_value_max: '',
+  
+  // Maturity & term details
+  maturity_date_start: '',
+  maturity_date_end: '',
+  date_of_note_start: '',
+  date_of_note_end: '',
+  payments_remaining_min: '',
+  payments_remaining_max: '',
+  
+  // Location info
+  location_state: '',
+  location_city: '',
   property_zip_code: '',
+  property_county: '',
+  
+  // Status & legal
+  note_status: [],
+  legal_status: [],
+  is_secured: false,
+  
+  // Jurisdiction classification
+  state_classifications: [],
+  
+  // Additional details
+  collateral_type: '',
   loan_term_years_min: '',
   loan_term_years_max: '',
   loan_term_months: '',
-  is_secured: false,
-  collateral_type: '',
-  date_of_note_start: '',
-  date_of_note_end: '',
   payment_frequency: '',
   amortization_type: '',
   description: '',
-  property_county: '',
-  loan_to_value_ratio_min: '',
-  loan_to_value_ratio_max: '',
 };
 
-const noteTypes = ['Promissory', 'Mortgage', 'Business', 'Land Contract'];
+// Basic filtering options
+const availabilityOptions = ['All', 'Available', 'Pending Sale'];
+const listingTypeOptions = ['All', 'Single Asset', 'Asset Pool'];
+const lienPositionOptions = ['All', '1st', '2nd'];
+const performanceOptions = ['All', 'Performing', 'Non-Performing'];
+
+// Note type options - from JSON
+const noteTypeOptions = [
+  { label: 'Deed of Trust', value: 'deed_of_trust' },
+  { label: 'Mortgage', value: 'mortgage' },
+  { label: 'Contract For Deed (CFD)', value: 'cfd' }
+];
+
+// Other dropdown options
 const states = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'];
 const noteStatuses = ['Performing', 'Non-Performing', 'Sub-Performing', 'REO'];
-const propertyTypes = ['Single Family', 'Multi-Family', 'Commercial', 'Land', 'Industrial', 'Mixed-Use'];
-const collateralTypes = ['Real Estate', 'Equipment', 'Vehicle', 'Business Assets', 'Unsecured'];
 const paymentFrequencies = ['Monthly', 'Bi-Weekly', 'Weekly', 'Quarterly', 'Semi-Annually', 'Annually'];
 const amortizationTypes = ['Fully Amortizing', 'Interest-Only', 'Balloon Payment', 'Adjustable Rate'];
+
+// Property types - from JSON
+const propertyTypes = [
+  { label: 'Commercial', value: 'commercial' },
+  { label: 'Condominium', value: 'condominium' },
+  { label: 'Land', value: 'land' },
+  { label: 'Multi-Family', value: 'multi-family' },
+  { label: 'Other', value: 'other' },
+  { label: 'Single Family', value: 'single-family' }
+];
+
+// Collateral types
+const collateralTypes = ['Real Estate', 'Equipment', 'Vehicle', 'Business Assets', 'Unsecured'];
+
+// Legal statuses
+const legalStatusOptions = [
+  { label: 'Foreclosure', value: 'foreclosure' },
+  { label: 'None', value: 'none' }
+];
+
+// State classifications
+const stateClassificationOptions = [
+  { label: 'Judicial State', value: 'judicial' },
+  { label: 'Non-Judicial State', value: 'non-judicial' }
+];
 
 interface SearchFilterProps {
   onApply: (filters: FilterState) => void;
@@ -84,7 +124,10 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onApply, onClose, isDrawer 
   const [filters, setFilters] = useState<FilterState>(initialFilterState);
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
 
-  const handleCheckboxChange = (field: 'note_status' | 'property_type', value: string) => {
+  const handleCheckboxChange = (
+    field: 'note_status' | 'property_type' | 'note_type' | 'legal_status' | 'state_classifications', 
+    value: string
+  ) => {
     const current = filters[field];
     const updated = current.includes(value)
       ? current.filter((item) => item !== value)
@@ -143,21 +186,113 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onApply, onClose, isDrawer 
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Availability */}
+        <div className="bg-gray-700/50 p-4 rounded-lg transition-all duration-300 hover:bg-gray-700/70">
+          <label className="text-white font-bold mb-2 block">Availability</label>
+          <div className="flex flex-col space-y-2">
+            {availabilityOptions.map((option) => (
+              <div key={option} className="flex items-center">
+                <input
+                  type="radio"
+                  id={`availability-${option}`}
+                  name="availability"
+                  checked={filters.availability === option}
+                  onChange={() => handleInputChange('availability', option)}
+                  className="mr-2 h-4 w-4 accent-purple-500"
+                />
+                <label htmlFor={`availability-${option}`} className="text-white text-sm cursor-pointer">
+                  {option}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Listing Type */}
+        <div className="bg-gray-700/50 p-4 rounded-lg transition-all duration-300 hover:bg-gray-700/70">
+          <label className="text-white font-bold mb-2 block">Listing Type</label>
+          <div className="flex flex-col space-y-2">
+            {listingTypeOptions.map((option) => (
+              <div key={option} className="flex items-center">
+                <input
+                  type="radio"
+                  id={`listing-type-${option}`}
+                  name="listingType"
+                  checked={filters.listingType === option}
+                  onChange={() => handleInputChange('listingType', option)}
+                  className="mr-2 h-4 w-4 accent-purple-500"
+                />
+                <label htmlFor={`listing-type-${option}`} className="text-white text-sm cursor-pointer">
+                  {option}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Lien Position */}
+        <div className="bg-gray-700/50 p-4 rounded-lg transition-all duration-300 hover:bg-gray-700/70">
+          <label className="text-white font-bold mb-2 block">Lien Position</label>
+          <div className="flex flex-col space-y-2">
+            {lienPositionOptions.map((option) => (
+              <div key={option} className="flex items-center">
+                <input
+                  type="radio"
+                  id={`lien-position-${option}`}
+                  name="lienPosition"
+                  checked={filters.lienPosition === option}
+                  onChange={() => handleInputChange('lienPosition', option)}
+                  className="mr-2 h-4 w-4 accent-purple-500"
+                />
+                <label htmlFor={`lien-position-${option}`} className="text-white text-sm cursor-pointer">
+                  {option}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Performance */}
+        <div className="bg-gray-700/50 p-4 rounded-lg transition-all duration-300 hover:bg-gray-700/70">
+          <label className="text-white font-bold mb-2 block">Performance</label>
+          <div className="flex flex-col space-y-2">
+            {performanceOptions.map((option) => (
+              <div key={option} className="flex items-center">
+                <input
+                  type="radio"
+                  id={`performance-${option}`}
+                  name="performance"
+                  checked={filters.performance === option}
+                  onChange={() => handleInputChange('performance', option)}
+                  className="mr-2 h-4 w-4 accent-purple-500"
+                />
+                <label htmlFor={`performance-${option}`} className="text-white text-sm cursor-pointer">
+                  {option}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+        
         {/* Note Type */}
         <div className="bg-gray-700/50 p-4 rounded-lg transition-all duration-300 hover:bg-gray-700/70">
           <label className="text-white font-bold mb-2 block">Note Type</label>
-          <select
-            value={filters.note_type}
-            onChange={(e) => handleInputChange('note_type', e.target.value)}
-            className="w-full bg-transparent text-white border-b border-gray-500 focus:border-purple-500 focus:outline-none font-bold placeholder-gray-400 py-2"
-          >
-            <option value="">Select Note Type</option>
-            {noteTypes.map((type) => (
-              <option key={type} value={type} className="bg-gray-800 text-white">
-                {type}
-              </option>
+          <div className="grid grid-cols-1 gap-2">
+            {noteTypeOptions.map((type) => (
+              <div key={type.value} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`note-type-${type.value}`}
+                  checked={filters.note_type.includes(type.value)}
+                  onChange={() => handleCheckboxChange('note_type', type.value)}
+                  className="mr-2 h-4 w-4 accent-purple-500"
+                />
+                <label htmlFor={`note-type-${type.value}`} className="text-white text-sm cursor-pointer">
+                  {type.label}
+                </label>
+              </div>
             ))}
-          </select>
+          </div>
         </div>
 
         {/* Original Amount */}
@@ -280,16 +415,16 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onApply, onClose, isDrawer 
           <label className="text-white font-bold mb-2 block">Property Type</label>
           <div className="grid grid-cols-2 gap-2">
             {propertyTypes.map((type) => (
-              <div key={type} className="flex items-center">
+              <div key={type.value} className="flex items-center">
                 <input
                   type="checkbox"
-                  id={`property-${type}`}
-                  checked={filters.property_type.includes(type)}
-                  onChange={() => handleCheckboxChange('property_type', type)}
+                  id={`property-${type.value}`}
+                  checked={filters.property_type.includes(type.value)}
+                  onChange={() => handleCheckboxChange('property_type', type.value)}
                   className="mr-2 h-4 w-4 accent-purple-500"
                 />
-                <label htmlFor={`property-${type}`} className="text-white text-sm cursor-pointer">
-                  {type}
+                <label htmlFor={`property-${type.value}`} className="text-white text-sm cursor-pointer">
+                  {type.label}
                 </label>
               </div>
             ))}
@@ -393,6 +528,48 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onApply, onClose, isDrawer 
           </select>
         </div>
 
+        {/* Legal Status */}
+        <div className="bg-gray-700/50 p-4 rounded-lg transition-all duration-300 hover:bg-gray-700/70">
+          <label className="text-white font-bold mb-2 block">Legal Status</label>
+          <div className="grid grid-cols-1 gap-2">
+            {legalStatusOptions.map((status) => (
+              <div key={status.value} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`legal-status-${status.value}`}
+                  checked={filters.legal_status.includes(status.value)}
+                  onChange={() => handleCheckboxChange('legal_status', status.value)}
+                  className="mr-2 h-4 w-4 accent-purple-500"
+                />
+                <label htmlFor={`legal-status-${status.value}`} className="text-white text-sm cursor-pointer">
+                  {status.label}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {/* State Classifications */}
+        <div className="bg-gray-700/50 p-4 rounded-lg transition-all duration-300 hover:bg-gray-700/70">
+          <label className="text-white font-bold mb-2 block">State Classification</label>
+          <div className="grid grid-cols-1 gap-2">
+            {stateClassificationOptions.map((classification) => (
+              <div key={classification.value} className="flex items-center">
+                <input
+                  type="checkbox"
+                  id={`state-classification-${classification.value}`}
+                  checked={filters.state_classifications.includes(classification.value)}
+                  onChange={() => handleCheckboxChange('state_classifications', classification.value)}
+                  className="mr-2 h-4 w-4 accent-purple-500"
+                />
+                <label htmlFor={`state-classification-${classification.value}`} className="text-white text-sm cursor-pointer">
+                  {classification.label}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+        
         {/* Secured Status */}
         <div className="bg-gray-700/50 p-4 rounded-lg transition-all duration-300 hover:bg-gray-700/70">
           <label className="text-white font-bold mb-2 block">Security Status</label>
