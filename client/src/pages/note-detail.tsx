@@ -64,6 +64,18 @@ export default function NoteDetailPage() {
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   const { toast } = useToast();
   
+  // Helper function to calculate monthly mortgage payment
+  const calculateMonthlyPayment = (principal: number, monthlyRate: number, termMonths: number): number => {
+    // Handle edge cases
+    if (monthlyRate === 0) return principal / termMonths;
+    if (termMonths === 0) return principal;
+    
+    // Standard mortgage payment formula: P * (r(1+r)^n) / ((1+r)^n - 1)
+    const numerator = monthlyRate * Math.pow(1 + monthlyRate, termMonths);
+    const denominator = Math.pow(1 + monthlyRate, termMonths) - 1;
+    return principal * (numerator / denominator);
+  };
+  
   // Fetch note listing details
   const { data: listingData, isLoading: isListingLoading, error: listingError } = useQuery<{ success: boolean; data: NoteListing }>({
     queryKey: [`/api/note-listings/${noteId}`],
@@ -91,9 +103,13 @@ export default function NoteDetailPage() {
     if (!listing) return null;
     // Annual yield calculation (simplified)
     const annualYield = listing.interestRate.toFixed(2);
-    // Cash on cash return
-    const monthlyIncome = listing.paymentAmount;
-    const annualIncome = monthlyIncome * 12;
+    // Calculate monthly payment amount based on current loan amount, interest rate, and remaining term
+    // This is an approximation of a mortgage payment calculation
+    const monthlyInterestRate = listing.interestRate / 100 / 12;
+    const remainingMonths = listing.remainingLoanTerm;
+    const monthlyPayment = listing.monthlyPaymentAmount || calculateMonthlyPayment(listing.currentLoanAmount, monthlyInterestRate, remainingMonths);
+    
+    const annualIncome = monthlyPayment * 12;
     const cashOnCash = ((annualIncome / listing.askingPrice) * 100).toFixed(2);
     
     return {
@@ -210,14 +226,14 @@ export default function NoteDetailPage() {
                   <CardContent className="p-4 flex flex-col items-center text-center">
                     <DollarSign className="w-8 h-8 text-primary mb-2" />
                     <p className="text-xs text-muted-foreground">Unpaid Principal</p>
-                    <p className="text-lg font-semibold">{formatCurrency(listing.loanAmount)}</p>
+                    <p className="text-lg font-semibold">{formatCurrency(listing.currentLoanAmount)}</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-4 flex flex-col items-center text-center">
                     <PiggyBank className="w-8 h-8 text-primary mb-2" />
                     <p className="text-xs text-muted-foreground">Monthly Payment</p>
-                    <p className="text-lg font-semibold">{formatCurrency(listing.paymentAmount)}</p>
+                    <p className="text-lg font-semibold">{formatCurrency(listing.monthlyPaymentAmount)}</p>
                   </CardContent>
                 </Card>
                 <Card>
@@ -231,14 +247,14 @@ export default function NoteDetailPage() {
                   <CardContent className="p-4 flex flex-col items-center text-center">
                     <Home className="w-8 h-8 text-primary mb-2" />
                     <p className="text-xs text-muted-foreground">Property Value</p>
-                    <p className="text-lg font-semibold">{formatCurrency(listing.propertyValue || listing.loanAmount * (100 / (listing.loanToValueRatio || 75)))}</p>
+                    <p className="text-lg font-semibold">{formatCurrency(listing.propertyValue || listing.currentLoanAmount * (100 / (listing.loanToValueRatio || 75)))}</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="p-4 flex flex-col items-center text-center">
                     <Calendar className="w-8 h-8 text-primary mb-2" />
                     <p className="text-xs text-muted-foreground">Remaining</p>
-                    <p className="text-lg font-semibold">{listing.remainingPayments} months</p>
+                    <p className="text-lg font-semibold">{listing.remainingLoanTerm} months</p>
                   </CardContent>
                 </Card>
               </div>
@@ -270,31 +286,31 @@ export default function NoteDetailPage() {
                     {/* Left column - first row */}
                     <div>
                       <div className="text-gray-600 text-sm font-medium mb-1.5">Unpaid Principal Balance</div>
-                      <div className="text-3xl font-bold">{formatCurrency(listing.loanAmount - (listing.loanAmount * (listing.timeHeld / listing.loanTerm)))}</div>
+                      <div className="text-3xl font-bold">{formatCurrency(listing.currentLoanAmount)}</div>
                     </div>
                     
                     {/* Right column - first row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                       <div>
                         <div className="text-gray-600 text-sm font-medium mb-1.5">Monthly Payment</div>
-                        <div className="text-xl font-bold">${listing.paymentAmount.toFixed(0)}</div>
+                        <div className="text-xl font-bold">${listing.monthlyPaymentAmount.toFixed(0)}</div>
                       </div>
                       <div>
                         <div className="text-gray-600 text-sm font-medium mb-1.5">Principle & Interest</div>
-                        <div className="text-xl font-bold">${listing.paymentAmount.toFixed(0)}</div>
+                        <div className="text-xl font-bold">${listing.monthlyPaymentAmount.toFixed(0)}</div>
                       </div>
                     </div>
                     
                     {/* Left column - second row */}
                     <div>
                       <div className="text-gray-600 text-sm font-medium mb-1.5">Original Balance</div>
-                      <div className="text-3xl font-bold">{formatCurrency(listing.loanAmount)}</div>
+                      <div className="text-3xl font-bold">{formatCurrency(listing.originalLoanAmount)}</div>
                     </div>
                     
                     {/* Right column - second row */}
                     <div>
                       <div className="text-gray-600 text-sm font-medium mb-1.5">Total Payoff</div>
-                      <div className="text-3xl font-bold">{formatCurrency(listing.paymentAmount * listing.remainingPayments)}</div>
+                      <div className="text-3xl font-bold">{formatCurrency(listing.monthlyPaymentAmount * listing.remainingLoanTerm)}</div>
                     </div>
                     
                     {/* Stats row with 3 columns */}
@@ -344,7 +360,7 @@ export default function NoteDetailPage() {
                       
                       <div className="flex justify-between border-b pb-2">
                         <div className="text-gray-600 font-medium">Property Value</div>
-                        <div className="font-semibold">{formatCurrency(listing.propertyValue || (listing.loanAmount * (100 / (listing.loanToValueRatio || 75))))}</div>
+                        <div className="font-semibold">{formatCurrency(listing.propertyValue || (listing.currentLoanAmount * (100 / (listing.loanToValueRatio || 75))))}</div>
                       </div>
                       
                       <div className="flex justify-between border-b pb-2">
