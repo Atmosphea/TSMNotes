@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { setupAuth } from "./auth";
 import { 
   insertWaitlistEntrySchema, 
   insertNoteListingSchema, 
@@ -131,6 +132,9 @@ async function addSampleListings() {
 const emailSchema = z.string().email("Please enter a valid email address");
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up authentication routes and middleware
+  setupAuth(app);
+  
   // Add sample listings on startup
   await addSampleListings();
   // Waitlist API route
