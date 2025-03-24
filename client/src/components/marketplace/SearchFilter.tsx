@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { X, Sliders, Filter } from 'lucide-react';
+import { X, Sliders, Filter, ChevronDown, ChevronUp } from 'lucide-react';
 import { FilterState } from './index';
 
 const initialFilterState: FilterState = {
