@@ -9,7 +9,22 @@ type User = {
   firstName?: string;
   lastName?: string;
   role: string;
+  status?: string;
+  bio?: string;
+  phone?: string;
+  company?: string;
+  companyName?: string; // Alternative name for company
+  website?: string;
+  location?: string;
+  profileImageUrl?: string;
+  emailNotifications?: boolean;
+  smsNotifications?: boolean;
+  marketingEmails?: boolean;
+  isAccreditedInvestor?: boolean;
+  accreditationProofUrl?: string;
+  lastLoginAt?: Date;
   createdAt: Date;
+  updatedAt?: Date;
 };
 
 interface AuthContextType {
