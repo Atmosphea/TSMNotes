@@ -14,8 +14,7 @@ import SignupPage from "@/pages/signup";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Navigation from "@/components/ui/navigation";
-import Footer from "@/components/ui/footer";
-import { useParallaxFooter } from "@/hooks/use-parallax-footer";
+import Footer2 from "@/components/ui/footer2";
 
 function Router() {
   return (
@@ -62,20 +61,24 @@ function Router() {
 }
 
 function App() {
-  // Use the parallax footer effect
-  useParallaxFooter();
-  
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <div className="min-h-screen flex flex-col">
-          <Navigation />
-          <div className="flex-grow">
-            <Router />
+        <>
+          {/* Fixed footer that sits at the bottom */}
+          <Footer2 />
+          
+          {/* Main content that scrolls over the footer */}
+          <div className="content-wrapper">
+            <div className="flex flex-col">
+              <Navigation />
+              <div className="flex-grow">
+                <Router />
+              </div>
+              <Toaster />
+            </div>
           </div>
-          <Footer />
-          <Toaster />
-        </div>
+        </>
       </AuthProvider>
     </QueryClientProvider>
   );
