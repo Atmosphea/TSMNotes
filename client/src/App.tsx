@@ -13,6 +13,7 @@ import LoginPage from "@/pages/login";
 import SignupPage from "@/pages/signup";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import Navigation from "@/components/ui/navigation"; //Import Navigation component
 
 function Router() {
   return (
@@ -52,6 +53,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <div className="min-h-screen"> {/*Replaced Header with Navigation*/}
+          <Navigation />
+        </div>
         <Router />
         <Toaster />
       </AuthProvider>
