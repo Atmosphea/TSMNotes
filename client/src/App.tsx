@@ -53,11 +53,13 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <div className="min-h-screen"> {/*Replaced Header with Navigation*/}
+        <div className="min-h-screen flex flex-col">
           <Navigation />
+          <div className="flex-grow">
+            <Router />
+          </div>
+          <Toaster />
         </div>
-        <Router />
-        <Toaster />
       </AuthProvider>
     </QueryClientProvider>
   );

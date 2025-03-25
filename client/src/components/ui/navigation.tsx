@@ -27,9 +27,11 @@ const Navigation = () => {
     }
   ];
 
+  const [, setLocation] = useLocation();
+  
   const handleBoxClick = (path: string) => {
     setIsOpen(false);
-    window.location.href = path;
+    setLocation(path);
   };
 
   return (
