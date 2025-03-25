@@ -13,7 +13,9 @@ import LoginPage from "@/pages/login";
 import SignupPage from "@/pages/signup";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import Navigation from "@/components/ui/navigation"; //Import Navigation component
+import Navigation from "@/components/ui/navigation";
+import Footer from "@/components/ui/footer";
+import { useParallaxFooter } from "@/hooks/use-parallax-footer";
 
 function Router() {
   return (
@@ -44,12 +46,25 @@ function Router() {
           </ProtectedRoute>
         )}
       </Route>
+      <Route path="/faq" component={() => (<div className="container mx-auto py-12"><h1 className="text-4xl font-bold">FAQ</h1></div>)} />
+      <Route path="/my-listings">
+        {() => (
+          <ProtectedRoute>
+            <div className="container mx-auto py-12">
+              <h1 className="text-4xl font-bold">My Listings</h1>
+            </div>
+          </ProtectedRoute>
+        )}
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
 }
 
 function App() {
+  // Use the parallax footer effect
+  useParallaxFooter();
+  
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -58,6 +73,7 @@ function App() {
           <div className="flex-grow">
             <Router />
           </div>
+          <Footer />
           <Toaster />
         </div>
       </AuthProvider>
