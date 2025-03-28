@@ -4,6 +4,7 @@ export { default as FilterDrawer } from './FilterDrawer';
 export { default as FilterModal } from './FilterModal';
 export { StatusIndicator } from './StatusIndicator';
 export { ContactRequestDialog } from './ContactRequestDialog';
+export { default as NoteDetailModal } from './NoteDetailModal';
 
 // Re-export the FilterState interface for convenience
 export interface FilterState {

@@ -45,7 +45,8 @@ import {
   FilterDrawer, 
   FilterState, 
   StatusIndicator,
-  ContactRequestDialog 
+  ContactRequestDialog,
+  NoteDetailModal
 } from "@/components/marketplace";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
@@ -73,6 +74,9 @@ export default function MarketplacePage() {
   // Contact request dialog state
   const [selectedListing, setSelectedListing] = useState<NoteListing | null>(null);
   const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
+  
+  // Note detail modal state
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   
   // Filter state variables
   const [noteType, setNoteType] = useState("");
