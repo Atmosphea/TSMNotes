@@ -2,6 +2,8 @@ export { default as SearchFilter } from './SearchFilter';
 export { default as FilterButton } from './FilterButton';
 export { default as FilterDrawer } from './FilterDrawer';
 export { default as FilterModal } from './FilterModal';
+export { StatusIndicator } from './StatusIndicator';
+export { ContactRequestDialog } from './ContactRequestDialog';
 
 // Re-export the FilterState interface for convenience
 export interface FilterState {

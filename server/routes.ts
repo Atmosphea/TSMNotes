@@ -1,6 +1,7 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { insertAccessRequestSchema } from "@shared/schema";
 import { setupAuth } from "./auth";
 import { 
   insertWaitlistEntrySchema, 
@@ -647,6 +648,167 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+  // Access Requests API Routes
+  
+  // Get all access requests
+  app.get("/api/access-requests", async (req, res) => {
+    try {
+      const accessRequests = await storage.getAllAccessRequests();
+      
+      // Update any expired requests
+      const now = new Date();
+      const updatedRequests = [];
+      
+      for (const request of accessRequests) {
+        if (request.expiresAt && new Date(request.expiresAt) < now && request.status === 'pending') {
+          const updatedRequest = await storage.updateAccessRequest(request.id, { 
+            status: 'expired' 
+          });
+          updatedRequests.push(updatedRequest);
+        } else {
+          updatedRequests.push(request);
+        }
+      }
+      
+      return res.status(200).json({
+        success: true,
+        data: updatedRequests
+      });
+    } catch (error) {
+      console.error("Error getting access requests:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while fetching access requests"
+      });
+    }
+  });
+  
+  // Create a new access request
+  app.post("/api/request-access", async (req, res) => {
+    try {
+      const data = insertAccessRequestSchema.parse(req.body);
+      
+      // Validate that the note listing exists
+      const noteListing = await storage.getNoteListingById(data.noteListingId);
+      if (!noteListing) {
+        return res.status(404).json({
+          success: false,
+          message: "Note listing not found"
+        });
+      }
+      
+      // Check if the user already has an active access request for this note
+      const existingRequests = await storage.getAccessRequestsByBuyerAndNote(
+        data.buyerId, 
+        data.noteListingId
+      );
+      
+      const activeRequest = existingRequests.find(req => 
+        req.status === 'pending' && new Date(req.expiresAt) > new Date()
+      );
+      
+      if (activeRequest) {
+        return res.status(409).json({
+          success: false,
+          message: "You already have an active access request for this note"
+        });
+      }
+      
+      // Create the access request
+      const accessRequest = await storage.createAccessRequest(data);
+      
+      // TODO: Send email notification to the buyer with note details and seller contact
+      
+      return res.status(201).json({
+        success: true,
+        message: "Access request created successfully",
+        data: accessRequest
+      });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({
+          success: false,
+          message: validationError.message
+        });
+      }
+      
+      console.error("Error creating access request:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while creating the access request"
+      });
+    }
+  });
+  
+  // Get access requests for a specific note listing
+  app.get("/api/note-listings/:id/access-requests", async (req, res) => {
+    try {
+      const noteListingId = parseInt(req.params.id);
+      if (isNaN(noteListingId)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid note listing ID"
+        });
+      }
+      
+      const accessRequests = await storage.getAccessRequestsByNoteListingId(noteListingId);
+      return res.status(200).json({
+        success: true,
+        data: accessRequests
+      });
+    } catch (error) {
+      console.error("Error getting note listing access requests:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while fetching access requests"
+      });
+    }
+  });
+  
+  // Update an access request status
+  app.put("/api/access-requests/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid access request ID"
+        });
+      }
+      
+      const { status } = req.body;
+      if (!status || !['pending', 'approved', 'rejected', 'expired'].includes(status)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid status. Must be one of: pending, approved, rejected, expired"
+        });
+      }
+      
+      const updatedRequest = await storage.updateAccessRequest(id, { status });
+      
+      if (!updatedRequest) {
+        return res.status(404).json({
+          success: false,
+          message: "Access request not found"
+        });
+      }
+      
+      return res.status(200).json({
+        success: true,
+        message: "Access request updated successfully",
+        data: updatedRequest
+      });
+    } catch (error) {
+      console.error("Error updating access request:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while updating the access request"
+      });
+    }
+  });
+  
+  // Inquiries API Routes
   
   // Create a new inquiry
   app.post("/api/inquiries", async (req, res) => {

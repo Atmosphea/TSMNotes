@@ -93,6 +93,8 @@ export const noteListings = pgTable("note_listings", {
   
   // Listing status & visibility
   status: text("status").default('active').notNull(), // active, pending, sold, expired, draft
+  accessRequests: integer("access_requests").default(0), // Number of buyers who requested contact info
+  lastAccessRequestAt: timestamp("last_access_request_at"), // When was the last contact request
   featured: boolean("featured").default(false),
   isPublic: boolean("is_public").default(true),
   verificationStatus: text("verification_status").default('pending'), // pending, verified, rejected
@@ -196,8 +198,33 @@ export const favoriteListings = pgTable("favorite_listings", {
 }, (table) => {
   return {
     // Ensure a user can only favorite a listing once
-    uniqueFavorite: unique({ columns: [table.userId, table.noteListingId] }),
+    uniqueFavorite: unique("unique_favorite").on(table.userId, table.noteListingId),
   };
+});
+
+// Create a new table to track access requests
+export const accessRequests = pgTable("access_requests", {
+  id: serial("id").primaryKey(),
+  buyerId: integer("buyer_id").notNull(),
+  noteListingId: integer("note_listing_id").notNull(),
+  
+  // Contact request details
+  requestType: text("request_type").default('contact').notNull(), // contact, purchase, view_docs
+  message: text("message"), // Optional message from buyer
+  
+  // Status tracking
+  status: text("status").default('pending').notNull(), // pending, approved, rejected, expired
+  reviewedById: integer("reviewed_by_id"), // User ID who reviewed request (typically seller)
+  reviewedAt: timestamp("reviewed_at"), // When request was reviewed
+  accessGranted: boolean("access_granted").default(false), // Whether access was granted
+  documentAccessCount: integer("document_access_count").default(0), // Number of times docs were accessed
+  emailSent: boolean("email_sent").default(false), // Notification email was sent to seller
+  emailSentAt: timestamp("email_sent_at"), // When notification email was sent
+
+  // Timestamps for expiration/cleanup
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  expiresAt: timestamp("expires_at"), // Will be set to createdAt + 48 hours
 });
 
 // Inquiries/offers from potential buyers
@@ -335,6 +362,8 @@ export const insertNoteListingSchema = createInsertSchema(noteListings).pick({
   amortizationType: true,
   paymentFrequency: true,
   status: true,
+  accessRequests: true,
+  lastAccessRequestAt: true,
   featured: true,
   isPublic: true,
   verificationStatus: true,
@@ -387,6 +416,18 @@ export const insertFavoriteListingSchema = createInsertSchema(favoriteListings).
   userId: true,
   noteListingId: true,
   notes: true,
+});
+
+export const insertAccessRequestSchema = createInsertSchema(accessRequests).pick({
+  buyerId: true,
+  noteListingId: true,
+  requestType: true,
+  message: true,
+  status: true,
+  reviewedById: true,
+  accessGranted: true,
+  emailSent: true,
+  expiresAt: true,
 });
 
 export const insertInquirySchema = createInsertSchema(inquiries).pick({
@@ -455,6 +496,9 @@ export type Inquiry = typeof inquiries.$inferSelect;
 
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 export type Transaction = typeof transactions.$inferSelect;
+
+export type InsertAccessRequest = z.infer<typeof insertAccessRequestSchema>;
+export type AccessRequest = typeof accessRequests.$inferSelect;
 
 export type InsertNote = z.infer<typeof insertNoteSchema>;
 export type Note = typeof notes.$inferSelect;

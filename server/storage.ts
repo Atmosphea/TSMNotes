@@ -10,6 +10,7 @@ import {
   favoriteListings,
   inquiries,
   transactions,
+  accessRequests,
   type User, 
   type InsertUser, 
   type WaitlistEntry, 
@@ -31,7 +32,9 @@ import {
   type Inquiry,
   type InsertInquiry,
   type Transaction,
-  type InsertTransaction
+  type InsertTransaction,
+  type AccessRequest,
+  type InsertAccessRequest
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, or, desc, asc, sql, like, gte, lte, inArray } from "drizzle-orm";
@@ -109,6 +112,16 @@ export interface IStorage {
   getNoteDocumentsByListingId(noteListingId: number): Promise<NoteDocument[]>;
   deleteNoteDocument(id: number): Promise<boolean>;
   
+  // Access Request operations
+  createAccessRequest(accessRequest: InsertAccessRequest): Promise<AccessRequest>;
+  getAccessRequestById(id: number): Promise<AccessRequest | undefined>;
+  getAccessRequestsByNoteListingId(noteListingId: number): Promise<AccessRequest[]>;
+  getAccessRequestsByBuyerId(buyerId: number): Promise<AccessRequest[]>;
+  getAccessRequestsByBuyerAndNote(buyerId: number, noteListingId: number): Promise<AccessRequest[]>;
+  getAllAccessRequests(): Promise<AccessRequest[]>;
+  updateAccessRequest(id: number, accessRequest: Partial<InsertAccessRequest>): Promise<AccessRequest | undefined>;
+  deleteAccessRequest(id: number): Promise<boolean>;
+  
   // Inquiry operations
   createInquiry(inquiry: InsertInquiry): Promise<Inquiry>;
   getInquiryById(id: number): Promise<Inquiry | undefined>;
@@ -134,6 +147,7 @@ export class MemStorage implements IStorage {
   private noteDocuments: Map<number, NoteDocument>;
   private notes: Map<number, Note>; // Legacy
   private inquiries: Map<number, Inquiry>;
+  private accessRequests: Map<number, AccessRequest>;
   
   private currentUserId: number;
   private currentWaitlistEntryId: number;
@@ -142,6 +156,7 @@ export class MemStorage implements IStorage {
   private currentNoteDocumentId: number;
   private currentNoteId: number;
   private currentInquiryId: number;
+  private currentAccessRequestId: number;
 
   constructor() {
     this.users = new Map();
@@ -151,6 +166,7 @@ export class MemStorage implements IStorage {
     this.noteDocuments = new Map();
     this.notes = new Map();
     this.inquiries = new Map();
+    this.accessRequests = new Map();
     
     this.currentUserId = 1;
     this.currentWaitlistEntryId = 1;
@@ -159,6 +175,7 @@ export class MemStorage implements IStorage {
     this.currentNoteDocumentId = 1;
     this.currentNoteId = 1;
     this.currentInquiryId = 1;
+    this.currentAccessRequestId = 1;
   }
 
   // User operations
@@ -357,6 +374,8 @@ export class MemStorage implements IStorage {
       viewCount: 0,
       favoriteCount: 0,
       inquiryCount: 0,
+      accessRequests: 0,
+      lastAccessRequestAt: null,
       listedAt: new Date(),
       expiresAt: null,
       createdAt: new Date(),
@@ -446,6 +465,129 @@ export class MemStorage implements IStorage {
   
   async deleteNoteDocument(id: number): Promise<boolean> {
     return this.noteDocuments.delete(id);
+  }
+  
+  // Access Request operations
+  async createAccessRequest(insertAccessRequest: InsertAccessRequest): Promise<AccessRequest> {
+    const id = this.currentAccessRequestId++;
+    const now = new Date();
+    
+    // Calculate expiration date (48 hours from now)
+    const expiresAt = new Date(now);
+    expiresAt.setHours(expiresAt.getHours() + 48);
+    
+    const accessRequest: AccessRequest = {
+      id,
+      buyerId: insertAccessRequest.buyerId,
+      noteListingId: insertAccessRequest.noteListingId,
+      requestType: insertAccessRequest.requestType || 'contact',
+      message: insertAccessRequest.message || null,
+      status: insertAccessRequest.status || 'pending',
+      reviewedById: insertAccessRequest.reviewedById || null,
+      reviewedAt: null,
+      accessGranted: insertAccessRequest.accessGranted ?? false,
+      documentAccessCount: 0,
+      emailSent: insertAccessRequest.emailSent ?? false,
+      emailSentAt: null,
+      expiresAt: insertAccessRequest.expiresAt || expiresAt,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    this.accessRequests.set(id, accessRequest);
+    
+    // Update the note listing with access request info
+    const noteListing = this.noteListings.get(accessRequest.noteListingId);
+    if (noteListing) {
+      // Increment the access request count
+      noteListing.accessRequests = (noteListing.accessRequests || 0) + 1;
+      // Update the timestamp of the most recent request
+      noteListing.lastAccessRequestAt = now;
+      
+      this.noteListings.set(accessRequest.noteListingId, noteListing);
+    }
+    
+    return accessRequest;
+  }
+  
+  async getAccessRequestById(id: number): Promise<AccessRequest | undefined> {
+    return this.accessRequests.get(id);
+  }
+  
+  async getAccessRequestsByNoteListingId(noteListingId: number): Promise<AccessRequest[]> {
+    return Array.from(this.accessRequests.values()).filter(
+      (request) => request.noteListingId === noteListingId
+    );
+  }
+  
+  async getAccessRequestsByBuyerId(buyerId: number): Promise<AccessRequest[]> {
+    return Array.from(this.accessRequests.values()).filter(
+      (request) => request.buyerId === buyerId
+    );
+  }
+  
+  async getAccessRequestsByBuyerAndNote(buyerId: number, noteListingId: number): Promise<AccessRequest[]> {
+    return Array.from(this.accessRequests.values()).filter(
+      (request) => request.buyerId === buyerId && request.noteListingId === noteListingId
+    );
+  }
+  
+  async getAllAccessRequests(): Promise<AccessRequest[]> {
+    return Array.from(this.accessRequests.values());
+  }
+  
+  async updateAccessRequest(id: number, accessRequestData: Partial<InsertAccessRequest>): Promise<AccessRequest | undefined> {
+    const existingRequest = this.accessRequests.get(id);
+    
+    if (!existingRequest) {
+      return undefined;
+    }
+    
+    // Check if status is being updated to 'approved' or 'rejected'
+    // and set reviewedAt timestamp if not already set
+    let reviewedAt = existingRequest.reviewedAt;
+    if ((accessRequestData.status === 'approved' || accessRequestData.status === 'rejected') && !existingRequest.reviewedAt) {
+      reviewedAt = new Date();
+    }
+    
+    const updatedRequest: AccessRequest = {
+      ...existingRequest,
+      buyerId: accessRequestData.buyerId ?? existingRequest.buyerId,
+      noteListingId: accessRequestData.noteListingId ?? existingRequest.noteListingId,
+      requestType: accessRequestData.requestType ?? existingRequest.requestType,
+      status: accessRequestData.status ?? existingRequest.status,
+      message: accessRequestData.message ?? existingRequest.message,
+      reviewedById: accessRequestData.reviewedById ?? existingRequest.reviewedById,
+      reviewedAt: reviewedAt,
+      accessGranted: accessRequestData.accessGranted ?? existingRequest.accessGranted,
+      emailSent: accessRequestData.emailSent ?? existingRequest.emailSent,
+      emailSentAt: existingRequest.emailSentAt,
+      expiresAt: accessRequestData.expiresAt ?? existingRequest.expiresAt,
+      documentAccessCount: existingRequest.documentAccessCount,
+      updatedAt: new Date()
+    };
+    
+    // If emailSent is changing from false to true, set the emailSentAt timestamp
+    if (accessRequestData.emailSent === true && !existingRequest.emailSent) {
+      updatedRequest.emailSentAt = new Date();
+    }
+    
+    this.accessRequests.set(id, updatedRequest);
+    
+    // If access is being granted, update the note listing status if it's active
+    if (accessRequestData.accessGranted === true && !existingRequest.accessGranted) {
+      const noteListing = this.noteListings.get(existingRequest.noteListingId);
+      if (noteListing && noteListing.status === 'active') {
+        noteListing.status = 'pending';  // Change to pending when access is granted
+        this.noteListings.set(noteListing.id, noteListing);
+      }
+    }
+    
+    return updatedRequest;
+  }
+  
+  async deleteAccessRequest(id: number): Promise<boolean> {
+    return this.accessRequests.delete(id);
   }
   
   // Inquiry operations
@@ -637,6 +779,147 @@ export class MemStorage implements IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  // Access Request operations
+  async createAccessRequest(accessRequest: InsertAccessRequest): Promise<AccessRequest> {
+    // Set default values for fields that might not be in the input
+    const now = new Date();
+    const expiresAt = new Date(now);
+    expiresAt.setHours(expiresAt.getHours() + 48); // Default 48-hour expiration
+    
+    const accessRequestWithDefaults = {
+      ...accessRequest,
+      requestType: accessRequest.requestType || 'contact',
+      message: accessRequest.message || null,
+      status: accessRequest.status || 'pending',
+      reviewedById: accessRequest.reviewedById || null,
+      accessGranted: accessRequest.accessGranted ?? false,
+      emailSent: accessRequest.emailSent ?? false,
+      expiresAt: accessRequest.expiresAt || expiresAt
+    };
+
+    const [newAccessRequest] = await db
+      .insert(accessRequests)
+      .values(accessRequestWithDefaults)
+      .returning();
+    
+    // Update the note listing with access request info
+    await db
+      .update(noteListings)
+      .set({
+        accessRequests: sql`COALESCE(${noteListings.accessRequests}, 0) + 1`,
+        lastAccessRequestAt: now,
+        updatedAt: now
+      })
+      .where(eq(noteListings.id, accessRequest.noteListingId));
+    
+    return newAccessRequest;
+  }
+  
+  async getAccessRequestById(id: number): Promise<AccessRequest | undefined> {
+    const [accessRequest] = await db
+      .select()
+      .from(accessRequests)
+      .where(eq(accessRequests.id, id));
+    return accessRequest;
+  }
+  
+  async getAccessRequestsByNoteListingId(noteListingId: number): Promise<AccessRequest[]> {
+    return await db
+      .select()
+      .from(accessRequests)
+      .where(eq(accessRequests.noteListingId, noteListingId));
+  }
+  
+  async getAccessRequestsByBuyerId(buyerId: number): Promise<AccessRequest[]> {
+    return await db
+      .select()
+      .from(accessRequests)
+      .where(eq(accessRequests.buyerId, buyerId));
+  }
+  
+  async getAccessRequestsByBuyerAndNote(buyerId: number, noteListingId: number): Promise<AccessRequest[]> {
+    return await db
+      .select()
+      .from(accessRequests)
+      .where(
+        and(
+          eq(accessRequests.buyerId, buyerId),
+          eq(accessRequests.noteListingId, noteListingId)
+        )
+      );
+  }
+  
+  async getAllAccessRequests(): Promise<AccessRequest[]> {
+    return await db
+      .select()
+      .from(accessRequests)
+      .orderBy(desc(accessRequests.createdAt));
+  }
+  
+  async updateAccessRequest(id: number, accessRequestData: Partial<InsertAccessRequest>): Promise<AccessRequest | undefined> {
+    const updates: any = {
+      ...accessRequestData,
+      updatedAt: new Date()
+    };
+    
+    // If we're updating the status to approved or rejected, set reviewedAt
+    if (accessRequestData.status === 'approved' || accessRequestData.status === 'rejected') {
+      updates.reviewedAt = new Date();
+    }
+    
+    // If we're setting emailSent to true for the first time, set emailSentAt
+    if (accessRequestData.emailSent === true) {
+      const [existingRequest] = await db
+        .select()
+        .from(accessRequests)
+        .where(eq(accessRequests.id, id));
+      
+      if (existingRequest && !existingRequest.emailSent) {
+        updates.emailSentAt = new Date();
+      }
+    }
+    
+    const [updatedRequest] = await db
+      .update(accessRequests)
+      .set(updates)
+      .where(eq(accessRequests.id, id))
+      .returning();
+    
+    // If access is being granted, update the note listing status if it's active
+    if (updatedRequest && accessRequestData.accessGranted === true) {
+      // Check if this is a newly granted access (was previously false)
+      const [existingRequest] = await db
+        .select()
+        .from(accessRequests)
+        .where(eq(accessRequests.id, id));
+      
+      if (existingRequest && !existingRequest.accessGranted) {
+        // Update the note listing status to pending when access is granted
+        await db
+          .update(noteListings)
+          .set({
+            status: 'pending',
+            updatedAt: new Date()
+          })
+          .where(
+            and(
+              eq(noteListings.id, updatedRequest.noteListingId),
+              eq(noteListings.status, 'active')
+            )
+          );
+      }
+    }
+    
+    return updatedRequest;
+  }
+  
+  async deleteAccessRequest(id: number): Promise<boolean> {
+    const result = await db
+      .delete(accessRequests)
+      .where(eq(accessRequests.id, id));
+    
+    return result.rowCount !== null && result.rowCount > 0;
+  }
   // User operations
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));

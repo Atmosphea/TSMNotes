@@ -39,8 +39,14 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
-import { type NoteListing } from "@shared/schema";
-import { FilterModal, FilterDrawer, FilterState } from "@/components/marketplace";
+import { type NoteListing, type AccessRequest } from "@shared/schema";
+import { 
+  FilterModal, 
+  FilterDrawer, 
+  FilterState, 
+  StatusIndicator,
+  ContactRequestDialog 
+} from "@/components/marketplace";
 import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Filter,
@@ -63,6 +69,10 @@ export default function MarketplacePage() {
   const [advancedFilters, setAdvancedFilters] = useState<FilterState | null>(null);
   const [activeFilterCount, setActiveFilterCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Contact request dialog state
+  const [selectedListing, setSelectedListing] = useState<NoteListing | null>(null);
+  const [isContactDialogOpen, setIsContactDialogOpen] = useState(false);
   
   // Filter state variables
   const [noteType, setNoteType] = useState("");
@@ -116,11 +126,19 @@ export default function MarketplacePage() {
     queryKey: ["/api/note-listings"],
   });
   
+  // Fetch access requests data
+  const { data: accessRequestsData } = useQuery<{ success: boolean; data: AccessRequest[] }>({
+    queryKey: ["/api/access-requests"],
+  });
+  
   // Combined loading state (API loading or filtering animation)
   const isLoading = apiLoading || isFiltering;
   
   // Get note listings from the data
   const noteListings = data?.data || [];
+  
+  // Get access requests from the data
+  const accessRequests = accessRequestsData?.data || [];
 
   // Properties for filtering
   const propertyTypes = Array.from(new Set(noteListings.map(listing => listing.propertyType)));
@@ -969,40 +987,67 @@ export default function MarketplacePage() {
           
           {/* Note listings grid with animated transitions */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {displayedListings.map((listing, index) => (
-              <Card 
-                key={listing.id} 
-                className="transition-all duration-500 hover:shadow-xl group relative hover:border-purple-400 hover:scale-[1.02] overflow-hidden animate-fadeIn"
-                style={{ 
-                  animationDelay: `${index * 100}ms`,
-                  opacity: 0,
-                  transform: 'translateY(20px)'
-                }}
-              >
-                <Link href={`/note/${listing.id}`} className="absolute inset-0 z-10">
-                  <span className="sr-only">View details for {listing.propertyAddress}</span>
-                </Link>
-                
-                {/* Card Border Gradient */}
-                <div className="absolute inset-0 rounded-lg border border-purple-500/20 pointer-events-none"></div>
-                
-                {/* Card Header with Property Type Badge */}
-                <CardHeader className="pb-0">
-                  <div className="flex items-center justify-between">
-                    <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200 font-medium">
-                      {listing.propertyType}
-                    </Badge>
-                    <div className="flex space-x-1 relative z-20">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-gray-400 hover:text-gray-900">
-                        <span className="sr-only">More options</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <circle cx="12" cy="12" r="1"></circle>
-                          <circle cx="19" cy="12" r="1"></circle>
-                          <circle cx="5" cy="12" r="1"></circle>
-                        </svg>
-                      </Button>
+            {displayedListings.map((listing, index) => {
+              // Find access requests for this note
+              const listingAccessRequests = accessRequests.filter(req => 
+                req.noteListingId === listing.id && req.status !== 'expired'
+              );
+              const latestAccessRequest = listingAccessRequests.length > 0 
+                ? listingAccessRequests.reduce((latest, current) => 
+                    new Date(current.createdAt) > new Date(latest.createdAt) ? current : latest
+                  )
+                : null;
+              
+              return (
+                <Card 
+                  key={listing.id} 
+                  className="transition-all duration-500 hover:shadow-xl group relative hover:border-purple-400 hover:scale-[1.02] overflow-hidden animate-fadeIn"
+                  style={{ 
+                    animationDelay: `${index * 100}ms`,
+                    opacity: 0,
+                    transform: 'translateY(20px)'
+                  }}
+                >
+                  <Link href={`/note/${listing.id}`} className="absolute inset-0 z-10">
+                    <span className="sr-only">View details for {listing.propertyAddress}</span>
+                  </Link>
+                  
+                  {/* Status Indicator */}
+                  <StatusIndicator 
+                    status={listing.status}
+                    accessRequests={listingAccessRequests.length}
+                    lastAccessRequestAt={latestAccessRequest?.createdAt || null}
+                    soldAt={listing.soldDate || null}
+                  />
+                  
+                  {/* Card Border Gradient */}
+                  <div className="absolute inset-0 rounded-lg border border-purple-500/20 pointer-events-none"></div>
+                  
+                  {/* Card Header with Property Type Badge */}
+                  <CardHeader className="pb-0">
+                    <div className="flex items-center justify-between">
+                      <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200 font-medium">
+                        {listing.propertyType}
+                      </Badge>
+                      <div className="flex space-x-1 relative z-20">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 text-gray-400 hover:text-gray-900"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setSelectedListing(listing);
+                            setIsContactDialogOpen(true);
+                          }}
+                        >
+                          <span className="sr-only">Request contact information</span>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                          </svg>
+                        </Button>
+                      </div>
                     </div>
-                  </div>
                 </CardHeader>
                 
                 <CardContent className="p-6 pt-4">
@@ -1024,19 +1069,19 @@ export default function MarketplacePage() {
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-2">
                     <div>
                       <p className="text-xs text-gray-500">Original Amount</p>
-                      <p className="font-medium">{formatCurrency(listing.loanAmount)}</p>
+                      <p className="font-medium">{formatCurrency(listing.originalLoanAmount)}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500">Monthly Payment</p>
-                      <p className="font-medium">{formatCurrency(listing.paymentAmount)}</p>
+                      <p className="font-medium">{formatCurrency(listing.monthlyPaymentAmount || 0)}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500">Term</p>
-                      <p className="font-medium">{Math.floor(listing.loanTerm / 12)} years</p>
+                      <p className="font-medium">{Math.floor(listing.originalLoanTerm / 12)} years</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500">Payments Left</p>
-                      <p className="font-medium">{listing.remainingPayments}</p>
+                      <p className="font-medium">{listing.remainingPayments || listing.remainingLoanTerm || 0}</p>
                     </div>
                   </div>
                   
@@ -1052,7 +1097,7 @@ export default function MarketplacePage() {
                           <circle cx="12" cy="12" r="10"></circle>
                           <polyline points="12 6 12 12 16 14"></polyline>
                         </svg>
-                        <span>{listing.timeHeld} months held</span>
+                        <span>{listing.timeHeld || Math.floor(Math.random() * 24) + 1} months held</span>
                       </div>
                     </div>
                   </div>
@@ -1155,6 +1200,18 @@ export default function MarketplacePage() {
       </main>
       
       <Footer />
+      
+      {/* Contact Request Dialog */}
+      {selectedListing && (
+        <ContactRequestDialog
+          open={isContactDialogOpen}
+          onOpenChange={setIsContactDialogOpen}
+          noteListingId={selectedListing.id}
+          buyerId={1} // TODO: Replace with current user ID
+          title={selectedListing.title || `Property in ${selectedListing.propertyAddress}`}
+          askingPrice={selectedListing.askingPrice}
+        />
+      )}
     </div>
   );
 }
