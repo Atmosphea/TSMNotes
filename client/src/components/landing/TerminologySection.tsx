@@ -141,16 +141,16 @@ const TerminologySection = () => {
           </div>
 
           <TabsContent value="terms" className="mt-0">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-3 gap-8">
               {keyTerms.map((item, index) => (
-                <div key={index} className="terminology-card" style={{ '--card-index': index } as React.CSSProperties}>
-                  <div className="flex items-center mb-3">
-                    <div className="feature-icon-container w-10 h-10 mr-3">
+                <div key={index} className="flex flex-col space-y-2">
+                  <div className="flex items-center space-x-2 mb-1">
+                    <div className="text-primary">
                       {item.icon}
                     </div>
                     <h3 className="font-bold text-lg text-gray-100">{item.term}</h3>
                   </div>
-                  <p className="text-gray-300 text-sm">{item.description}</p>
+                  <p className="text-gray-300 text-sm leading-relaxed">{item.description}</p>
                 </div>
               ))}
             </div>
