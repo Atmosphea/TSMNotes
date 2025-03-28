@@ -1,40 +1,40 @@
-import { Search, ShieldCheck, BarChart3, HeartHandshake } from "lucide-react";
+import { Briefcase, Map, ShieldCheck, Clock } from "lucide-react";
 
 const ProcessSection = () => {
   const processes = [
     {
-      title: "Sourcing & Evaluation",
-      description: "We acquire unseasoned notes from banks and lenders, ensuring high-potential investments. Every note undergoes rigorous borrower analysis, property assessment, and loan term review to minimize risk.",
-      icon: <Search className="h-6 w-6" />,
-      id: "sourcing"
+      title: "Professional",
+      description: "Our platform is designed for serious investors and sellers who value efficiency, security, and professionalism.",
+      icon: <Briefcase className="h-6 w-6 text-primary" />,
+      id: "professional"
     },
     {
-      title: "Risk & Structuring",
-      description: "We classify notes by risk, determine fair pricing, and implement loss mitigation strategies to protect investors.",
-      icon: <ShieldCheck className="h-6 w-6" />,
-      id: "risk"
+      title: "Local",
+      description: "We emphasize local relationships and connections, ensuring you work with professionals you can trust.",
+      icon: <Map className="h-6 w-6 text-primary" />,
+      id: "local"
     },
     {
-      title: "Marketplace & Transactions",
-      description: "We list vetted notes with full transparency, matching investors with opportunities suited to their goals. Transactions are secured through escrow services and expert loan servicers.",
-      icon: <BarChart3 className="h-6 w-6" />,
-      id: "marketplace"
+      title: "Secure",
+      description: "State-of-the-art security measures protect your sensitive information and transaction details.",
+      icon: <ShieldCheck className="h-6 w-6 text-primary" />,
+      id: "secure"
     },
     {
-      title: "Post-Sale Support",
-      description: "We offer ongoing monitoring, servicing recommendations, and exit strategy guidance to maximize returns.",
-      icon: <HeartHandshake className="h-6 w-6" />,
-      id: "support"
+      title: "On Your Terms",
+      description: "Our flexible platform allows you to negotiate and close deals on your own timeline and preferences.",
+      icon: <Clock className="h-6 w-6 text-primary" />,
+      id: "terms"
     }
   ];
 
   return (
     <section id="process" className="py-20 gradient-bg-darker">
       <div className="container mx-auto px-6 lg:px-8">
-        <div className="max-w-4xl mb-12">
-          <h2 className="section-title text-4xl mb-4">Our <span className="text-gradient">Process</span></h2>
-          <p className="section-description text-gray-300">
-            Our comprehensive approach ensures that every note on our platform undergoes rigorous evaluation and structuring to provide secure, transparent investment opportunities.
+        <div className="max-w-4xl mx-auto mb-12 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">Core Values</span></h2>
+          <p className="text-gray-300">
+            What makes our platform different from the rest
           </p>
         </div>
 
@@ -63,19 +63,19 @@ const ProcessSection = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-y-4">
             <div className="flex items-start px-4">
               <div className="text-primary mr-3 text-2xl">✔</div>
-              <p className="text-gray-200">Thorough due diligence</p>
+              <p className="text-gray-200">Handcrafted Network of known players</p>
             </div>
             <div className="flex items-start px-4">
               <div className="text-primary mr-3 text-2xl">✔</div>
-              <p className="text-gray-200">Transparent data</p>
+              <p className="text-gray-200">Simple interface</p>
             </div>
             <div className="flex items-start px-4">
               <div className="text-primary mr-3 text-2xl">✔</div>
-              <p className="text-gray-200">Diverse investment options</p>
+              <p className="text-gray-200">Open Bounty System</p>
             </div>
             <div className="flex items-start px-4">
               <div className="text-primary mr-3 text-2xl">✔</div>
-              <p className="text-gray-200">End-to-end support</p>
+              <p className="text-gray-200">Custom Contract Creation</p>
             </div>
           </div>
         </div>

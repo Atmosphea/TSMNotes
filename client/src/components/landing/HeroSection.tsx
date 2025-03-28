@@ -18,7 +18,7 @@ const HeroSection = () => {
         <div className="flex flex-col lg:flex-row items-start gap-16">
           <div className="flex-1 max-w-2xl">
             <div className="border-l-4 border-primary pl-6 mb-8">
-              <h2 className="text-white text-lg font-medium uppercase tracking-wider">Professional Marketplace</h2>
+              <h2 className="text-white text-lg font-medium uppercase tracking-wider">Professional, Local, Secure</h2>
             </div>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight">
               The Secure Platform for <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">Mortgage Note Trading</span>

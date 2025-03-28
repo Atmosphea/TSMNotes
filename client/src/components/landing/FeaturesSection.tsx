@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { 
   ClipboardCheck, 
-  Lock, 
+  Clock,
   CreditCard, 
   Users, 
   FileText, 
@@ -39,30 +39,26 @@ const FeaturesSection = () => {
   return (
     <section id="features" className="py-16 bg-gray-50">
       <div className="container mx-auto px-6 lg:px-8">
-        <div className="mb-12 max-w-3xl">
-          <div className="accent-border">
-            <h2 className="section-title">
-              Professional Features for Note Industry Experts
-            </h2>
-            <p className="section-description">
-              Our platform is designed specifically for the unique needs of mortgage note buyers and sellers
-            </p>
-          </div>
+        <div className="max-w-3xl mx-auto mb-12 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Key <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">Features</span></h2>
+          <p className="text-gray-600">
+            Everything you need for successful note investing
+          </p>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-20 gap-y-10">
           <div className="space-y-8">
             <Feature 
               icon={<ClipboardCheck className="h-5 w-5 text-primary" />}
-              title="Comprehensive Listings"
-              description="Create detailed note listings with all essential metrics and documentation for proper due diligence."
+              title="Custom Contracts"
+              description="Our platform helps you create tailored agreements that protect your interests and ensure smooth transactions with clarity and confidence."
               index={0}
             />
             
             <Feature 
-              icon={<Lock className="h-5 w-5 text-primary" />}
-              title="Secure Communication"
-              description="End-to-end encrypted messaging system for safe communication between buyers and sellers."
+              icon={<Clock className="h-5 w-5 text-primary" />}
+              title="On Your Time"
+              description="Our flexible platform lets you manage your note investments at your own pace, without pressure or time constraints."
               index={1}
             />
             
@@ -101,7 +97,7 @@ const FeaturesSection = () => {
         <div className="mt-16 border-t border-gray-200 pt-8">
           <Card className="p-6 bg-white border-l-4 border-primary max-w-3xl mx-auto">
             <p className="text-base italic text-gray-600">
-              "Our platform provides the essential tools needed to confidently trade mortgage notes in today's market. With comprehensive listings, secure communications, and robust verification systems, we've created a professional environment where serious buyers and sellers can connect and transact with confidence."
+              "We're not just a marketplace—we're a community of local professionals who understand the value of relationships in this business. Our platform provides the tools, connections, and flexibility that note investors need to make confident decisions on their own terms."
             </p>
           </Card>
         </div>
