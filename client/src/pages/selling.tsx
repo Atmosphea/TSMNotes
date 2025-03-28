@@ -34,6 +34,8 @@ import {
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { formatCurrency } from "@/lib/utils";
+import { FileUploaderRegular } from '@uploadcare/react-uploader';
+import '@uploadcare/react-uploader/core.css';
 
 // Property type options
 const propertyTypes = [
@@ -92,7 +94,7 @@ const NoteCard = ({
 }) => {
   const isActive = listing.status === "active";
   const isSold = listing.status === "sold";
-  
+
   return (
     <div 
       className={`relative rounded-lg overflow-hidden ${isCondensed ? 'aspect-[1.618/1]' : ''}`}
@@ -106,14 +108,14 @@ const NoteCard = ({
             </Badge>
           </div>
         )}
-        
+
         <CardHeader className="pb-2">
           <CardTitle className={`${isCondensed ? 'text-base' : 'text-xl'} truncate`}>
             {listing.propertyType} Note
           </CardTitle>
           <p className={`text-gray-400 ${isCondensed ? 'text-xs' : 'text-sm'} truncate`}>{listing.propertyAddress}</p>
         </CardHeader>
-        
+
         <CardContent className={`space-y-3 ${isCondensed ? 'p-3' : 'p-6'}`}>
           <div className="grid grid-cols-2 gap-2">
             <div>
@@ -141,7 +143,7 @@ const NoteCard = ({
               </>
             )}
           </div>
-          
+
           {!isCondensed && (
             <div className="mt-4 pt-4 border-t border-gray-800">
               <div className="flex justify-between items-end">
@@ -155,7 +157,7 @@ const NoteCard = ({
               </div>
             </div>
           )}
-          
+
           {isCondensed && (
             <>
               <div className="bg-black/30 p-2 rounded">
@@ -187,14 +189,14 @@ const SellingPage = () => {
   });
   const [editingContact, setEditingContact] = useState(false);
   const [selectedListing, setSelectedListing] = useState<NoteListing | null>(null);
-  
+
   // Function to handle file upload from various places
   const handleFileInputChange = (e: any) => {
     if (e.target && e.target.files) {
       handleFileUpload(e as React.ChangeEvent<HTMLInputElement>);
     }
   };
-  
+
   // Initialize form with default values
   const form = useForm<NoteListingFormValues>({
     resolver: zodResolver(noteListingFormSchema),
@@ -213,7 +215,7 @@ const SellingPage = () => {
       status: "draft",
     },
   });
-  
+
   const { mutate: createNoteListing, isPending } = useMutation({
     mutationFn: async (values: NoteListingFormValues) => {
       const response = await apiRequest(
@@ -241,7 +243,7 @@ const SellingPage = () => {
       });
     },
   });
-  
+
   function onSubmit(values: NoteListingFormValues) {
     // Set status to "active" when actually submitting
     createNoteListing({
@@ -249,7 +251,7 @@ const SellingPage = () => {
       status: "active"
     });
   }
-  
+
   // Function to handle file upload (mock implementation for now)
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -263,17 +265,17 @@ const SellingPage = () => {
           type: newFile.type.includes("pdf") ? "Loan Agreement" : "Property Appraisal"
         }
       ]);
-      
+
       toast({
         title: "File uploaded",
         description: `${newFile.name} has been uploaded successfully.`,
       });
-      
+
       // Reset file input
       event.target.value = "";
     }
   };
-  
+
   const calculateMonthlyPayment = (loanAmount: number, interestRate: number, loanTerm: number) => {
     // Monthly interest rate
     const monthlyRate = interestRate / 100 / 12;
@@ -281,42 +283,42 @@ const SellingPage = () => {
     const payment = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, loanTerm) / (Math.pow(1 + monthlyRate, loanTerm) - 1);
     return payment;
   };
-  
+
   // Calculate ROI
   const calculateROI = (form: any) => {
     const values = form.getValues();
     const { askingPrice, paymentAmount, remainingPayments } = values;
-    
+
     if (!askingPrice || !paymentAmount || !remainingPayments) return 0;
-    
+
     const totalPayments = paymentAmount * remainingPayments;
     const profit = totalPayments - askingPrice;
     const roi = (profit / askingPrice) * 100;
-    
+
     return roi;
   };
-  
+
   // Watch form values for real-time preview
   const watchAll = form.watch();
-  
+
   // When loan amount, interest rate, or term changes, recalculate payment amount
   const updatePaymentAmount = () => {
     const loanAmount = form.getValues("loanAmount");
     const interestRate = form.getValues("interestRate");
     const loanTerm = form.getValues("loanTerm");
-    
+
     if (loanAmount && interestRate && loanTerm) {
       const payment = calculateMonthlyPayment(loanAmount, interestRate, loanTerm);
       form.setValue("paymentAmount", parseFloat(payment.toFixed(2)));
     }
   };
-  
+
   // Fetch all listings for the user (using sample user ID for now)
   const { data: userListings } = useQuery({
     queryKey: ["/api/note-listings/seller/1"],
     select: (data: any) => data.data || [],
   });
-  
+
   // Mock data for listings in different states
   const mockActiveListings = userListings && userListings.length > 0 ? userListings : [];
   const mockInactiveListings = [
@@ -420,7 +422,7 @@ const SellingPage = () => {
           <DialogHeader className="bg-purple-600 text-white p-6">
             <DialogTitle className="text-2xl font-bold">Listing Preview</DialogTitle>
           </DialogHeader>
-          
+
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -435,7 +437,7 @@ const SellingPage = () => {
                     <p className="font-medium">{form.getValues("propertyType")}</p>
                   </div>
                 </div>
-                
+
                 <h3 className="text-lg font-medium mt-6 mb-1 text-gray-900">Loan Details</h3>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-3 mt-3">
                   <div>
@@ -464,7 +466,7 @@ const SellingPage = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div>
                 <h3 className="text-lg font-medium mb-1 text-gray-900">Listing Details</h3>
                 <div className="space-y-3 mt-3">
@@ -472,18 +474,18 @@ const SellingPage = () => {
                     <p className="text-sm text-gray-500">Asking Price</p>
                     <p className="text-xl font-bold text-purple-700">{formatCurrency(form.getValues("askingPrice"))}</p>
                   </div>
-                  
+
                   <div>
                     <p className="text-sm text-gray-500">Description</p>
                     <p className="text-sm mt-1">{form.getValues("description")}</p>
                   </div>
-                  
+
                   <div className="mt-6">
                     <p className="text-sm text-gray-500">Potential ROI</p>
                     <p className="font-medium text-green-600">{calculateROI(form).toFixed(2)}%</p>
                   </div>
                 </div>
-                
+
                 <div className="mt-6">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-medium text-gray-900">Contact Information</h3>
@@ -497,7 +499,7 @@ const SellingPage = () => {
                       Edit
                     </Button>
                   </div>
-                  
+
                   {editingContact ? (
                     <div className="mt-3 space-y-3">
                       <div>
@@ -550,7 +552,7 @@ const SellingPage = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="mt-8 border-t border-gray-200 pt-6">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
                 Documents
@@ -558,7 +560,7 @@ const SellingPage = () => {
                   ({documents.length} uploaded)
                 </span>
               </h3>
-              
+
               {documents.length > 0 ? (
                 <div className="space-y-3">
                   {documents.map((doc, index) => (
@@ -594,26 +596,17 @@ const SellingPage = () => {
                 <div className="text-center py-8 border border-dashed border-gray-300 rounded-lg">
                   <UploadCloud className="h-10 w-10 mx-auto text-gray-400 mb-2" />
                   <p className="text-gray-500">No documents uploaded</p>
-                  <Button 
-                    variant="outline"
-                    className="mt-4 border-purple-500 text-purple-700 hover:bg-purple-50"
-                    onClick={() => {
-                      const fileInput = document.createElement('input');
-                      fileInput.type = 'file';
-                      fileInput.accept = '.pdf,.jpg,.jpeg,.png';
-                      fileInput.multiple = true;
-                      fileInput.onchange = handleFileInputChange;
-                      fileInput.click();
-                    }}
-                  >
-                    <Upload className="mr-2 h-4 w-4" />
-                    Upload Documents
-                  </Button>
+                  <FileUploaderRegular
+                     sourceList="local, camera, facebook, gdrive"
+                     cameraModes="photo, video"
+                     classNameUploader="uc-light"
+                     pubkey="da490079f7eb8ed675f1"
+                  />
                 </div>
               )}
             </div>
           </div>
-          
+
           <DialogFooter className="p-6 border-t border-gray-200">
             <Button
               variant="outline"
@@ -634,7 +627,7 @@ const SellingPage = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      
+
       <div className="container mx-auto px-4 py-16">
         <div className="space-y-12">
           <div className="text-center">
@@ -645,7 +638,7 @@ const SellingPage = () => {
               Complete the form below to create your listing and get top dollar for your note
             </p>
           </div>
-          
+
           {/* Centered form with horizontal fields */}
           <div className="max-w-4xl mx-auto">
             <Card className="border border-gray-200 bg-white shadow-md">
@@ -654,7 +647,7 @@ const SellingPage = () => {
                   Note Details
                 </CardTitle>
               </CardHeader>
-              
+
               <CardContent className="pt-8">
                 <Form {...form}>
                   <form className="space-y-8">
@@ -678,7 +671,7 @@ const SellingPage = () => {
                           )}
                         />
                       </div>
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="pb-2 relative">
                           <h3 className="text-lg font-medium text-gray-700 mb-2">Loan Amount</h3>
@@ -707,7 +700,7 @@ const SellingPage = () => {
                             )}
                           />
                         </div>
-                        
+
                         <div className="border-b border-purple-500/20 pb-2 relative">
                           <FormField
                             control={form.control}
@@ -730,7 +723,7 @@ const SellingPage = () => {
                             )}
                           />
                         </div>
-                        
+
                         <div className="border-b border-purple-500/20 pb-2 relative">
                           <FormField
                             control={form.control}
@@ -758,7 +751,7 @@ const SellingPage = () => {
                             )}
                           />
                         </div>
-                        
+
                         <div className="border-b border-purple-500/20 pb-2 relative">
                           <FormField
                             control={form.control}
@@ -785,7 +778,7 @@ const SellingPage = () => {
                             )}
                           />
                         </div>
-                        
+
                         <div className="border-b border-purple-500/20 pb-2 relative">
                           <FormField
                             control={form.control}
@@ -809,7 +802,7 @@ const SellingPage = () => {
                             )}
                           />
                         </div>
-                        
+
                         <div className="border-b border-purple-500/20 pb-2 relative">
                           <FormField
                             control={form.control}
@@ -841,7 +834,7 @@ const SellingPage = () => {
                             )}
                           />
                         </div>
-                        
+
                         <div className="border-b border-purple-500/20 pb-2 relative">
                           <FormField
                             control={form.control}
@@ -864,7 +857,7 @@ const SellingPage = () => {
                             )}
                           />
                         </div>
-                        
+
                         <div className="border-b border-purple-500/20 pb-2 relative">
                           <FormField
                             control={form.control}
@@ -888,7 +881,7 @@ const SellingPage = () => {
                           />
                         </div>
                       </div>
-                      
+
                       <div className="border-b border-purple-500/20 pb-4 relative">
                         <FormField
                           control={form.control}
@@ -915,20 +908,14 @@ const SellingPage = () => {
                         <UploadCloud className="h-10 w-10 mx-auto text-purple-400 mb-4" />
                         <h3 className="text-base font-medium mb-2">Upload supporting documents</h3>
                         <p className="text-sm text-gray-400 mb-4">Loan agreement, property appraisal, payment history, etc.</p>
-                        <Button 
-                          variant="outline"
-                          className="bg-transparent border-purple-500/30 hover:bg-purple-500/10 relative"
-                        >
-                          <input 
-                            type="file" 
-                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            onChange={handleFileUpload}
-                          />
-                          Select Files
-                        </Button>
+                        <FileUploaderRegular
+                           sourceList="local, camera, facebook, gdrive"
+                           cameraModes="photo, video"
+                           classNameUploader="uc-light"
+                           pubkey="da490079f7eb8ed675f1"
+                        />
                       </div>
-                      
+
                       {documents.length > 0 && (
                         <div className="mt-4 space-y-2">
                           {documents.map((doc, index) => (
@@ -965,28 +952,13 @@ const SellingPage = () => {
                   </form>
                 </Form>
               </CardContent>
-              
+
               <CardFooter className="border-t border-gray-200 pt-6">
                 <div className="w-full flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <Button 
-                      variant="outline"
-                      className="bg-white border-purple-500 text-purple-700 hover:bg-purple-50"
-                      onClick={() => {
-                        // Handle document upload functionality
-                        const fileInput = document.createElement('input');
-                        fileInput.type = 'file';
-                        fileInput.accept = '.pdf,.jpg,.jpeg,.png';
-                        fileInput.multiple = true;
-                        fileInput.onchange = handleFileInputChange;
-                        fileInput.click();
-                      }}
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      Upload Documents
-                    </Button>
+                    {/* Removed redundant document upload button */}
                   </div>
-                  
+
                   <Button 
                     onClick={() => setShowPreview(true)}
                     disabled={!form.formState.isValid}
@@ -1010,13 +982,13 @@ const SellingPage = () => {
               </CardFooter>
             </Card>
           </div>
-          
+
           {/* Active listings section */}
           <div className="py-10 border-t border-purple-500/20">
             <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
               Your Note Listings
             </h2>
-            
+
             <Tabs defaultValue="listings" className="w-full">
               <TabsList className="grid grid-cols-3 max-w-md mb-8">
                 <TabsTrigger 
@@ -1038,13 +1010,13 @@ const SellingPage = () => {
                   Sold
                 </TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="listings" className="mt-0">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                   {[...mockActiveListings, ...mockInactiveListings].map((listing) => (
                     <NoteCard key={listing.id} listing={listing} isCondensed={true} />
                   ))}
-                  
+
                   <div className="aspect-[1.618/1] flex items-center justify-center">
                     <Button 
                       variant="outline" 
@@ -1057,7 +1029,7 @@ const SellingPage = () => {
                   </div>
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="market" className="mt-0">
                 <div className="text-center py-6">
                   <p className="text-gray-400">Explore the marketplace to see what other notes are available</p>
@@ -1071,7 +1043,7 @@ const SellingPage = () => {
                   </Button>
                 </div>
               </TabsContent>
-              
+
               <TabsContent value="sold" className="mt-0">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                   {mockSoldListings.map((listing) => (
