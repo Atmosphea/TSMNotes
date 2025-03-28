@@ -6,44 +6,44 @@ export default {
   theme: {
     extend: {
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "0.075rem", // Adjusted radius
+        md: "calc(0.075rem - 2px)", // Adjusted radius
+        sm: "calc(0.075rem - 4px)", // Adjusted radius
       },
       colors: {
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        background: "#000", // Black background
+        foreground: "#fff", // White text
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "#fff", // White card background
+          foreground: "#000", // Black card text
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "#fff", // White popover background
+          foreground: "#000", // Black popover text
         },
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#fff", // White primary background (adjust as needed)
+          foreground: "#000", // Black primary text
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "#fff", // White secondary background (adjust as needed)
+          foreground: "#000", // Black secondary text
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "#fff", // White muted background (adjust as needed)
+          foreground: "#000", // Black muted text
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "#fff", // White accent background (adjust as needed)
+          foreground: "#000", // Black accent text
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "#fff", // White destructive background (adjust as needed)
+          foreground: "#000", // Black destructive text
         },
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
+        border: "#fff", // White border
+        input: "#fff", // White input background (adjust as needed)
+        ring: "#fff", // White ring (adjust as needed)
         chart: {
           "1": "hsl(var(--chart-1))",
           "2": "hsl(var(--chart-2))",
@@ -52,14 +52,14 @@ export default {
           "5": "hsl(var(--chart-5))",
         },
         sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
+          DEFAULT: "#000", // Black sidebar background
+          foreground: "#fff", // White sidebar text
           primary: "hsl(var(--sidebar-primary))",
           "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
           accent: "hsl(var(--sidebar-accent))",
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
+          border: "#fff", // White sidebar border
+          ring: "#fff", // White sidebar ring
         },
       },
       keyframes: {

@@ -10,12 +10,12 @@
   }
   
   * {
-    @apply border-border;
+    @apply border-border rounded-sm;
   }
 
   body {
-    @apply font-sans antialiased text-foreground;
-    background: rgba(42, 42, 42, 0.95);
+    @apply font-sans antialiased text-white;
+    background: #000000;
     min-height: 100vh;
     overflow-x: hidden;
   }
@@ -70,7 +70,7 @@
   }
   
   .glass-card {
-    @apply backdrop-blur-md bg-white/5 border border-white/10 rounded-lg opacity-0;
+    @apply backdrop-blur-md bg-black/50 border border-white/30 rounded-sm opacity-0;
     animation: fadeIn 0.8s ease-out forwards;
   }
   
