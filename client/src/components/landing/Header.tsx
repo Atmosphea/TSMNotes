@@ -81,55 +81,6 @@ const Header = () => {
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
-          {isLandingPage ? (
-            // Landing page navigation
-            <>
-              <div className="relative group">
-                <button 
-                  className="flex items-center text-sm font-medium hover:text-primary transition-colors nav-glow px-3 py-2"
-                  onMouseMove={(e) => {
-                    const el = e.currentTarget;
-                    const rect = el.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    el.style.setProperty("--x", `${x}px`);
-                    el.style.setProperty("--y", `${y}px`);
-                  }}
-                >
-                  Learn <ChevronDown className="h-4 w-4 ml-1" />
-                </button>
-                <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-black/90 border border-gray-800 hidden group-hover:block backdrop-blur-md">
-                  <div className="py-1">
-                    <button 
-                      onClick={() => scrollToSection("features")} 
-                      className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white"
-                    >
-                      Features
-                    </button>
-                    <button 
-                      onClick={() => scrollToSection("how-it-works")} 
-                      className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white"
-                    >
-                      How It Works
-                    </button>
-                    <button 
-                      onClick={() => scrollToSection("testimonials")} 
-                      className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white"
-                    >
-                      Testimonials
-                    </button>
-                    <button 
-                      onClick={() => scrollToSection("faq")} 
-                      className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white"
-                    >
-                      FAQ
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </>
-          ) : null}
-          
           <Link href="/marketplace" className="flex items-center text-sm font-medium hover:text-primary transition-colors nav-glow px-3 py-2">
             <ShoppingBag className="h-4 w-4 mr-1" />
             Buying
@@ -138,11 +89,6 @@ const Header = () => {
           <Link href="/selling" className="flex items-center text-sm font-medium hover:text-primary transition-colors nav-glow px-3 py-2">
             <FileText className="h-4 w-4 mr-1" />
             Selling
-          </Link>
-          
-          <Link href="/faq" className="flex items-center text-sm font-medium hover:text-primary transition-colors nav-glow px-3 py-2">
-            <HelpCircle className="h-4 w-4 mr-1" />
-            FAQ
           </Link>
         </nav>
         
@@ -188,7 +134,7 @@ const Header = () => {
             <div className="hidden md:flex items-center space-x-3">
               <Link href="/login">
                 <Button variant="ghost" className="text-white hover:text-primary">
-                  Login
+                  Have a key?
                 </Button>
               </Link>
               <Button 
@@ -222,41 +168,6 @@ const Header = () => {
           </button>
           
           <div className="px-6 py-8 flex flex-col space-y-8">
-            {isLandingPage && (
-              <div className="space-y-6">
-                <h3 className="text-xs uppercase tracking-wider text-gray-400 font-semibold">Learn</h3>
-                <div className="space-y-4 pl-2">
-                  <button 
-                    onClick={() => scrollToSection("features")} 
-                    className="flex w-full items-center text-xl font-medium hover:text-primary transition-colors"
-                  >
-                    Features
-                    <ChevronRight className="ml-auto h-5 w-5 opacity-60" />
-                  </button>
-                  <button 
-                    onClick={() => scrollToSection("how-it-works")} 
-                    className="flex w-full items-center text-xl font-medium hover:text-primary transition-colors"
-                  >
-                    How It Works
-                    <ChevronRight className="ml-auto h-5 w-5 opacity-60" />
-                  </button>
-                  <button 
-                    onClick={() => scrollToSection("testimonials")} 
-                    className="flex w-full items-center text-xl font-medium hover:text-primary transition-colors"
-                  >
-                    Testimonials
-                    <ChevronRight className="ml-auto h-5 w-5 opacity-60" />
-                  </button>
-                  <button 
-                    onClick={() => scrollToSection("faq")} 
-                    className="flex w-full items-center text-xl font-medium hover:text-primary transition-colors"
-                  >
-                    FAQ
-                    <ChevronRight className="ml-auto h-5 w-5 opacity-60" />
-                  </button>
-                </div>
-              </div>
-            )}
             
             <div className="space-y-6">
               <h3 className="text-xs uppercase tracking-wider text-gray-400 font-semibold">Platform</h3>
@@ -285,18 +196,7 @@ const Header = () => {
                   Selling
                   <ChevronRight className="ml-auto h-5 w-5 opacity-60" />
                 </Link>
-                <Link 
-                  href="/faq" 
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    document.body.style.overflow = "";
-                  }}
-                  className="flex w-full items-center text-xl font-medium hover:text-primary transition-colors"
-                >
-                  <HelpCircle className="h-5 w-5 mr-2" />
-                  FAQ
-                  <ChevronRight className="ml-auto h-5 w-5 opacity-60" />
-                </Link>
+
               </div>
             </div>
             
@@ -336,7 +236,7 @@ const Header = () => {
               <div className="pt-6 space-y-4">
                 <Link href="/login">
                   <Button variant="outline" className="w-full h-12 text-lg">
-                    Login
+                    Have a key?
                   </Button>
                 </Link>
                 <Button

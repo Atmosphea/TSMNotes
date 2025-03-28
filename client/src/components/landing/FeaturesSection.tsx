@@ -87,9 +87,6 @@ const FeaturesSection = () => {
             />
           </div>
         </div>
-        
-          </Card>
-        </div>
       </div>
     </section>
   );

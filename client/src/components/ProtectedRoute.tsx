@@ -4,10 +4,11 @@ import { Redirect } from 'wouter';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  requiredRole?: string | string[];
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, loading } = useAuth();
+export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
+  const { isAuthenticated, loading, user } = useAuth();
 
   if (loading) {
     return (
@@ -19,6 +20,22 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (!isAuthenticated) {
     return <Redirect to="/login" />;
+  }
+
+  // Check if the route requires a specific role
+  if (requiredRole && user) {
+    const userRole = user.role;
+    
+    // Check if the user has the required role
+    if (typeof requiredRole === 'string') {
+      if (userRole !== requiredRole) {
+        return <Redirect to="/marketplace" />;
+      }
+    } else if (Array.isArray(requiredRole)) {
+      if (!requiredRole.includes(userRole)) {
+        return <Redirect to="/marketplace" />;
+      }
+    }
   }
 
   return <>{children}</>;

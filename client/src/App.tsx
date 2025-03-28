@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Redirect } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -15,14 +15,23 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Navigation from "@/components/ui/navigation";
 import Footer2 from "@/components/ui/footer2";
+import { useAuth } from "@/contexts/AuthContext";
 
 function Router() {
+  const { isAuthenticated } = useAuth();
+  
   return (
     <Switch>
-      <Route path="/" component={LandingPage} />
+      <Route path="/">
+        {() => isAuthenticated ? <Redirect to="/marketplace" /> : <LandingPage />}
+      </Route>
       <Route path="/marketplace" component={MarketplacePage} />
-      <Route path="/login" component={LoginPage} />
-      <Route path="/signup" component={SignupPage} />
+      <Route path="/login">
+        {() => isAuthenticated ? <Redirect to="/marketplace" /> : <LoginPage />}
+      </Route>
+      <Route path="/signup">
+        {() => isAuthenticated ? <Redirect to="/marketplace" /> : <SignupPage />}
+      </Route>
       <Route path="/note/:id" component={NoteDetailPage} />
       <Route path="/selling">
         {() => (
@@ -40,7 +49,7 @@ function Router() {
       </Route>
       <Route path="/admin">
         {() => (
-          <ProtectedRoute>
+          <ProtectedRoute requiredRole="admin">
             <AdminPage />
           </ProtectedRoute>
         )}
