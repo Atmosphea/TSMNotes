@@ -31,7 +31,7 @@
 
 @layer components {
   .section-title {
-    @apply font-serif text-3xl font-bold text-left text-gray-100;
+    @apply font-serif text-3xl font-bold text-left text-black;
   }
   
   .section-description {
