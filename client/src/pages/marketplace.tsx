@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/pagination";
 import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/landing/Header";
-import Footer from "@/components/landing/Footer";
+import Footer2 from "@/components/landing/Footer2";
 import { type NoteListing, type AccessRequest } from "@shared/schema";
 import { 
   FilterModal, 
@@ -1203,7 +1203,7 @@ export default function MarketplacePage() {
         </div>
       </main>
       
-      <Footer />
+      <Footer2 />
       
       {/* Contact Request Dialog */}
       {selectedListing && (

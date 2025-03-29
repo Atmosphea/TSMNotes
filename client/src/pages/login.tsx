@@ -90,10 +90,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 relative flex items-center justify-center p-5">
-      <div className="absolute inset-5 border border-white/20"></div>
+    <div className="min-h-screen bg-[#1a2332] relative flex items-center justify-center p-5">
+      <div className="absolute inset-5 border-2 border-[#595e65]"></div>
       
-      <div className="w-full max-w-md bg-black/30 backdrop-blur-sm p-8 rounded-lg border border-white/10">
+      <div className="w-full max-w-md bg-[#131823] p-8 rounded-lg border-2 border-[#595e65] text-white">
         <div className="flex flex-col items-center mb-8">
           <div className="w-20 h-20 mb-4">
             <svg viewBox="0 0 100 100" className="text-white">
@@ -120,7 +120,7 @@ export default function LoginPage() {
                   <FormControl>
                     <Input 
                       placeholder="Username or username:password"
-                      className="bg-transparent border-white/30 text-white placeholder:text-gray-400"
+                      className="bg-[#131823] text-white border-[#595e65] placeholder:text-gray-400"
                       {...field}
                     />
                   </FormControl>
@@ -137,7 +137,7 @@ export default function LoginPage() {
                     <Input 
                       type="password"
                       placeholder="Password"
-                      className="bg-transparent border-white/30 text-white placeholder:text-gray-400"
+                      className="bg-[#131823] text-white border-[#595e65] placeholder:text-gray-400"
                       {...field}
                     />
                   </FormControl>
@@ -148,7 +148,7 @@ export default function LoginPage() {
             
             <Button 
               type="submit" 
-              className="w-full bg-[#D2B48C] hover:bg-[#C19A6B] text-white font-semibold"
+              className="w-full bg-[#c49c6c] hover:bg-[#b38b5b] text-white font-semibold"
               disabled={isLoading}
             >
               {isLoading ? (

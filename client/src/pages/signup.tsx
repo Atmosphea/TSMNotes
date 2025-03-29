@@ -85,10 +85,10 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-[#1a2332]">
       <Header />
       <main className="flex-1 container flex items-center justify-center py-12">
-        <Card className="w-full max-w-md mx-auto">
+        <Card className="w-full max-w-md mx-auto bg-[#131823] border-2 border-[#595e65] text-white">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl font-bold tracking-tight">
               Create an account
@@ -112,7 +112,7 @@ export default function SignupPage() {
                     <FormItem>
                       <FormLabel>Username</FormLabel>
                       <FormControl>
-                        <Input placeholder="johndoe" {...field} />
+                        <Input placeholder="johndoe" className="bg-[#131823] text-white border-[#595e65] placeholder:text-gray-400" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -125,7 +125,7 @@ export default function SignupPage() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="john.doe@example.com" {...field} />
+                        <Input type="email" placeholder="john.doe@example.com" className="bg-[#131823] text-white border-[#595e65] placeholder:text-gray-400" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -138,7 +138,7 @@ export default function SignupPage() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                        <Input type="password" placeholder="••••••••" className="bg-[#131823] text-white border-[#595e65] placeholder:text-gray-400" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -151,7 +151,7 @@ export default function SignupPage() {
                     <FormItem>
                       <FormLabel>Confirm Password</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                        <Input type="password" placeholder="••••••••" className="bg-[#131823] text-white border-[#595e65] placeholder:text-gray-400" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -164,13 +164,13 @@ export default function SignupPage() {
                     <FormItem>
                       <FormLabel>Invite Key</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter your invite key" {...field} />
+                        <Input placeholder="Enter your invite key" className="bg-[#131823] text-white border-[#595e65] placeholder:text-gray-400" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button type="submit" className="w-full bg-[#c49c6c] hover:bg-[#b38b5b] text-white" disabled={isLoading}>
                   {isLoading ? (
                     <>
                       <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent"></div>
