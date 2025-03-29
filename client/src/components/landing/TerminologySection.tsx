@@ -148,7 +148,7 @@ const TerminologySection = () => {
                     <div className="text-primary">
                       {item.icon}
                     </div>
-                    <h3 className="font-bold text-lg text-gray-100">{item.term}</h3>
+                    <h3 className="font-bold text-lg text-black">{item.term}</h3>
                   </div>
                   <p className="text-gray-300 text-sm leading-relaxed">{item.description}</p>
                 </div>

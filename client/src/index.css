@@ -34,6 +34,10 @@
     @apply font-serif text-3xl font-bold text-left text-black;
   }
   
+  .text-landing {
+    @apply text-black;
+  }
+  
   .section-description {
     @apply mt-3 text-lg text-gray-300 text-left;
   }

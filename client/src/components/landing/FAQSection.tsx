@@ -38,32 +38,32 @@ const FAQSection = () => {
       <div className="container mx-auto px-6 lg:px-8">
         <div className="mb-12 max-w-3xl">
           <div className="accent-border">
-            <h2 className="section-title">
+            <h2 className="section-title text-black">
               Frequently Asked Questions
             </h2>
-            <p className="section-description">
+            <p className="section-description text-black">
               Everything you need to know about our note trading platform
             </p>
           </div>
         </div>
-        
+
         <div className="max-w-3xl mx-auto bg-white rounded-lg p-6 border border-gray-200 shadow-sm">
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`} className="border-b border-gray-200 last:border-0">
-                <AccordionTrigger className="text-left font-serif font-medium text-lg hover:no-underline hover:text-primary">
+                <AccordionTrigger className="text-left font-serif font-medium text-lg text-black hover:no-underline">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-600">
+                <AccordionContent className="text-black">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
         </div>
-        
+
         <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-black">
             Don't see what you're looking for? <a href="#" className="text-primary font-medium">Contact us</a> for more information.
           </p>
         </div>

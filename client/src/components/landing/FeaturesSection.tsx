@@ -23,11 +23,11 @@ const Feature = ({ icon, title, description, index }: FeatureProps) => {
         {icon}
       </div>
       <div className="ml-4">
-        <h3 className="text-base font-bold text-foreground flex items-center">
+        <h3 className="text-base font-bold text-black flex items-center"> {/* Changed to text-black */}
           <ChevronRight className="h-4 w-4 mr-1 text-primary" />
           {title}
         </h3>
-        <p className="text-sm text-gray-600 mt-1">
+        <p className="text-sm text-black mt-1"> {/* Changed to text-black */}
           {description}
         </p>
       </div>
@@ -39,7 +39,7 @@ const FeaturesSection = () => {
   return (
     <section id="features" className="py-16 bg-gray-50">
       <div className="container mx-auto px-6 lg:px-8">
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-20 gap-y-10">
           <div className="space-y-8">
             <Feature 
@@ -48,14 +48,14 @@ const FeaturesSection = () => {
               description="Our platform helps you create tailored agreements that protect your interests and ensure smooth transactions with clarity and confidence."
               index={0}
             />
-            
+
             <Feature 
               icon={<Clock className="h-5 w-5 text-primary" />}
               title="On Your Time"
               description="Our flexible platform lets you manage your note investments at your own pace, without pressure or time constraints."
               index={1}
             />
-            
+
             <Feature 
               icon={<CreditCard className="h-5 w-5 text-primary" />}
               title="Advanced Filtering"
@@ -63,7 +63,7 @@ const FeaturesSection = () => {
               index={2}
             />
           </div>
-          
+
           <div className="space-y-8">
             <Feature 
               icon={<Users className="h-5 w-5 text-primary" />}
@@ -71,14 +71,14 @@ const FeaturesSection = () => {
               description="All platform participants are verified to ensure you're dealing with legitimate industry professionals."
               index={0}
             />
-            
+
             <Feature 
               icon={<FileText className="h-5 w-5 text-primary" />}
               title="Due Diligence Tools"
               description="Built-in calculators and analysis tools to help evaluate potential investments with confidence."
               index={1}
             />
-            
+
             <Feature 
               icon={<Calendar className="h-5 w-5 text-primary" />}
               title="Market Activity Tracking"
