@@ -73,21 +73,13 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <>
-          {/* Fixed footer that sits at the bottom */}
-          <Footer2 />
-          
-          {/* Main content that scrolls over the footer */}
-          <div className="content-wrapper">
-            <div className="flex flex-col">
-              <Navigation />
-              <div className="flex-grow">
-                <Router />
-              </div>
-              <Toaster />
-            </div>
+        <div className="flex flex-col min-h-screen">
+          <Navigation />
+          <div className="flex-grow">
+            <Router />
           </div>
-        </>
+          <Toaster />
+        </div>
       </AuthProvider>
     </QueryClientProvider>
   );

@@ -36,7 +36,6 @@ import {
 } from "@/components/ui/dialog";
 import { type NoteDocument, type NoteListing, type User } from "@shared/schema";
 import Header from "@/components/landing/Header";
-import Footer from "@/components/landing/Footer";
 import { InquiryForm, InquiryList } from "@/components/inquiries";
 import { 
   BarChart3,
@@ -133,21 +132,20 @@ export default function NoteDetailPage() {
   
   if (isLoading) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex flex-col min-h-screen note-page">
         <Header />
         <main className="flex-1 container px-4 py-12 mx-auto max-w-7xl">
           <div className="flex justify-center items-center h-64">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
   
   if (listingError || !listing) {
     return (
-      <div className="flex flex-col min-h-screen bg-background">
+      <div className="flex flex-col min-h-screen note-page">
         <Header />
         <main className="flex-1 container px-4 py-12 mx-auto max-w-7xl">
           <div className="flex flex-col items-center justify-center h-64">
@@ -158,13 +156,12 @@ export default function NoteDetailPage() {
             </Button>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
   
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen note-page">
       <Header />
       
       <main className="flex-1">
@@ -193,7 +190,7 @@ export default function NoteDetailPage() {
               {/* Note header */}
               <div>
                 <h1 className="text-3xl font-bold tracking-tight mb-2">
-                  <span className="bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-primary to-orange-600 bg-clip-text text-transparent">
                     {formatCurrency(listing.askingPrice)}
                   </span>
                 </h1>
@@ -209,7 +206,7 @@ export default function NoteDetailPage() {
               </div>
               
               {/* Property visual */}
-              <div className="relative aspect-video rounded-lg overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+              <div className="relative aspect-video rounded-lg overflow-hidden bg-gradient-to-br from-primary to-orange-700 flex items-center justify-center">
                 <Building2 className="w-32 h-32 text-white opacity-50" />
               </div>
               
@@ -486,7 +483,7 @@ export default function NoteDetailPage() {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full bg-gradient-to-r from-primary to-purple-600 text-white" onClick={() => setIsContactDialogOpen(true)}>
+                  <Button className="w-full bg-gradient-to-r from-primary to-orange-600 text-white" onClick={() => setIsContactDialogOpen(true)}>
                     Inquire About This Note
                   </Button>
                 </CardFooter>
@@ -580,8 +577,6 @@ export default function NoteDetailPage() {
           </div>
         </div>
       </main>
-      
-      <Footer />
       
       {/* Inquiry Form Dialog */}
       <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>

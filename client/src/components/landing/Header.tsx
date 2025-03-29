@@ -34,6 +34,8 @@ const Header = () => {
     // When opening the menu, prevent scrolling
     if (!isMenuOpen) {
       document.body.style.overflow = "hidden";
+      // Ensure it's visible even when scrolled down
+      window.scrollTo(0, 0);
     } else {
       document.body.style.overflow = "";
     }
@@ -94,7 +96,7 @@ const Header = () => {
         
         <div className="flex items-center space-x-4">
           {isAuthenticated ? (
-            // User is logged in - show profile dropdown
+            // User is logged in - show profile dropdown only
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -170,7 +172,7 @@ const Header = () => {
           <div className="px-6 py-8 flex flex-col space-y-8">
             
             <div className="space-y-6">
-              <h3 className="text-xs uppercase tracking-wider text-gray-400 font-semibold">Platform</h3>
+              <h3 className="text-xs uppercase tracking-wider text-gray-400 font-semibold">Menu</h3>
               <div className="space-y-4 pl-2">
                 <Link 
                   href="/marketplace" 
