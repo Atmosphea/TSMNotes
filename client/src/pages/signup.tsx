@@ -98,6 +98,11 @@ export default function SignupPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="mb-6 text-center">
+              <p className="text-muted-foreground">
+                Have an account? <Link href="/login"><a className="text-primary font-semibold hover:underline">Login here</a></Link>
+              </p>
+            </div>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FormField
@@ -180,10 +185,7 @@ export default function SignupPage() {
           </CardContent>
           <CardFooter className="flex justify-center">
             <p className="text-sm text-muted-foreground">
-              Already have an account?{' '}
-              <Link href="/login">
-                <a className="text-primary hover:underline">Login</a>
-              </Link>
+              By signing up, you agree to our Terms of Service and Privacy Policy
             </p>
           </CardFooter>
         </Card>
