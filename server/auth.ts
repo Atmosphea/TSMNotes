@@ -14,7 +14,7 @@ declare module 'express-session' {
 }
 
 // Valid invite keys (in a real app, these would be stored in the database)
-const VALID_INVITE_KEYS = ['TEST123']; // Add your test key here
+const VALID_INVITE_KEYS = ['key', 'TEST123']; // Added test key
 
 // Set up session middleware
 export function setupAuth(app: Express) {

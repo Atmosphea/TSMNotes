@@ -136,6 +136,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes and middleware
   setupAuth(app);
   
+  // Create test user
+  await storage.createTestUser();
+  
   // Add sample listings on startup
   await addSampleListings();
   // Waitlist API route

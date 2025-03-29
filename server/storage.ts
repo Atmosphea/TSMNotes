@@ -936,6 +936,22 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async createTestUser() {
+    const testUser = await this.getUserByUsername("user");
+    if (!testUser) {
+      await this.createUser({
+        username: "user",
+        password: "$2b$10$NrzWZHOZM0oSgfz9zkHhIeYcSw156C0pz.IIAm/U5OQJGRVJy3h0e", // Hashed "pass"
+        email: "test@example.com",
+        firstName: "Test",
+        lastName: "User",
+        role: "investor",
+        status: "active"
+      } as any);
+      console.log("Created test user: username='user', password='pass'");
+    }
+  }
+
   async createUser(insertUser: InsertUser): Promise<User> {
     // Set default values for the new schema fields that might not be in insertUser
     const userWithDefaults = {
