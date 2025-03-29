@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Form,
   FormControl,
@@ -18,11 +20,11 @@ import {
 } from "@/components/ui/form";
 
 const formSchema = z.object({
-  username: z.string().min(3, {
-    message: 'Username must be at least 3 characters.',
+  username: z.string().min(1, {
+    message: 'Username is required',
   }),
-  password: z.string().min(6, {
-    message: 'Password must be at least 6 characters.',
+  password: z.string().min(1, {
+    message: 'Password is required',
   }),
   rememberMe: z.boolean().default(false),
 });
@@ -45,6 +47,23 @@ export default function LoginPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
+      // Check if username contains a colon (username:password format)
+      if (values.username.includes(':')) {
+        const [username, password] = values.username.split(':');
+        if (username && password) {
+          const success = await login(username, password);
+          if (success) {
+            toast({
+              title: 'Login successful',
+              description: 'You have been logged in successfully.',
+            });
+            setLocation('/marketplace');
+            return;
+          }
+        }
+      }
+      
+      // Regular login if not using username:password format
       const success = await login(values.username, values.password);
       if (success) {
         toast({
@@ -84,6 +103,13 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold tracking-wider text-white">MEMBER LOGIN</h1>
         </div>
 
+        <Alert className="mb-4 bg-primary/10 text-white border-primary/20">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            You can also login with format: <span className="font-mono font-semibold">username:password</span>
+          </AlertDescription>
+        </Alert>
+        
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -93,7 +119,7 @@ export default function LoginPage() {
                 <FormItem>
                   <FormControl>
                     <Input 
-                      placeholder="Username"
+                      placeholder="Username or username:password"
                       className="bg-transparent border-white/30 text-white placeholder:text-gray-400"
                       {...field}
                     />
