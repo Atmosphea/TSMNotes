@@ -116,43 +116,39 @@ export default function InquiryForm({
   // Form submission handler
   const onSubmitForm = (values: FormValues) => {
     setIsSubmitting(true);
-    if (onSubmit) {
-      onSubmit(values);
-    } else {
-      mutation.mutate(values);
-    }
+    mutation.mutate(values);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] bg-[#131823] border-[#595e65] text-white">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
-            <span className="bg-gradient-to-r from-[#c49c6c] to-[#b38b5b] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
               Inquiry for {noteName}
             </span>
           </DialogTitle>
-          <DialogDescription className="text-gray-300">
+          <DialogDescription>
             Send a message to the seller of this note. Include any questions about the property, note terms, or make an offer.
           </DialogDescription>
         </DialogHeader>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit((values) => onSubmitForm(values))} className="space-y-6 py-4">
+          <form onSubmit={form.handleSubmit(onSubmitForm)} className="space-y-6 py-4">
             <FormField
               control={form.control}
               name="message"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white">Your Message</FormLabel>
+                  <FormLabel>Your Message</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="I'm interested in this note. Could you provide more information about..."
-                      className="min-h-[120px] resize-none bg-[#131823] text-white border-[#595e65] placeholder:text-gray-400"
+                      className="min-h-[120px] resize-none"
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription className="text-gray-400">
+                  <FormDescription>
                     Introduce yourself and ask any specific questions about the note.
                   </FormDescription>
                   <FormMessage />
@@ -165,19 +161,19 @@ export default function InquiryForm({
               name="offerAmount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-white">Offer Amount (Optional)</FormLabel>
+                  <FormLabel>Offer Amount (Optional)</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <DollarSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
                         type="number"
                         placeholder={askingPrice.toString()}
-                        className="pl-10 bg-[#131823] text-white border-[#595e65] placeholder:text-gray-400"
+                        className="pl-10"
                         {...field}
                       />
                     </div>
                   </FormControl>
-                  <FormDescription className="text-gray-400">
+                  <FormDescription>
                     Make an offer if you're ready, or leave blank to inquire first.
                   </FormDescription>
                   <FormMessage />
@@ -190,18 +186,17 @@ export default function InquiryForm({
                 type="button" 
                 variant="outline" 
                 onClick={onClose}
-                disabled={isLoading || isSubmitting}
-                className="border-[#595e65] text-white hover:bg-[#1a2332] hover:text-white"
+                disabled={isLoading}
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
-                disabled={isLoading || isSubmitting}
-                className="gap-2 bg-[#c49c6c] hover:bg-[#b38b5b] text-white"
+                disabled={isLoading}
+                className="gap-2"
               >
                 <Send className="h-4 w-4" />
-                {isLoading || isSubmitting ? "Sending..." : "Send Inquiry"}
+                {isLoading ? "Sending..." : "Send Inquiry"}
               </Button>
             </DialogFooter>
           </form>

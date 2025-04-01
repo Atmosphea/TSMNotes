@@ -90,15 +90,9 @@ export default function InquiryResponseDialog({
   // Mutation to respond to inquiry
   const mutation = useMutation({
     mutationFn: async (values: FormValues) => {
-      return apiRequest(`/api/inquiries/${inquiry.id}/respond`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          responseMessage: values.responseMessage,
-          status: values.status,
-        }),
+      return apiRequest("POST", `/api/inquiries/${inquiry.id}/respond`, {
+        responseMessage: values.responseMessage,
+        status: values.status,
       });
     },
     onSuccess: () => {

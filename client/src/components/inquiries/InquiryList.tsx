@@ -41,6 +41,11 @@ interface InquiryListProps {
   className?: string;
   maxHeight?: string;
   onlyShowActive?: boolean;
+  filterOffers?: boolean;
+  showResponded?: boolean;
+  showAccepted?: boolean;
+  showRejected?: boolean;
+  showCountered?: boolean;
 }
 
 export default function InquiryList({
@@ -49,7 +54,12 @@ export default function InquiryList({
   isSeller = false, 
   className = "", 
   maxHeight = "400px",
-  onlyShowActive = false
+  onlyShowActive = false,
+  filterOffers = false,
+  showResponded = false,
+  showAccepted = false,
+  showRejected = false,
+  showCountered = false
 }: InquiryListProps) {
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
   const [isResponseDialogOpen, setIsResponseDialogOpen] = useState(false);
