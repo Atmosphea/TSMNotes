@@ -59,7 +59,7 @@ const profileFormSchema = z.object({
   lastName: z.string().min(2, "Last name must be at least 2 characters."),
   email: z.string().email("Please enter a valid email address."),
   phone: z.string().optional(),
-  companyName: z.string().optional(),
+  company: z.string().optional(),
   bio: z.string().max(500, "Bio cannot be more than 500 characters.").optional(),
 });
 
@@ -80,7 +80,7 @@ export default function ProfilePage() {
   const [avatarUrl, setAvatarUrl] = useState(user?.profileImageUrl || "");
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [confirmDeactivate, setConfirmDeactivate] = useState(false);
 
@@ -92,14 +92,27 @@ export default function ProfilePage() {
       lastName: user?.lastName || "",
       email: user?.email || "",
       phone: user?.phone || "",
-      companyName: user?.companyName || "",
+      company: user?.company || "",
       bio: user?.bio || "",
     },
   });
 
   const profileMutation = useMutation({
     mutationFn: async (values: ProfileFormValues) => {
-      const response = await apiRequest("PATCH", `/api/users/${user?.id}`, values);
+      const response = await fetch(`/api/users/${user?.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(values)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message);
+      }
+
       return await response.json();
     },
     onSuccess: (data) => {
@@ -107,15 +120,15 @@ export default function ProfilePage() {
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/me'] });
     },
     onError: (error) => {
       toast({
         title: "Error",
-        description: "Failed to update profile. Please try again.",
+        description: error.message || "Failed to update profile",
         variant: "destructive",
       });
-    },
+    }
   });
 
   function onProfileSubmit(values: ProfileFormValues) {
@@ -181,14 +194,14 @@ export default function ProfilePage() {
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">Profile</h1>
         </div>
-        
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full md:w-auto grid-cols-3">
             <TabsTrigger value="profile">Profile Information</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="account">Account</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="profile" className="space-y-6 mt-6">
             <Card>
               <CardHeader>
@@ -210,7 +223,7 @@ export default function ProfilePage() {
                       <Upload className="mr-2 h-4 w-4" /> Upload Photo
                     </Button>
                   </div>
-                  
+
                   <div className="w-full md:w-3/4">
                     <Form {...profileForm}>
                       <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
@@ -228,7 +241,7 @@ export default function ProfilePage() {
                               </FormItem>
                             )}
                           />
-                          
+
                           <FormField
                             control={profileForm.control}
                             name="lastName"
@@ -243,7 +256,7 @@ export default function ProfilePage() {
                             )}
                           />
                         </div>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <FormField
                             control={profileForm.control}
@@ -258,7 +271,7 @@ export default function ProfilePage() {
                               </FormItem>
                             )}
                           />
-                          
+
                           <FormField
                             control={profileForm.control}
                             name="phone"
@@ -273,13 +286,13 @@ export default function ProfilePage() {
                             )}
                           />
                         </div>
-                        
+
                         <FormField
                           control={profileForm.control}
-                          name="companyName"
+                          name="company"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Company Name</FormLabel>
+                              <FormLabel>Company</FormLabel>
                               <FormControl>
                                 <Input placeholder="Your company name" {...field} />
                               </FormControl>
@@ -287,7 +300,7 @@ export default function ProfilePage() {
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={profileForm.control}
                           name="bio"
@@ -308,7 +321,7 @@ export default function ProfilePage() {
                             </FormItem>
                           )}
                         />
-                        
+
                         <Button 
                           type="submit"
                           disabled={profileMutation.isPending}
@@ -330,7 +343,7 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="notifications" className="space-y-6 mt-6">
             <Card>
               <CardHeader>
@@ -362,7 +375,7 @@ export default function ProfilePage() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={notificationForm.control}
                       name="newListingAlerts"
@@ -383,7 +396,7 @@ export default function ProfilePage() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={notificationForm.control}
                       name="inquiryAlerts"
@@ -404,7 +417,7 @@ export default function ProfilePage() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={notificationForm.control}
                       name="accountUpdates"
@@ -425,7 +438,7 @@ export default function ProfilePage() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={notificationForm.control}
                       name="systemMessages"
@@ -446,7 +459,7 @@ export default function ProfilePage() {
                         </FormItem>
                       )}
                     />
-                    
+
                     <Button 
                       type="submit"
                       disabled={notificationMutation.isPending}
@@ -466,7 +479,7 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="account" className="space-y-6 mt-6">
             <Card>
               <CardHeader>
@@ -485,9 +498,9 @@ export default function ProfilePage() {
                     <Button className="w-full md:w-auto">Update Password</Button>
                   </div>
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium">Account Actions</h3>
                   <p className="text-muted-foreground">
@@ -527,7 +540,7 @@ export default function ProfilePage() {
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
-                    
+
                     <Dialog open={confirmDelete} onOpenChange={setConfirmDelete}>
                       <DialogTrigger asChild>
                         <Button variant="outline" className="border-red-300 text-red-600">
@@ -563,9 +576,9 @@ export default function ProfilePage() {
                     </Dialog>
                   </div>
                 </div>
-                
+
                 <Separator />
-                
+
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium">Data Retention Policy</h3>
                   <p className="text-muted-foreground">

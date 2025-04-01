@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { apiRequest, getQueryFn } from '@/lib/queryClient';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { apiRequest, getQueryFn } from "@/lib/queryClient";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 type User = {
   id: number;
@@ -31,45 +31,71 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (username: string, password: string) => Promise<boolean>;
-  signup: (username: string, email: string, password: string, inviteKey: string) => Promise<boolean>;
+  signup: (
+    username: string,
+    email: string,
+    password: string,
+    inviteKey: string,
+  ) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [token, setToken] = useState<string | null>(() =>
+    localStorage.getItem("token"),
+  );
+
+  const storeToken = (newToken: string | null) => {
+    if (newToken) {
+      localStorage.setItem("token", newToken);
+    } else {
+      localStorage.removeItem("token");
+    }
+    setToken(newToken);
+  };
 
   // Check if user is already logged in
-  const { 
+  const {
     data: userData,
     isLoading: loading,
-    error
+    error,
   } = useQuery({
-    queryKey: ['/api/auth/me'],
+    queryKey: ["/api/auth/me"],
     queryFn: async () => {
+      const storedToken = localStorage.getItem("token");
+      if (!storedToken) {
+        throw new Error("No token found");
+      }
+
       try {
-        const response = await fetch('/api/auth/me', {
-          method: 'GET',
-          credentials: 'include',
+        const response = await fetch("/api/auth/me", {
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+          },
         });
-        
+
         if (!response.ok) {
-          throw new Error('Not authenticated');
+          throw new Error("Not authenticated");
         }
-        
+
         const data = await response.json();
         return data.data;
       } catch (error) {
-        console.error('Auth check error:', error);
+        console.error("Auth check error:", error);
+        storeToken(null); // Clear invalid token
         throw error;
       }
     },
-    retry: false
+    retry: false,
   });
-  
+
   // Update user state when data changes
   useEffect(() => {
     if (userData) {
@@ -82,107 +108,131 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [userData, error]);
 
   const loginMutation = useMutation({
-    mutationFn: async ({ username, password }: { username: string; password: string }) => {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
+    mutationFn: async ({
+      username,
+      password,
+    }: {
+      username: string;
+      password: string;
+    }) => {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
         body: JSON.stringify({ username, password }),
       });
-      
+
       if (!response.ok) {
-        throw new Error('Login failed');
+        throw new Error("Login failed");
       }
-      
+
       const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message || "Login failed");
+      }
       return data.data;
     },
     onSuccess: (data) => {
-      setUser(data);
+      storeToken(data.token);
+      setUser(data.user);
       setIsAuthenticated(true);
-    }
+    },
   });
 
   const signupMutation = useMutation({
-    mutationFn: async ({ username, email, password, inviteKey }: { 
-      username: string; 
-      email: string; 
-      password: string; 
-      inviteKey: string 
+    mutationFn: async ({
+      username,
+      email,
+      password,
+      inviteKey,
+    }: {
+      username: string;
+      email: string;
+      password: string;
+      inviteKey: string;
     }) => {
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        credentials: 'include',
+        credentials: "include",
         body: JSON.stringify({ username, email, password, inviteKey }),
       });
-      
+
       if (!response.ok) {
-        throw new Error('Signup failed');
+        throw new Error("Signup failed");
       }
-      
+
       const data = await response.json();
       return data.data;
     },
     onSuccess: (data) => {
       setUser(data);
       setIsAuthenticated(true);
-    }
+    },
   });
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
       });
-      
+
       if (!response.ok) {
-        throw new Error('Logout failed');
+        throw new Error("Logout failed");
       }
-      
+
       return await response.json();
     },
     onSuccess: () => {
       setUser(null);
       setIsAuthenticated(false);
-    }
+    },
   });
 
   const login = async (username: string, password: string) => {
     try {
-      await loginMutation.mutateAsync({ username, password });
+      const data = await loginMutation.mutateAsync({ username, password });
       return true;
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
       return false;
     }
   };
 
-  const signup = async (username: string, email: string, password: string, inviteKey: string) => {
+  const signup = async (
+    username: string,
+    email: string,
+    password: string,
+    inviteKey: string,
+  ) => {
     try {
-      await signupMutation.mutateAsync({ username, email, password, inviteKey });
+      await signupMutation.mutateAsync({
+        username,
+        email,
+        password,
+        inviteKey,
+      });
       return true;
     } catch (error) {
-      console.error('Signup error:', error);
+      console.error("Signup error:", error);
       return false;
     }
   };
 
-  const logout = async () => {
-    try {
-      await logoutMutation.mutateAsync();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+  const logout = () => {
+    storeToken(null);
+    setUser(null);
+    setIsAuthenticated(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout, isAuthenticated }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, signup, logout, isAuthenticated }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -191,7 +241,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

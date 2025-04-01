@@ -25,7 +25,7 @@ interface ContactRequestDialogProps {
   askingPrice: number;
 }
 
-export function ContactRequestDialog({
+export default function ContactRequestDialog({
   open,
   onOpenChange,
   noteListingId,

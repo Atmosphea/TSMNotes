@@ -183,3 +183,31 @@ export type Inquiry = typeof inquiries.$inferSelect;
 
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 export type Transaction = typeof transactions.$inferSelect;
+
+// Creation of the access requests table and schema
+import { pgTable, serial, integer, text, timestamp } from "drizzle-orm/pg-core";
+
+// Access Request table
+export const accessRequests = pgTable("access_requests", {
+  id: serial("id").primaryKey(),
+  buyerId: integer("buyer_id").notNull().references(() => users.id),
+  noteListingId: integer("note_listing_id").notNull().references(() => noteListings.id),
+  requestType: text("request_type").notNull(), // contact, document, etc.
+  status: text("status").notNull(), // pending, approved, rejected, expired
+  requestedAt: timestamp("requested_at").defaultNow().notNull(),
+  approvedAt: timestamp("approved_at"),
+  rejectedAt: timestamp("rejected_at"),
+  expiresAt: timestamp("expires_at").notNull(),
+});
+
+// Insert schema for access requests
+export const insertAccessRequestSchema = createInsertSchema(accessRequests).pick({
+  buyerId: true,
+  noteListingId: true,
+  requestType: true,
+  status: true,
+  expiresAt: true,
+});
+
+export type InsertAccessRequest = z.infer<typeof insertAccessRequestSchema>;
+export type AccessRequest = typeof accessRequests.$inferSelect;
