@@ -101,124 +101,134 @@ export default function SignupPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <Header />
-      <main className="flex-1 container flex items-center justify-center py-12">
-        <Card className="w-full max-w-md mx-auto">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold tracking-tight">
-              Create an account
-            </CardTitle>
-            <CardDescription>
-              Enter your details to create your account
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-4"
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 relative flex items-center justify-center p-5">
+        <div className="absolute inset-5 border border-white/20"></div>
+        
+        <div className="w-full max-w-md bg-black/30 backdrop-blur-sm p-8 rounded-lg border border-white/10">
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-20 h-20 mb-4">
+              <svg viewBox="0 0 100 100" className="text-white">
+                <path d="M50 0 L100 100 L0 100 Z" fill="currentColor" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold tracking-wider text-white">
+              CREATE ACCOUNT
+            </h1>
+          </div>
+
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-6"
+            >
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input 
+                        placeholder="Username" 
+                        className="bg-transparent border-white/30 text-white placeholder:text-gray-400"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="Email"
+                        className="bg-transparent border-white/30 text-white placeholder:text-gray-400"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Password"
+                        className="bg-transparent border-white/30 text-white placeholder:text-gray-400"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Confirm Password"
+                        className="bg-transparent border-white/30 text-white placeholder:text-gray-400"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="inviteKey"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input 
+                        placeholder="Invite Key" 
+                        className="bg-transparent border-white/30 text-white placeholder:text-gray-400"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button 
+                type="submit" 
+                className="w-full bg-[#c49c6c] hover:bg-[#b38b5b] text-white font-semibold" 
+                disabled={isLoading}
               >
-                <FormField
-                  control={form.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Username</FormLabel>
-                      <FormControl>
-                        <Input placeholder="johndoe" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="email"
-                          placeholder="john.doe@example.com"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="inviteKey"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Invite Key</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter your invite key" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-background border-t-transparent"></div>
-                      Creating account...
-                    </>
-                  ) : (
-                    "Create Account"
-                  )}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-          <CardFooter className="flex justify-center">
-            <p className="text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <Link href="/login">
-                <a className="text-primary hover:underline">Login</a>
-              </Link>
-            </p>
-          </CardFooter>
-        </Card>
-      </main>
-      <Footer />
+                {isLoading ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                    Creating account...
+                  </>
+                ) : (
+                  "CREATE ACCOUNT"
+                )}
+              </Button>
+
+              <div className="mt-6 text-center text-sm text-gray-300">
+                Already have an account?{" "}
+                <Link href="/login">
+                  <a className="text-[#c49c6c] hover:underline">Sign in</a>
+                </Link>
+              </div>
+            </form>
+          </Form>
+        </div>
+      </div>
     </div>
   );
 }

@@ -269,10 +269,9 @@
 
             return (
               <div className="flex flex-col min-h-screen bg-background">
-                <Header />
-
-                <main className="flex-1">
-                  <div className="container px-4 py-12 mx-auto max-w-7xl">
+                <main className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 relative">
+                  <div className="absolute inset-5 border border-white/20"></div>
+                  <div className="container px-4 py-12 mx-auto max-w-7xl relative z-10">
                     {/* Breadcrumb */}
                     <Breadcrumb className="mb-8">
                       <BreadcrumbList>
@@ -289,7 +288,7 @@
                     {/* Page Title */}
                     <div className="mb-10 text-center">
                       <h1 className="mb-3 text-4xl font-bold tracking-tight lg:text-5xl">
-                        <span className="bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
+                        <span className="text-white">
                           Note Marketplace
                         </span>
                       </h1>
@@ -353,10 +352,10 @@
                     </div>
 
                     {/* Collapsible Filter Panel with Gradient Header */}
-                    <div className="mb-8 rounded-2xl overflow-hidden border border-purple-500/20 shadow-lg">
+                    <div className="mb-8 rounded-2xl overflow-hidden border border-white/20 shadow-lg">
                       {/* Gradient Filter Toggle Header */}
                       <div 
-                        className={`bg-gradient-to-r from-purple-800 to-purple-900 transition-all duration-300 ease-in-out cursor-pointer flex items-center justify-between px-6 ${isFilterVisible ? "py-4" : "py-2.5 hover:py-5"}`}
+                        className={`bg-[#131823] border-b border-white/20 transition-all duration-300 ease-in-out cursor-pointer flex items-center justify-between px-6 ${isFilterVisible ? "py-4" : "py-2.5 hover:py-5"}`}
                         onClick={() => setIsFilterVisible(!isFilterVisible)}
                       >
                         <div className="flex items-center gap-2">
@@ -371,7 +370,7 @@
                       </div>
 
                       {/* Filter Content - Collapsible */}
-                      <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isFilterVisible ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"} bg-gradient-to-br from-gray-900 to-purple-900 p-0`}>
+                      <div className={`transition-all duration-500 ease-in-out overflow-hidden ${isFilterVisible ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"} bg-black/30 backdrop-blur-sm p-0`}>
                         <div className="p-4">
                           <form onSubmit={(e) => {
                             e.preventDefault();
@@ -1199,7 +1198,7 @@
                       {displayedListings.map((listing, index) => (
                         <Card 
                           key={listing.id} 
-                          className="transition-all duration-500 hover:shadow-xl group relative hover:border-purple-400 hover:scale-[1.02] overflow-hidden animate-fadeIn"
+                          className="transition-all duration-500 group relative hover:scale-[1.02] overflow-hidden animate-fadeIn bg-black/30 backdrop-blur-sm border border-white/10"
                           style={{ 
                             animationDelay: `${index * 100}ms`,
                             opacity: 0,
@@ -1211,7 +1210,7 @@
                           </Link>
 
                           {/* Card Border Gradient */}
-                          <div className="absolute inset-0 rounded-lg border border-purple-500/20 pointer-events-none"></div>
+                          <div className="absolute inset-0 rounded-lg border border-white/20 pointer-events-none"></div>
 
                           {/* Card Header with Property Type Badge */}
                           <CardHeader className="pb-0">
@@ -1273,7 +1272,7 @@
                           </CardContent>
 
                           <CardFooter className="pt-0 pb-5 px-6">
-                            <Button className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-md">View Details</Button>
+                            <Button className="w-full bg-[#c49c6c] hover:bg-[#b38b5b] text-white">View Details</Button>
                           </CardFooter>
 
                           {/* Status overlay for non-active listings */}
@@ -1345,7 +1344,7 @@
                       <p className="mx-auto mb-6 max-w-md text-muted-foreground">
                         Join our exclusive network of note sellers and connect with qualified buyers looking for quality investments.
                       </p>
-                      <Button className="bg-gradient-to-r from-primary to-purple-600 text-white hover:from-primary/90 hover:to-purple-600/90" asChild>
+                      <Button className="bg-[#c49c6c] hover:bg-[#b38b5b] text-white" asChild>
                         <Link href="/selling">
                           Start Selling
                         </Link>
