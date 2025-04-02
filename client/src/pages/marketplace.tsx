@@ -1,4 +1,4 @@
-          import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
           import { useQuery } from "@tanstack/react-query";
           import { Link } from "wouter";
           import { 
@@ -78,8 +78,7 @@
             const [filterPropertyType, setFilterPropertyType] = useState<string | null>(null);
             const [advancedFilters, setAdvancedFilters] = useState<FilterState | null>(null);
             const [activeFilterCount, setActiveFilterCount] = useState(0);
-            const [searchQuery, setSearchQuery] = useState('');
-
+            
             // Filter state variables
             const [noteType, setNoteType] = useState("");
             const [originalAmountMin, setOriginalAmountMin] = useState(0);
@@ -145,7 +144,6 @@
             }>({
               queryKey: ["/api/note-listings", {
                 propertyType: filterPropertyType,
-                searchQuery,
                 advancedFilters,
                 page,
                 limit: ITEMS_PER_PAGE,
@@ -154,7 +152,6 @@
               queryFn: async ({ queryKey }) => {
                 const [_, params] = queryKey as [string, {
                   propertyType?: string;
-                  searchQuery?: string;
                   advancedFilters?: FilterState;
                   page?: number;
                   limit?: number;
@@ -164,7 +161,6 @@
 
                 // Basic filters
                 if (params.propertyType) searchParams.append('propertyType', params.propertyType);
-                if (params.searchQuery) searchParams.append('search', params.searchQuery);
                 if (params.page) searchParams.append('page', params.page.toString());
                 if (params.limit) searchParams.append('limit', params.limit.toString());
                 if (params.sortBy) searchParams.append('sortBy', params.sortBy);
@@ -280,57 +276,17 @@
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
-                          <BreadcrumbPage>Marketplace</BreadcrumbPage>
+                          <BreadcrumbPage>Notes</BreadcrumbPage>
                         </BreadcrumbItem>
                       </BreadcrumbList>
                     </Breadcrumb>
 
-                    {/* Page Title */}
-                    <div className="mb-10 text-center">
-                      <h1 className="mb-3 text-4xl font-bold tracking-tight lg:text-5xl">
-                        <span className="text-white">
-                          Note Marketplace
-                        </span>
-                      </h1>
-                      <p className="mx-auto max-w-2xl text-muted-foreground">
-                        Browse our curated selection of high-quality mortgage notes from vetted sellers.
-                        Each listing is thoroughly verified for authenticity and performance.
-                      </p>
-                    </div>
-
-                    {/* Search Bar and Sort */}
-                    <div className="flex flex-col gap-4 mb-8 md:flex-row md:items-center md:justify-between">
-                      <div className="relative w-full md:w-64">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground">
-                          <circle cx="11" cy="11" r="8"></circle>
-                          <path d="m21 21-4.3-4.3"></path>
-                        </svg>
-                        <input
-                          className="pl-10 w-full h-10 rounded-md border border-input bg-background ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                          placeholder="Search notes..."
-                          type="search"
-                          value={searchQuery}
-                          onChange={(e) => {
-                            // If significant change in search (more than just typing), show animation
-                            if (searchQuery.length === 0 || e.target.value.length === 0) {
-                              setIsFiltering(true);
-                              setTimeout(() => {
-                                setSearchQuery(e.target.value);
-                                setPage(1); // Reset to first page when searching
-                                setIsFiltering(false);
-                              }, 400);
-                            } else {
-                              setSearchQuery(e.target.value);
-                              setPage(1); // Reset to first page when searching
-                            }
-                          }}
-                        />
-                      </div>
-
+                    {/* Sort Dropdown Only */}
+                    <div className="flex justify-end mb-8">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm text-gray-600 whitespace-nowrap">Sort by:</p>
+                        <p className="text-sm text-white whitespace-nowrap">Sort by:</p>
                         <select 
-                          className="px-2 py-1 border rounded-md text-sm bg-white"
+                          className="px-2 py-1 border rounded-md text-sm bg-[#131823] text-white"
                           value={sortBy}
                           onChange={(e) => {
                             // Show animation when sorting changes
@@ -682,7 +638,7 @@
                                       <div className="w-1/2">
                                         <input 
                                           type="text"
-                                          className="w-full p-1 bg-gray-800/5 border border-gray-700/20 rounded text-white text-sm opacity-80 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
+                                          className="w-full p-1 bg-gray-800/5 border border-gray-700/20 rounded text-white text-sm opacity-80 hover:opacity-80 hover:opacity-80 focus:opacity-80 transition-opacity duration-200"
                                           value={interestRateMin === 0 ? '-∞' : `${interestRateMin}%`}
                                           onChange={(e) => {
                                             if (e.target.value === '-∞') {
@@ -1338,28 +1294,14 @@
                       </Pagination>
                     )}
 
-                    {/* Call-to-action for sellers */}
-                    <div className="p-8 mt-12 text-center rounded-lg bg-muted">
-                      <h2 className="mb-3 text-2xl font-bold">Have notes to sell?</h2>
-                      <p className="mx-auto mb-6 max-w-md text-muted-foreground">
-                        Join our exclusive network of note sellers and connect with qualified buyers looking for quality investments.
-                      </p>
-                      <Button className="bg-[#c49c6c] hover:bg-[#b38b5b] text-white" asChild>
-                        <Link href="/selling">
-                          Start Selling
-                        </Link>
-                      </Button>
-                    </div>
-
                     {/* Pass the handler to both filter components */}
                     {isMobile ? (
                       <FilterDrawer 
-                        onApplyFilters={handleApplyFilters}
-                        activeFilterCount={activeFilterCount}
+                        onApplyFilters={handleApplyFilters as any}
                       />
                     ) : (
                       <FilterModal 
-                        onApplyFilters={handleApplyFilters}
+                        onApplyFilters={handleApplyFilters as any}
                         activeFilterCount={activeFilterCount}
                       />
                     )}
