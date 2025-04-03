@@ -38,7 +38,7 @@ import { useState, useEffect } from "react";
           } from "@/components/ui/pagination";
           import { formatCurrency } from "@/lib/utils";
           import Header from "@/components/landing/Header";
-          import Footer from "@/components/landing/Footer";
+          import Footer2 from "@/components/ui/footer2";
           import { type NoteListing } from "@shared/schema";
           import { FilterModal, FilterDrawer, FilterState } from "@/components/marketplace";
           import { useIsMobile } from "@/hooks/use-mobile";
@@ -1308,7 +1308,7 @@ import { useState, useEffect } from "react";
                   </div>
                 </main>
 
-                <Footer />
+                <Footer2 />
               </div>
             );
           }

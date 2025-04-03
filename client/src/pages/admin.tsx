@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import Header from "@/components/landing/Header";
-import Footer from "@/components/landing/Footer";
+import Footer2 from "@/components/ui/footer2";
 import { Button } from "@/components/ui/button";
 import { Shield, AlertTriangle } from "lucide-react";
 
@@ -61,7 +61,7 @@ export default function AdminPage() {
             Return to Home
           </Button>
         </main>
-        <Footer />
+        <Footer2 />
       </div>
     );
   }
@@ -78,7 +78,7 @@ export default function AdminPage() {
       <main className="flex-1 container max-w-7xl mx-auto">
         <AdminDashboard />
       </main>
-      <Footer />
+      <Footer2 />
     </div>
   );
 }

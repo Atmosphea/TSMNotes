@@ -24,8 +24,7 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import Header from "@/components/landing/Header";
-import Footer from "@/components/landing/Footer";
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 
 const formSchema = z
   .object({
@@ -51,7 +50,8 @@ const formSchema = z
 export default function SignupPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { signup } = useAuth();
+  const { signup: localSignup } = useAuth();
+  const { register } = useKindeAuth();
   const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -68,7 +68,7 @@ export default function SignupPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const success = await signup(
+      const success = await localSignup(
         values.username,
         values.email,
         values.password,
@@ -97,6 +97,11 @@ export default function SignupPage() {
     } finally {
       setIsLoading(false);
     }
+  }
+  
+  // Handler for Kinde register
+  const handleKindeRegister = () => {
+    register();
   }
 
   return (
@@ -217,6 +222,22 @@ export default function SignupPage() {
                 ) : (
                   "CREATE ACCOUNT"
                 )}
+              </Button>
+              
+              {/* Divider with text */}
+              <div className="relative flex items-center my-4">
+                <div className="flex-grow border-t border-white/20"></div>
+                <span className="mx-4 flex-shrink text-white/60 text-sm">OR</span>
+                <div className="flex-grow border-t border-white/20"></div>
+              </div>
+              
+              {/* Kinde Register Button */}
+              <Button
+                type="button"
+                onClick={handleKindeRegister}
+                className="w-full bg-[#c49c6c] hover:bg-[#b38b5b] text-white font-semibold"
+              >
+                REGISTER WITH KINDE
               </Button>
 
               <div className="mt-6 text-center text-sm text-gray-300">

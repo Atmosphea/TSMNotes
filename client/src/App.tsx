@@ -17,6 +17,7 @@ import Navigation from "@/components/ui/navigation";
 import Footer2 from "@/components/ui/footer2";
 import InquiriesPage from "@/pages/inquiries";
 import MyInquiriesPage from "@/pages/my-inquiries";
+import { KindeProvider } from "@kinde-oss/kinde-auth-react";
 
 function Router() {
   return (
@@ -81,25 +82,32 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <>
-          {/* Fixed footer that sits at the bottom */}
-          <Footer2 />
+    <KindeProvider
+      clientId="8e07f1cc552d4250b9f48d72eec4bab5"
+      domain="https://tristatemortgage.kinde.com"
+      redirectUri="http://localhost:5000"
+      logoutUri="http://localhost:5000"
+    >
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <>
+            {/* Fixed footer that sits at the bottom */}
+            <Footer2 />
 
-          {/* Main content that scrolls over the footer */}
-          <div className="content-wrapper">
-            <div className="flex flex-col">
-              <Navigation />
-              <div className="flex-grow">
-                <Router />
+            {/* Main content that scrolls over the footer */}
+            <div className="content-wrapper">
+              <div className="flex flex-col">
+                <Navigation />
+                <div className="flex-grow">
+                  <Router />
+                </div>
+                <Toaster />
               </div>
-              <Toaster />
             </div>
-          </div>
-        </>
-      </AuthProvider>
-    </QueryClientProvider>
+          </>
+        </AuthProvider>
+      </QueryClientProvider>
+    </KindeProvider>
   );
 }
 

@@ -15,6 +15,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
 
 const formSchema = z.object({
   username: z.string().min(3, {
@@ -29,7 +30,8 @@ const formSchema = z.object({
 export default function LoginPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { login } = useAuth();
+  const { login: localLogin } = useAuth();
+  const { login: kindeLogin, register } = useKindeAuth();
   const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -41,10 +43,11 @@ export default function LoginPage() {
     },
   });
 
+  // This function can be kept for backward compatibility or removed
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const success = await login(values.username, values.password);
+      const success = await localLogin(values.username, values.password);
       if (success) {
         toast({
           title: "Login successful",
@@ -70,6 +73,16 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
+  }
+  
+  // Handler for Kinde login
+  const handleKindeLogin = () => {
+    kindeLogin();
+  }
+  
+  // Handler for Kinde register
+  const handleKindeRegister = () => {
+    register();
   }
 
   return (
@@ -125,9 +138,10 @@ export default function LoginPage() {
                 )}
               />
 
+              {/* Regular login button */}
               <Button
                 type="submit"
-                className="w-full bg-[#D2B48C] hover:bg-[#C19A6B] text-white font-semibold"
+                className="w-full bg-[#c49c6c] hover:bg-[#b38b5b] text-white font-semibold"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -139,6 +153,33 @@ export default function LoginPage() {
                   "SIGN IN"
                 )}
               </Button>
+              
+              {/* Divider with text */}
+              <div className="relative flex items-center my-4">
+                <div className="flex-grow border-t border-white/20"></div>
+                <span className="mx-4 flex-shrink text-white/60 text-sm">OR</span>
+                <div className="flex-grow border-t border-white/20"></div>
+              </div>
+              
+              {/* Kinde Auth buttons */}
+              <div className="space-y-3">
+                <Button
+                  type="button"
+                  onClick={handleKindeLogin}
+                  className="w-full bg-[#c49c6c] hover:bg-[#b38b5b] text-white font-semibold"
+                >
+                  LOGIN WITH KINDE
+                </Button>
+                
+                <Button
+                  type="button"
+                  onClick={handleKindeRegister}
+                  variant="outline"
+                  className="w-full border-white/30 text-white hover:bg-white/10"
+                >
+                  REGISTER WITH KINDE
+                </Button>
+              </div>
 
               <div className="flex items-center justify-between mt-4">
                 <FormField
@@ -166,7 +207,7 @@ export default function LoginPage() {
 
               <div className="mt-6 text-center text-sm text-gray-300">
                 Don't have an account?{" "}
-                <a href="/signup" className="text-primary hover:underline">
+                <a href="/signup" className="text-[#c49c6c] hover:underline">
                   Sign up
                 </a>
               </div>
