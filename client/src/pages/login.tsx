@@ -1,30 +1,80 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
+import { useForm } from "react-hook-form";
 import { useLocation } from "wouter";
+import { z } from "zod";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { useKindeAuth } from "@kinde-oss/kinde-auth-react";
-import { FcGoogle } from "react-icons/fc";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+
+const formSchema = z.object({
+  username: z.string().min(3, {
+    message: "Username must be at least 3 characters.",
+  }),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters.",
+  }),
+  rememberMe: z.boolean().default(false),
+});
 
 export default function LoginPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { login } = useKindeAuth();
+  const { login } = useAuth();
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  // Handler for Kinde login
-  const handleSignIn = () => {
-    login(); // Standard Kinde login
-  };
-  
-  // Handler for Google login
-  const handleGoogleLogin = () => {
-    // Use login with optional params for Google
-    login({ connectionId: "google" });
-  };
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+      rememberMe: false,
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      const success = await login(values.username, values.password);
+      if (success) {
+        toast({
+          title: "Login successful",
+          description: "You have been logged in successfully.",
+        });
+        // Get redirect URL from query params or default to marketplace
+        const params = new URLSearchParams(window.location.search);
+        const redirect = params.get("redirect") || "/marketplace";
+        setLocation(redirect);
+      } else {
+        toast({
+          title: "Login failed",
+          description: "Invalid username or password. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Login failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
-    <div className="h-screen overflow-hidden bg-background">
-      <div className="h-full bg-gradient-to-br from-gray-900 to-gray-800 relative flex items-center justify-center p-5">
+    <div className="flex flex-col min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 relative flex items-center justify-center p-5">
         <div className="absolute inset-5 border border-white/20"></div>
 
         <div className="w-full max-w-md bg-black/30 backdrop-blur-sm p-8 rounded-lg border border-white/10">
@@ -39,41 +89,89 @@ export default function LoginPage() {
             </h1>
           </div>
 
-          <div className="space-y-6">
-            {/* Primary Sign In Button */}
-            <Button
-              type="button"
-              onClick={handleSignIn}
-              className="w-full h-12 bg-[#c49c6c] hover:bg-[#b38b5b] text-white font-semibold text-lg"
-            >
-              SIGN IN
-            </Button>
-            
-            {/* Divider with text */}
-            <div className="relative flex items-center">
-              <Separator className="flex-grow bg-white/20" />
-              <span className="mx-4 flex-shrink text-white/60 text-sm">OR</span>
-              <Separator className="flex-grow bg-white/20" />
-            </div>
-            
-            {/* Google Login Button */}
-            <Button
-              type="button"
-              onClick={handleGoogleLogin}
-              variant="outline"
-              className="w-full h-12 flex items-center justify-center gap-2 border-white/30 text-white hover:bg-white/10"
-            >
-              <FcGoogle className="w-5 h-5" />
-              <span>CONTINUE WITH GOOGLE</span>
-            </Button>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        placeholder="Username"
+                        className="bg-transparent border-white/30 text-white placeholder:text-gray-400"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        placeholder="Password"
+                        className="bg-transparent border-white/30 text-white placeholder:text-gray-400"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <div className="mt-6 text-center text-sm text-gray-300">
-              Don't have an account?{" "}
-              <a href="/signup" className="text-[#c49c6c] hover:underline">
-                Sign up
-              </a>
-            </div>
-          </div>
+              <Button
+                type="submit"
+                className="w-full bg-[#D2B48C] hover:bg-[#C19A6B] text-white font-semibold"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                    Signing in...
+                  </>
+                ) : (
+                  "SIGN IN"
+                )}
+              </Button>
+
+              <div className="flex items-center justify-between mt-4">
+                <FormField
+                  control={form.control}
+                  name="rememberMe"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          className="border-white/50 data-[state=checked]:bg-primary"
+                        />
+                      </FormControl>
+                      <label className="text-sm text-gray-300">
+                        Remember Me
+                      </label>
+                    </FormItem>
+                  )}
+                />
+                <a href="#" className="text-sm text-gray-300 hover:text-white">
+                  Forgot Password?
+                </a>
+              </div>
+
+              <div className="mt-6 text-center text-sm text-gray-300">
+                Don't have an account?{" "}
+                <a href="/signup" className="text-primary hover:underline">
+                  Sign up
+                </a>
+              </div>
+            </form>
+          </Form>
         </div>
       </div>
     </div>

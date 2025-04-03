@@ -8,7 +8,7 @@ import TerminologySection from "@/components/landing/TerminologySection";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import FAQSection from "@/components/landing/FAQSection";
 import CTASection from "@/components/landing/CTASection";
-import Footer2 from "@/components/ui/footer2";
+import Footer from "@/components/landing/Footer";
 
 export default function LandingPage() {
   return (
@@ -27,7 +27,7 @@ export default function LandingPage() {
         <CTASection />
       </main>
       
-      <Footer2 />
+      <Footer />
     </div>
   );
 }

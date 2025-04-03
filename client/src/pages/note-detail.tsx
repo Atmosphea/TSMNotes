@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/dialog";
 import { type NoteDocument, type NoteListing, type User } from "@shared/schema";
 import Header from "@/components/landing/Header";
-import Footer2 from "@/components/ui/footer2";
+import Footer from "@/components/landing/Footer";
 import { InquiryForm, InquiryList } from "@/components/inquiries";
 import { 
   BarChart3,
@@ -136,7 +136,7 @@ export default function NoteDetailPage() {
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         </main>
-        <Footer2 />
+        <Footer />
       </div>
     );
   }
@@ -154,7 +154,7 @@ export default function NoteDetailPage() {
             </Button>
           </div>
         </main>
-        <Footer2 />
+        <Footer />
       </div>
     );
   }
@@ -577,7 +577,7 @@ export default function NoteDetailPage() {
         </div>
       </main>
 
-      <Footer2 />
+      <Footer />
 
       {/* Inquiry Form Dialog */}
       <Dialog open={isContactDialogOpen} onOpenChange={setIsContactDialogOpen}>
