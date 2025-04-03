@@ -19,8 +19,8 @@ export default function SignupPage() {
   // Handler for Google signup
   const handleGoogleSignup = () => {
     login({ 
-      connectionId: "google",
-      prompt: "signup"
+      connectionId: "google"
+      // Using register() instead of prompt:"signup" as it's not a valid prompt type
     });
   };
 
