@@ -291,7 +291,7 @@ export default function TransactionDetailPage() {
             </div>
             <p className="text-muted-foreground mt-1">
               {isBuyer ? 'Buying from Seller' : 'Selling to Buyer'} • 
-              ${transaction?.finalAmount?.toLocaleString()} • 
+              Total: ${transaction?.totalPrice?.toLocaleString()} (Note: ${transaction?.finalAmount?.toLocaleString()} + 0.8% fee) • 
               Created {formatDistanceToNow(new Date(transaction?.createdAt), { addSuffix: true })}
             </p>
           </div>
@@ -338,6 +338,16 @@ export default function TransactionDetailPage() {
                 <div>
                   <Label className="text-muted-foreground mb-1 block">Final Amount</Label>
                   <span className="font-medium">${transaction?.finalAmount?.toLocaleString()}</span>
+                </div>
+                
+                <div>
+                  <Label className="text-muted-foreground mb-1 block">Platform Fee (0.8%)</Label>
+                  <span className="font-medium">${transaction?.platformFee?.toLocaleString()}</span>
+                </div>
+                
+                <div>
+                  <Label className="text-muted-foreground mb-1 block">Total Price</Label>
+                  <span className="font-medium font-bold">${transaction?.totalPrice?.toLocaleString()}</span>
                 </div>
                 
                 <div>

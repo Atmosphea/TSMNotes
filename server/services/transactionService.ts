@@ -15,6 +15,16 @@ import { eq, and, desc } from "drizzle-orm";
 export const transactionService = {
   // Transaction CRUD operations
   async createTransaction(transactionData: InsertTransaction): Promise<Transaction> {
+    // Calculate platform fee (0.8%) and total price
+    if (transactionData.finalAmount) {
+      const platformFee = transactionData.finalAmount * 0.008; // 0.8% fee
+      const totalPrice = transactionData.finalAmount + platformFee;
+      
+      // Add calculated values to transaction data
+      transactionData.platformFee = platformFee;
+      transactionData.totalPrice = totalPrice;
+    }
+    
     const [transaction] = await db.insert(transactions).values(transactionData).returning();
     return transaction;
   },
@@ -37,6 +47,16 @@ export const transactionService = {
   },
   
   async updateTransaction(id: number, transactionData: Partial<InsertTransaction>): Promise<Transaction | undefined> {
+    // If finalAmount is changing, recalculate platform fee and total price
+    if (transactionData.finalAmount !== undefined) {
+      const platformFee = transactionData.finalAmount * 0.008; // 0.8% fee
+      const totalPrice = transactionData.finalAmount + platformFee;
+      
+      // Update calculated values
+      transactionData.platformFee = platformFee;
+      transactionData.totalPrice = totalPrice;
+    }
+    
     const [updatedTransaction] = await db.update(transactions)
       .set(transactionData)
       .where(eq(transactions.id, id))
