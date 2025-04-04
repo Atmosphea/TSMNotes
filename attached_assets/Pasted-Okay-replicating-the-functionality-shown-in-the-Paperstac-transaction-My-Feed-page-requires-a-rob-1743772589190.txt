@@ -1,0 +1,167 @@
+Okay, replicating the functionality shown in the Paperstac transaction "My Feed" page requires a robust backend system focused on state management, data storage, and controlled access. Here's a breakdown of the backend requirements:
+
+I. Database Schema:
+
+You'll need dedicated tables to manage the transaction lifecycle:
+
+Transactions Table:
+
+id (Primary Key, Unique Transaction ID - e.g., 20250328...)
+
+note_id (Foreign Key linking to the specific Notes table entry)
+
+buyer_id (Foreign Key linking to the Users table for the buyer)
+
+seller_id (Foreign Key linking to the Users table for the seller)
+
+current_price (Decimal/Numeric - Agreed sale price)
+
+platform_fee (Decimal/Numeric - Calculated fee)
+
+total_price (Decimal/Numeric - current_price + platform_fee)
+
+cut_off_date (Date, nullable)
+
+closing_date (Date, nullable)
+
+effective_date (Date, nullable)
+
+closing_schedule_type (Enum/String - e.g., 'EscrowAndAudit')
+
+seller_vesting_info (Text, nullable)
+
+buyer_vesting_info (Text, nullable)
+
+seller_servicer_info (Text, nullable)
+
+buyer_servicer_info (Text, nullable)
+
+buyer_shipping_address (Text, nullable)
+
+seller_bank_wire_info (Text, nullable - Consider encrypting or storing securely)
+
+seller_collateral_shipping_info (Text, nullable)
+
+auditor_collateral_verification_report_url (Text, nullable - Link to the report file)
+
+current_status (Enum/String - e.g., 'Negotiation', 'Closing', 'Completed', 'Cancelled')
+
+created_at, updated_at (Timestamps)
+
+TransactionTasks Table (for the To-Do List):
+
+id (Primary Key)
+
+transaction_id (Foreign Key linking to Transactions)
+
+task_identifier (Enum/String - A unique key for each task, e.g., seller_accepted_sale_price, buyer_wired_funds)
+
+status (Enum/String - e.g., 'Pending', 'Complete', 'Skipped', 'Failed')
+
+completed_by_user_id (Foreign Key linking to Users, nullable)
+
+completed_at (Timestamp, nullable)
+
+phase (Enum/String - 'Negotiation', 'Closing') - Optional, helps grouping
+
+TransactionFiles Table (for uploaded documents):
+
+id (Primary Key)
+
+transaction_id (Foreign Key linking to Transactions)
+
+file_url (Text - Link to the document in cloud storage)
+
+file_name (Text - Original filename)
+
+file_type (Enum/String - e.g., 'PSA', 'Assignment', 'Allonge', 'DisbursementAgreement', 'CollateralVerificationReport')
+
+uploaded_by_user_id (Foreign Key linking to Users)
+
+uploaded_at (Timestamp)
+
+TransactionTimelineEvents Table (for the Timeline tab):
+
+id (Primary Key)
+
+transaction_id (Foreign Key linking to Transactions)
+
+event_description (Text - e.g., "Buyer accepted sale price", "Funds disbursed to Seller")
+
+event_timestamp (Timestamp)
+
+triggered_by_user_id (Foreign Key linking to Users, nullable - Who performed the action)
+
+II. API Endpoints:
+
+Your backend needs APIs to allow the frontend to fetch and update transaction data:
+
+GET /api/transactions/:transactionId:
+
+Fetch all details for a specific transaction ID.
+
+Requires authentication and authorization (user must be the buyer or seller).
+
+Returns data from the Transactions table, joined with related TransactionTasks, TransactionFiles, and TransactionTimelineEvents.
+
+PUT /api/transactions/:transactionId:
+
+Update mutable fields in the Transactions table (e.g., vesting info, servicer info, dates).
+
+Requires authentication and authorization (only the relevant party can update certain fields).
+
+Logs an event in TransactionTimelineEvents.
+
+POST /api/transactions/:transactionId/tasks/:taskIdentifier/complete:
+
+Mark a specific task in TransactionTasks as 'Complete'.
+
+Requires authentication and authorization (ensure the correct user is completing the task).
+
+Updates the task status, completed_by_user_id, and completed_at.
+
+Logs an event in TransactionTimelineEvents.
+
+Potentially updates the Transactions.current_status if all tasks in a phase are done.
+
+POST /api/transactions/:transactionId/files:
+
+Handle file uploads (integrating with your cloud storage).
+
+Requires authentication and authorization.
+
+Creates an entry in the TransactionFiles table.
+
+Logs an event in TransactionTimelineEvents.
+
+GET /api/transactions/my:
+
+Fetch a list of transactions where the logged-in user is either the buyer or the seller.
+
+III. Core Backend Logic & Functionality:
+
+State Machine: Implement logic to manage the Transactions.current_status based on the completion of tasks in TransactionTasks. For example, move from 'Negotiation' to 'Closing' when all negotiation tasks are complete.
+
+Task Management: Accurately track the status of each task in the To-Do list.
+
+Data Validation: Validate all incoming data before saving it to the database (e.g., ensure dates are valid, vesting info format is correct).
+
+Fee Calculation: Automatically calculate platform_fee and total_price when the current_price is set or updated.
+
+Timeline Event Creation: Automatically create entries in TransactionTimelineEvents whenever a significant action occurs (task completion, data update, file upload).
+
+File Handling: Securely handle file uploads to cloud storage and associate the file URL with the correct transaction and file type.
+
+Authentication & Authorization: Ensure only the authenticated buyer or seller associated with the transaction can view or modify its data. Implement role-based checks for specific actions (e.g., only the buyer can mark "Buyer wired funds to escrow" complete).
+
+IV. Notifications (Highly Recommended):
+
+Implement an email or in-app notification system to alert the buyer/seller when:
+
+Action is required from them (e.g., a task needs completion).
+
+The other party completes a significant step.
+
+The transaction status changes.
+
+By implementing these backend components, you can effectively manage the complex workflow of a note transaction, providing a clear and structured experience for both buyers and sellers, similar to the Paperstac example.

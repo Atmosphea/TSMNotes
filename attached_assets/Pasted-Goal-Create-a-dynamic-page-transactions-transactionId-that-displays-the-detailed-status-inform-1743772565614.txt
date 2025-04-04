@@ -1,0 +1,160 @@
+Goal: Create a dynamic page (/transactions/:transactionId) that displays the detailed status, information, tasks, and related files for a specific note transaction between a buyer and seller.
+
+Core Requirements:
+
+Data Fetching:
+
+Use React Query to fetch transaction details from the backend API (GET /api/transactions/:transactionId). The transactionId will come from the URL parameter.
+
+Handle loading and error states gracefully.
+
+Fetch the logged-in user's profile to determine their role (Buyer/Seller) in this specific transaction.
+
+Layout (TailwindCSS):
+
+Implement a responsive layout. Consider a two-column layout for wider screens (main details on the left, To-Do list on the right) stacking vertically on smaller screens.
+
+Use TailwindCSS utility classes for styling, aiming for a clean, professional look similar to the example. Pay attention to padding, margins, font sizes, and colors.
+
+Key Components & Functionality:
+
+TransactionPage (Main Container):
+
+Gets transactionId from Wouter's useParams.
+
+Manages the main React Query data fetching for the transaction.
+
+Passes fetched data down to child components.
+
+Handles overall loading/error states.
+
+TransactionHeader:
+
+Displays "My Feed" title (or Transaction ID).
+
+Includes "Prev" / "Next" navigation buttons (logic to fetch adjacent transaction IDs from a user's list might be needed).
+
+Displays current transaction phase (e.g., "Negotiations", "Closing") based on backend data (Transactions.current_status).
+
+Displays Buyer and Seller information using a reusable ParticipantCard component.
+
+Displays the "Current Price".
+
+ParticipantCard:
+
+Accepts user data (profile pic URL, username, role, rating/indicator).
+
+Displays the information clearly.
+
+AssetSummary:
+
+Displays basic asset details (e.g., "1st", Property Address).
+
+TabsComponent:
+
+Manages the state for the active tab ("Timeline", "Assets", "Files", "Metadata").
+
+Renders the content of the currently active tab.
+
+Styling for active/inactive tabs.
+
+TransactionDetailsTab (Content for "Metadata" or a default view):
+
+Transaction ID: Displays the ID with a "Copy" button (implement clipboard copy functionality).
+
+Closing Terms Section:
+
+Displays Financial Breakdown (Price, Fee, Total).
+
+Displays Key Dates (Cut-off, Closing, Effective). Display "Not Set" if null.
+
+Displays Closing Schedule description.
+
+Vesting Information Section: Displays Seller's and Buyer's vesting info. Display "Not Set" if null.
+
+Servicing Information Section: Displays Seller's and Buyer's servicer info. Display "Not Set" if null.
+
+Buyer's Shipping Address Section: Displays the address. Display "Not Set" if null.
+
+(Future): Consider adding "Edit" buttons for relevant sections if users need to update this info, triggering PUT /api/transactions/:transactionId calls.
+
+ToDoList Component:
+
+Fetches task data (TransactionTasks) associated with the transaction (likely part of the main transaction data fetch).
+
+Groups tasks by phase ("Negotiations Phase", "Closing Phase"). Use collapsible sections if desired.
+
+Renders each task using a TaskItem component.
+
+TaskItem Component:
+
+Displays the task description (e.g., "Seller accepted sale price").
+
+Displays a checkbox.
+
+State: Checkbox should be checked if task.status is 'Complete'.
+
+Interactivity:
+
+Checkbox should be disabled if the task is already 'Complete' OR if the logged-in user is not authorized to complete this specific task (backend should ideally provide this info, or frontend logic based on role/task type).
+
+If enabled, clicking the checkbox should trigger an API call (POST /api/transactions/:transactionId/tasks/:taskIdentifier/complete).
+
+Use React Query's useMutation for the update. Handle loading/error states for the mutation. Consider optimistic updates for a smoother UX.
+
+Upon successful completion, refetch the transaction data or update the local cache to reflect the change.
+
+TimelineTab Component:
+
+Fetches timeline events (TransactionTimelineEvents) associated with the transaction.
+
+Displays events chronologically, showing the description and timestamp.
+
+FilesTab Component:
+
+Fetches the list of associated files (TransactionFiles).
+
+Displays a list of files (name, type, uploader, date).
+
+Upload: Include a file input component and button to trigger the file upload API (POST /api/transactions/:transactionId/files). Handle upload progress display.
+
+Download: For each file, provide a "Download" button. Clicking this should:
+
+Call a backend endpoint (GET /api/documents/:fileId/signed-url or similar) to get a secure, short-lived download URL (Signed URL).
+
+Initiate the download using the received signed URL (e.g., window.location.href = signedUrl).
+
+State Management:
+
+React Query: Primarily for server state (fetching, caching, updating transaction data, tasks, files, timeline).
+
+Local Component State (useState): For UI state like active tab, loading state for mutations, form inputs (if adding editing capabilities).
+
+API Integration Points:
+
+GET /api/transactions/:transactionId (Fetch main data)
+
+GET /api/users/me (Fetch logged-in user profile/role)
+
+PUT /api/transactions/:transactionId (Update transaction details - if editing is added)
+
+POST /api/transactions/:transactionId/tasks/:taskIdentifier/complete (Mark task complete)
+
+POST /api/transactions/:transactionId/files (Upload file)
+
+GET /api/documents/:fileId/signed-url (Get secure download link - endpoint name might vary)
+
+GET /api/transactions/my (Potentially needed for Prev/Next navigation logic)
+
+Styling Notes:
+
+Use TailwindCSS consistently.
+
+Ensure clear visual hierarchy.
+
+Use icons sparingly and appropriately (e.g., copy icon, download icon).
+
+Maintain the professional and clean aesthetic of the example.
+
+Ensure responsiveness across different screen sizes.
+

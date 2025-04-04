@@ -1,5 +1,11 @@
 import { useState, useEffect, useRef, MouseEvent } from "react";
-import { Book, Users, ShoppingBag, MessageCircle, CheckCircle } from "lucide-react";
+import {
+  Book,
+  Users,
+  ShoppingBag,
+  MessageCircle,
+  CheckCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface StepProps {
@@ -11,8 +17,8 @@ interface StepProps {
 
 const Step = ({ title, description, icon, index }: StepProps) => {
   return (
-    <div 
-      className="process-step-card hover-glow" 
+    <div
+      className="process-step-card hover-glow"
       style={{ "--step-index": index } as React.CSSProperties}
       onMouseMove={(e) => {
         const el = e.currentTarget;
@@ -44,39 +50,38 @@ const InvestmentStepsSection = () => {
         const rect = sectionRef.current.getBoundingClientRect();
         setMousePosition({
           x: ((e.clientX - rect.left) / rect.width) * 100,
-          y: ((e.clientY - rect.top) / rect.height) * 100
+          y: ((e.clientY - rect.top) / rect.height) * 100,
         });
       }
     };
 
     const section = sectionRef.current;
     if (section) {
-      section.addEventListener('mousemove', handleMouseMove as unknown as EventListener);
+      section.addEventListener(
+        "mousemove",
+        handleMouseMove as unknown as EventListener,
+      );
     }
 
     return () => {
       if (section) {
-        section.removeEventListener('mousemove', handleMouseMove as unknown as EventListener);
+        section.removeEventListener(
+          "mousemove",
+          handleMouseMove as unknown as EventListener,
+        );
       }
     };
   }, []);
 
   return (
-    <section 
+    <section
       ref={sectionRef}
       className="relative py-12 overflow-hidden"
       style={{
-        background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(var(--primary-rgb), 0.15) 0%, transparent 60%), linear-gradient(135deg, #121212 0%, #1a1a1a 100%)`
+        background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(var(--primary-rgb), 0.15) 0%, transparent 60%), linear-gradient(135deg, #121212 0%, #1a1a1a 100%)`,
       }}
     >
       <div className="container mx-auto px-6 lg:px-8">
-        <div className="mb-8 max-w-2xl mx-auto text-center">
-          <h2 className="section-title mb-4 text-center">Your 5-Step Investment Journey</h2>
-          <p className="section-description text-center">
-            Navigate the mortgage note investment process with confidence through our streamlined 5-step approach.
-          </p>
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
           <Step
             title="Learn"
@@ -108,15 +113,6 @@ const InvestmentStepsSection = () => {
             icon={<CheckCircle className="h-5 w-5" />}
             index={4}
           />
-        </div>
-
-        <div className="mt-10 text-center">
-          <Button 
-            className="bg-primary/90 hover:bg-primary text-white"
-            size="lg"
-          >
-            Start Your Investment Journey
-          </Button>
         </div>
       </div>
     </section>

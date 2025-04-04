@@ -25,6 +25,7 @@ import { WaitlistController } from "./controllers/WaitlistController";
 import { NoteListingController } from "./controllers/NoteListingController";
 import { DocumentController } from "./controllers/DocumentController";
 import { InquiryController } from "./controllers/InquiryController";
+import { TransactionController } from "./controllers/TransactionController";
 
 // Function to add sample note listings
 async function addSampleListings() {
@@ -155,6 +156,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const noteListingController = new NoteListingController();
   const documentController = new DocumentController();
   const inquiryController = new InquiryController();
+  const transactionController = new TransactionController();
 
   // Waitlist routes
   app.post("/api/waitlist", waitlistController.create.bind(waitlistController));
@@ -189,6 +191,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/inquiries/:id", inquiryController.delete.bind(inquiryController));
   app.post("/api/inquiries/:id/respond", inquiryController.respond.bind(inquiryController));
   app.get("/api/inquiries/stats", inquiryController.getStats.bind(inquiryController));
+
+  // Protected transaction routes
+  app.get("/api/transactions/:id", transactionController.getById.bind(transactionController));
+  app.get("/api/transactions", transactionController.getByUser.bind(transactionController));
+  app.post("/api/transactions", transactionController.create.bind(transactionController));
+  app.put("/api/transactions/:id", transactionController.update.bind(transactionController));
+  app.post("/api/transactions/:id/tasks/:taskId/complete", transactionController.completeTask.bind(transactionController));
+  app.post("/api/transactions/:id/files", transactionController.uploadFile.bind(transactionController));
+  app.get("/api/documents/:fileId/signed-url", transactionController.getSignedFileUrl.bind(transactionController));
 
   const httpServer = createServer(app);
 

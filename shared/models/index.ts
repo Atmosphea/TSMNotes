@@ -7,4 +7,7 @@ export * from './search.model';
 export * from './favorite.model';
 export * from './inquiry.model';
 export * from './transaction.model';
+export * from './transactionTask.model';
+export * from './transactionFile.model';
+export * from './transactionTimelineEvent.model';
 export * from './waitlist.model'; 

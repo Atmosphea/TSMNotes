@@ -1,6 +1,10 @@
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { users, waitlistEntries, messages, noteListings, noteDocuments, investorPreferences, savedSearches, favoriteListings, inquiries, transactions } from "./models";
+import { 
+  users, waitlistEntries, messages, noteListings, noteDocuments,
+  investorPreferences, savedSearches, favoriteListings, inquiries,
+  transactions, transactionTasks, transactionFiles, transactionTimelineEvents
+} from "./models";
 
 // Extend the user schema to include passwordHash for internal use
 export const userExtendedSchema = z.object({
@@ -148,9 +152,59 @@ export const insertTransactionSchema = createInsertSchema(transactions).pick({
   buyerId: true,
   finalAmount: true,
   platformFee: true,
+  totalPrice: true,
   status: true,
+  currentPhase: true,
+  cutOffDate: true,
+  closingDate: true,
+  effectiveDate: true,
+  closingScheduleType: true,
+  sellerVestingInfo: true,
+  buyerVestingInfo: true,
+  sellerServicerInfo: true,
+  buyerServicerInfo: true,
+  buyerShippingAddress: true,
+  sellerWireInfo: true,
+  sellerCollateralShippingInfo: true,
+  auditorVerificationReportUrl: true,
   contractUrl: true,
   notes: true,
+});
+
+export const insertTransactionTaskSchema = createInsertSchema(transactionTasks).pick({
+  transactionId: true,
+  taskIdentifier: true,
+  description: true,
+  status: true,
+  phase: true,
+  isRequired: true,
+  assignedTo: true,
+  completedByUserId: true,
+  displayOrder: true,
+});
+
+export const insertTransactionFileSchema = createInsertSchema(transactionFiles).pick({
+  transactionId: true,
+  fileUrl: true,
+  fileName: true,
+  fileType: true,
+  fileSize: true,
+  uploadedByUserId: true,
+  description: true,
+  isPublic: true,
+  category: true,
+  isVerified: true,
+  verifiedByUserId: true,
+});
+
+export const insertTransactionTimelineEventSchema = createInsertSchema(transactionTimelineEvents).pick({
+  transactionId: true,
+  eventDescription: true,
+  triggeredByUserId: true,
+  eventType: true,
+  eventData: true,
+  relatedTaskId: true,
+  relatedFileId: true,
 });
 
 // Export types for all tables
@@ -183,6 +237,15 @@ export type Inquiry = typeof inquiries.$inferSelect;
 
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 export type Transaction = typeof transactions.$inferSelect;
+
+export type InsertTransactionTask = z.infer<typeof insertTransactionTaskSchema>;
+export type TransactionTask = typeof transactionTasks.$inferSelect;
+
+export type InsertTransactionFile = z.infer<typeof insertTransactionFileSchema>;
+export type TransactionFile = typeof transactionFiles.$inferSelect;
+
+export type InsertTransactionTimelineEvent = z.infer<typeof insertTransactionTimelineEventSchema>;
+export type TransactionTimelineEvent = typeof transactionTimelineEvents.$inferSelect;
 
 // Creation of the access requests table and schema
 import { pgTable, serial, integer, text, timestamp } from "drizzle-orm/pg-core";
