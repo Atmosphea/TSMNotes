@@ -299,21 +299,21 @@ export default function NoteDetailPage() {
                         <div className="text-xl font-bold text-white">${listing.monthlyPaymentAmount.toFixed(0)}</div>
                       </div>
                       <div>
-                        <div className="text-white/70 text-sm font-medium mb-1.5">Principle & Interest</div>
-                        <div className="text-xl font-bold text-white">${listing.monthlyPaymentAmount.toFixed(0)}</div>
+                        <div className="text-white/70 text-sm font-medium mb-1.5">Term</div>
+                        <div className="text-xl font-bold text-white">{listing.remainingLoanTerm} months</div>
                       </div>
                     </div>
 
                     {/* Left column - second row */}
                     <div>
-                      <div className="text-white/70 text-sm font-medium mb-1.5">Original Balance</div>
+                      <div className="text-white/70 text-sm font-medium mb-1.5">Original Loan Amount</div>
                       <div className="text-3xl font-bold text-white">{formatCurrency(listing.originalLoanAmount)}</div>
                     </div>
 
                     {/* Right column - second row */}
                     <div>
-                      <div className="text-white/70 text-sm font-medium mb-1.5">Total Payoff</div>
-                      <div className="text-3xl font-bold text-white">{formatCurrency(listing.monthlyPaymentAmount * listing.remainingLoanTerm)}</div>
+                      <div className="text-white/70 text-sm font-medium mb-1.5">Remaining Balance</div>
+                      <div className="text-3xl font-bold text-white">{formatCurrency(listing.currentLoanAmount)}</div>
                     </div>
 
                     {/* Stats row with 3 columns */}
@@ -465,27 +465,27 @@ export default function NoteDetailPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex justify-between">
-                    <span className="text-white/70">Asking Price</span>
-                    <span className="font-semibold text-white">{formatCurrency(listing.askingPrice)}</span>
+                    <span className="text-white/70">Original Loan Amount</span>
+                    <span className="font-semibold text-white">{formatCurrency(listing.originalLoanAmount)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/70">Annual Yield</span>
-                    <span className="font-semibold text-white">{metrics?.annualYield}%</span>
+                    <span className="text-white/70">Remaining Balance</span>
+                    <span className="font-semibold text-white">{formatCurrency(listing.currentLoanAmount)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/70">Cash on Cash Return</span>
-                    <span className="font-semibold text-white">{metrics?.cashOnCash}%</span>
+                    <span className="text-white/70">Note Rate</span>
+                    <span className="font-semibold text-white">{listing.interestRate}%</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/70">Monthly Income</span>
+                    <span className="text-white/70">Monthly Payment</span>
                     <span className="font-semibold text-white">{formatCurrency(listing.monthlyPaymentAmount)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/70">Remaining Term</span>
+                    <span className="text-white/70">Term</span>
                     <span className="font-semibold text-white">{listing.remainingLoanTerm} months</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/70">LTV Ratio</span>
+                    <span className="text-white/70">LTV</span>
                     <span className="font-semibold text-white">{listing.loanToValueRatio || '75'}%</span>
                   </div>
                 </CardContent>
