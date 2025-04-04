@@ -51,7 +51,7 @@ const formSchema = z
 export default function SignupPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const { signup } = useAuth();
+  const { register } = useAuth();
   const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -68,32 +68,17 @@ export default function SignupPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const success = await signup(
-        values.username,
-        values.email,
-        values.password,
-        values.inviteKey,
-      );
-      if (success) {
-        toast({
-          title: "Account created",
-          description: "Your account has been created successfully.",
-        });
-        setLocation("/selling");
-      } else {
-        toast({
-          title: "Registration failed",
-          description:
-            "Invalid invite key or username already exists. Please try again.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Registration failed",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
+      // Pass registration data as an object to match AuthContext expectations
+      await register({
+        username: values.username,
+        email: values.email,
+        password: values.password,
+        inviteKey: values.inviteKey
       });
+      // Success is handled in the AuthContext
+    } catch (error) {
+      // Error is handled in the AuthContext, but we can add additional handling here
+      console.error("Registration error:", error);
     } finally {
       setIsLoading(false);
     }

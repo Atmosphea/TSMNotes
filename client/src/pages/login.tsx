@@ -44,29 +44,15 @@ export default function LoginPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const success = await login(values.username, values.password);
-      if (success) {
-        toast({
-          title: "Login successful",
-          description: "You have been logged in successfully.",
-        });
-        // Get redirect URL from query params or default to marketplace
-        const params = new URLSearchParams(window.location.search);
-        const redirect = params.get("redirect") || "/marketplace";
-        setLocation(redirect);
-      } else {
-        toast({
-          title: "Login failed",
-          description: "Invalid username or password. Please try again.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Login failed",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
+      // Pass credentials as an object to match AuthContext expectations
+      await login({
+        username: values.username,
+        password: values.password
       });
+      // Login success is handled in the AuthContext
+    } catch (error) {
+      // Error is handled in the AuthContext, but we can add additional handling here
+      console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }

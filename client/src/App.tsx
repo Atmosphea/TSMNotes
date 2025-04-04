@@ -12,7 +12,6 @@ import AdminPage from "@/pages/admin";
 import LoginPage from "@/pages/login";
 import SignupPage from "@/pages/signup";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { Auth0ProviderWithConfig } from "@/contexts/Auth0Context";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AdminProtectedRoute } from "@/components/auth/AdminProtectedRoute";
 import Navigation from "@/components/ui/navigation";
@@ -96,8 +95,7 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Auth0ProviderWithConfig>
-        <AuthProvider>
+      <AuthProvider>
         <>
           {/* Fixed footer that sits at the bottom */}
           <Footer2 />
@@ -114,7 +112,6 @@ function App() {
           </div>
         </>
       </AuthProvider>
-      </Auth0ProviderWithConfig>
     </QueryClientProvider>
   );
 }

@@ -24,6 +24,7 @@ interface RegisterCredentials extends LoginCredentials {
   email: string;
   firstName?: string;
   lastName?: string;
+  inviteKey?: string;
 }
 
 interface AuthContextType {
@@ -55,6 +56,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  
+  // Check if token exists on initialization
+  useEffect(() => {
+    // This will trigger auth-related fetches to include the token if it exists
+    const token = localStorage.getItem('authToken');
+    console.log('Auth token exists:', !!token);
+  }, []);
   
   const {
     data: user,
@@ -90,7 +98,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Store the token in localStorage
+      if (data.data && data.data.token) {
+        localStorage.setItem('authToken', data.data.token);
+      }
+      
       refetch();
       toast({
         title: 'Login successful',
@@ -117,7 +130,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Store the token in localStorage
+      if (data.data && data.data.token) {
+        localStorage.setItem('authToken', data.data.token);
+      }
+      
       refetch();
       toast({
         title: 'Registration successful',
@@ -143,7 +161,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     },
     onSuccess: () => {
+      // Remove the token from localStorage
+      localStorage.removeItem('authToken');
+      
+      // Clear the user data from cache
       queryClient.setQueryData(['/api/auth/current-user'], null);
+      
       toast({
         title: 'Logged out',
         description: 'You have been logged out successfully.',

@@ -13,9 +13,10 @@ export function setupAuth(app: Express) {
   const authController = new AuthController();
   
   // Auth routes
-  app.post('/api/auth/signup', authController.signup.bind(authController));
+  app.post('/api/auth/register', authController.signup.bind(authController));
   app.post('/api/auth/login', authController.login.bind(authController));
-  app.get('/api/auth/me', authenticateToken, authController.getCurrentUser.bind(authController));
+  app.post('/api/auth/logout', (req, res) => res.status(200).json({ success: true }));
+  app.get('/api/auth/current-user', authenticateToken, authController.getCurrentUser.bind(authController));
 
   // Authentication middleware for routes that need to be protected
   app.use(authenticateToken);
