@@ -20,9 +20,21 @@
     overflow-x: hidden;
   }
   
-  /* White background for Note page */
-  .note-page {
+  /* White background for Note page and marketplace */
+  .note-page, [data-page="note"], [data-page="marketplace"] {
     @apply bg-white text-black;
+  }
+
+  /* Fix text contrast */
+  .note-page *, [data-page="note"] *, [data-page="marketplace"] * {
+    --tw-text-opacity: 1;
+    color: rgb(0 0 0 / var(--tw-text-opacity));
+  }
+
+  /* Keep certain elements white text */
+  .bg-black *, .bg-primary *, [class*="bg-gradient"] * {
+    --tw-text-opacity: 1;
+    color: rgb(255 255 255 / var(--tw-text-opacity));
   }
 
   h1, h2, h3, h4, h5, h6 {
