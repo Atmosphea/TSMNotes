@@ -197,9 +197,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/transactions", transactionController.getByUser.bind(transactionController));
   app.post("/api/transactions", transactionController.create.bind(transactionController));
   app.put("/api/transactions/:id", transactionController.update.bind(transactionController));
+  
+  // Transaction task management
+  app.get("/api/transactions/:id/tasks", transactionController.getTasksByTransactionId.bind(transactionController));
+  app.post("/api/transactions/:id/tasks", transactionController.createTask.bind(transactionController));
   app.post("/api/transactions/:id/tasks/:taskId/complete", transactionController.completeTask.bind(transactionController));
+  
+  // Transaction file management
+  app.get("/api/transactions/:id/files", transactionController.getFilesByTransactionId.bind(transactionController));
   app.post("/api/transactions/:id/files", transactionController.uploadFile.bind(transactionController));
-  app.get("/api/documents/:fileId/signed-url", transactionController.getSignedFileUrl.bind(transactionController));
+  app.get("/api/files/:fileId/signed-url", transactionController.getSignedFileUrl.bind(transactionController));
+  
+  // Transaction timeline events
+  app.get("/api/transactions/:id/timeline", transactionController.getTimelineByTransactionId.bind(transactionController));
+  app.post("/api/transactions/:id/timeline", transactionController.createTimelineEvent.bind(transactionController));
 
   const httpServer = createServer(app);
 

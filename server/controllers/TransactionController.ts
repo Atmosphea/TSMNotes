@@ -269,4 +269,166 @@ export class TransactionController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  async getTasksByTransactionId(req: Request, res: Response) {
+    try {
+      const transactionId = parseInt(req.params.id);
+      if (isNaN(transactionId)) {
+        return res.status(400).json({ error: "Invalid transaction ID" });
+      }
+      
+      // Authorization check
+      const transaction = await transactionService.getTransactionById(transactionId);
+      if (!transaction) {
+        return res.status(404).json({ error: "Transaction not found" });
+      }
+      
+      const userId = (req as AuthRequest).userId;
+      if (!userId || (userId !== transaction.buyerId && 
+          userId !== transaction.sellerId &&
+          (req as any).userRole !== 'admin')) {
+        return res.status(403).json({ error: "Not authorized to view this transaction's tasks" });
+      }
+      
+      const tasks = await transactionService.getTasksByTransactionId(transactionId);
+      res.json(tasks);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async createTask(req: Request, res: Response) {
+    try {
+      const transactionId = parseInt(req.params.id);
+      if (isNaN(transactionId)) {
+        return res.status(400).json({ error: "Invalid transaction ID" });
+      }
+      
+      // Authorization check
+      const transaction = await transactionService.getTransactionById(transactionId);
+      if (!transaction) {
+        return res.status(404).json({ error: "Transaction not found" });
+      }
+      
+      const userId = (req as AuthRequest).userId;
+      if (!userId || (userId !== transaction.sellerId && (req as any).userRole !== 'admin')) {
+        return res.status(403).json({ error: "Only the seller or an admin can create tasks" });
+      }
+      
+      const parsedData = insertTransactionTaskSchema.parse({
+        ...req.body,
+        transactionId
+      });
+      
+      const task = await transactionService.createTransactionTask(parsedData);
+      
+      // Create a timeline event for the task creation
+      await transactionService.createTimelineEvent({
+        transactionId,
+        eventDescription: `New task created: ${task.description}`,
+        eventType: "info",
+        triggeredByUserId: userId,
+        relatedTaskId: task.id
+      });
+      
+      res.status(201).json(task);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
+  async getFilesByTransactionId(req: Request, res: Response) {
+    try {
+      const transactionId = parseInt(req.params.id);
+      if (isNaN(transactionId)) {
+        return res.status(400).json({ error: "Invalid transaction ID" });
+      }
+      
+      // Authorization check
+      const transaction = await transactionService.getTransactionById(transactionId);
+      if (!transaction) {
+        return res.status(404).json({ error: "Transaction not found" });
+      }
+      
+      const userId = (req as AuthRequest).userId;
+      if (!userId || (userId !== transaction.buyerId && 
+          userId !== transaction.sellerId &&
+          (req as any).userRole !== 'admin')) {
+        return res.status(403).json({ error: "Not authorized to view this transaction's files" });
+      }
+      
+      const files = await transactionService.getFilesByTransactionId(transactionId);
+      
+      // Filter out non-public files if the user is not the owner of those files
+      const filteredFiles = files.filter(file => 
+        file.isPublic || 
+        file.uploadedByUserId === userId || 
+        (req as any).userRole === 'admin'
+      );
+      
+      res.json(filteredFiles);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getTimelineByTransactionId(req: Request, res: Response) {
+    try {
+      const transactionId = parseInt(req.params.id);
+      if (isNaN(transactionId)) {
+        return res.status(400).json({ error: "Invalid transaction ID" });
+      }
+      
+      // Authorization check
+      const transaction = await transactionService.getTransactionById(transactionId);
+      if (!transaction) {
+        return res.status(404).json({ error: "Transaction not found" });
+      }
+      
+      const userId = (req as AuthRequest).userId;
+      if (!userId || (userId !== transaction.buyerId && 
+          userId !== transaction.sellerId &&
+          (req as any).userRole !== 'admin')) {
+        return res.status(403).json({ error: "Not authorized to view this transaction's timeline" });
+      }
+      
+      const timeline = await transactionService.getTimelineByTransactionId(transactionId);
+      res.json(timeline);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async createTimelineEvent(req: Request, res: Response) {
+    try {
+      const transactionId = parseInt(req.params.id);
+      if (isNaN(transactionId)) {
+        return res.status(400).json({ error: "Invalid transaction ID" });
+      }
+      
+      // Authorization check
+      const transaction = await transactionService.getTransactionById(transactionId);
+      if (!transaction) {
+        return res.status(404).json({ error: "Transaction not found" });
+      }
+      
+      const userId = (req as AuthRequest).userId;
+      if (!userId || (userId !== transaction.buyerId && 
+          userId !== transaction.sellerId &&
+          (req as any).userRole !== 'admin')) {
+        return res.status(403).json({ error: "Not authorized to add events to this transaction's timeline" });
+      }
+      
+      const parsedData = insertTransactionTimelineEventSchema.parse({
+        ...req.body,
+        transactionId,
+        triggeredByUserId: userId
+      });
+      
+      const event = await transactionService.createTimelineEvent(parsedData);
+      res.status(201).json(event);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  }
 }

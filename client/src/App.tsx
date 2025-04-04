@@ -17,6 +17,8 @@ import Navigation from "@/components/ui/navigation";
 import Footer2 from "@/components/ui/footer2";
 import InquiriesPage from "@/pages/inquiries";
 import MyInquiriesPage from "@/pages/my-inquiries";
+import TransactionsPage from "@/pages/transactions";
+import TransactionDetailPage from "@/pages/transaction-detail";
 
 function Router() {
   return (
@@ -72,6 +74,16 @@ function Router() {
       <Route path="/my-inquiries">
         <ProtectedRoute>
           <MyInquiriesPage />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/transactions">
+        <ProtectedRoute>
+          <TransactionsPage />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/transactions/:transactionId">
+        <ProtectedRoute>
+          <TransactionDetailPage />
         </ProtectedRoute>
       </Route>
       <Route component={NotFound} />
