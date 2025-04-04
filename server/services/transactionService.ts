@@ -1,14 +1,15 @@
 import { db } from "../db";
-import { 
-  transactions, transactionTasks, transactionFiles, transactionTimelineEvents,
-  users, noteListings
-} from "@shared/schema";
 import {
   InsertTransaction, Transaction, 
   InsertTransactionTask, TransactionTask,
   InsertTransactionFile, TransactionFile,
-  InsertTransactionTimelineEvent, TransactionTimelineEvent
+  InsertTransactionTimelineEvent, TransactionTimelineEvent,
+  User, NoteListing
 } from "@shared/schema";
+import { 
+  transactions, transactionTasks, transactionFiles, transactionTimelineEvents,
+  users, noteListings
+} from "@shared/models";
 import { eq, and, desc } from "drizzle-orm";
 
 export const transactionService = {
@@ -57,8 +58,7 @@ export const transactionService = {
       .set({
         status: 'complete',
         completedByUserId: userId,
-        completedAt: new Date(),
-        updatedAt: new Date()
+        completedAt: new Date()
       })
       .where(eq(transactionTasks.id, taskId))
       .returning();
@@ -122,8 +122,7 @@ export const transactionService = {
   async updateTransactionPhase(id: number, newPhase: string): Promise<Transaction | undefined> {
     const [updatedTransaction] = await db.update(transactions)
       .set({
-        currentPhase: newPhase,
-        updatedAt: new Date()
+        currentPhase: newPhase
       })
       .where(eq(transactions.id, id))
       .returning();
