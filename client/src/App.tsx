@@ -12,6 +12,7 @@ import AdminPage from "@/pages/admin";
 import LoginPage from "@/pages/login";
 import SignupPage from "@/pages/signup";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { Auth0ProviderWithConfig } from "@/contexts/Auth0Context";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AdminProtectedRoute } from "@/components/auth/AdminProtectedRoute";
 import Navigation from "@/components/ui/navigation";
