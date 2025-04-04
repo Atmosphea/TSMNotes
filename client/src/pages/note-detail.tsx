@@ -211,7 +211,7 @@ export default function NoteDetailPage() {
               </div>
 
               {/* Quick stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <Card className="bg-black/30 backdrop-blur-sm border border-white/10 relative">
                   <div className="absolute inset-0 rounded-lg border border-white/20 pointer-events-none"></div>
                   <CardContent className="p-4 flex flex-col items-center text-center">
@@ -226,22 +226,6 @@ export default function NoteDetailPage() {
                     <DollarSign className="w-8 h-8 text-[#c49c6c] mb-2" />
                     <p className="text-xs text-white/70">Unpaid Principal</p>
                     <p className="text-lg font-semibold text-white">{formatCurrency(listing.currentLoanAmount)}</p>
-                  </CardContent>
-                </Card>
-                <Card className="bg-black/30 backdrop-blur-sm border border-white/10 relative">
-                  <div className="absolute inset-0 rounded-lg border border-white/20 pointer-events-none"></div>
-                  <CardContent className="p-4 flex flex-col items-center text-center">
-                    <PiggyBank className="w-8 h-8 text-[#c49c6c] mb-2" />
-                    <p className="text-xs text-white/70">Monthly Payment</p>
-                    <p className="text-lg font-semibold text-white">{formatCurrency(listing.monthlyPaymentAmount)}</p>
-                  </CardContent>
-                </Card>
-                <Card className="bg-black/30 backdrop-blur-sm border border-white/10 relative">
-                  <div className="absolute inset-0 rounded-lg border border-white/20 pointer-events-none"></div>
-                  <CardContent className="p-4 flex flex-col items-center text-center">
-                    <BarChart3 className="w-8 h-8 text-[#c49c6c] mb-2" />
-                    <p className="text-xs text-white/70">LTV Ratio</p>
-                    <p className="text-lg font-semibold text-white">{listing.loanToValueRatio || '75'}%</p>
                   </CardContent>
                 </Card>
                 <Card className="bg-black/30 backdrop-blur-sm border border-white/10 relative">
@@ -347,6 +331,11 @@ export default function NoteDetailPage() {
                       </div>
 
                       <div className="flex justify-between border-b border-white/10 pb-2">
+                        <div className="text-white/70 font-medium">Escrow</div>
+                        <div className="font-semibold text-white">$0</div>
+                      </div>
+
+                      <div className="flex justify-between border-b border-white/10 pb-2">
                         <div className="text-white/70 font-medium">Maturity</div>
                         <div className="font-semibold text-white">Oct 17, 2023</div>
                       </div>
@@ -354,16 +343,6 @@ export default function NoteDetailPage() {
                       <div className="flex justify-between border-b border-white/10 pb-2">
                         <div className="text-white/70 font-medium">Last Payment Received</div>
                         <div className="font-semibold text-white/50">No data</div>
-                      </div>
-
-                      <div className="flex justify-between border-b border-white/10 pb-2">
-                        <div className="text-white/70 font-medium">Escrow</div>
-                        <div className="font-semibold text-white">$0</div>
-                      </div>
-
-                      <div className="flex justify-between border-b border-white/10 pb-2">
-                        <div className="text-white/70 font-medium">Property Value</div>
-                        <div className="font-semibold text-white">{formatCurrency(listing.propertyValue || (listing.currentLoanAmount * (100 / (listing.loanToValueRatio || 75))))}</div>
                       </div>
 
                       <div className="flex justify-between border-b border-white/10 pb-2">
@@ -509,10 +488,7 @@ export default function NoteDetailPage() {
                       <UserIcon className="w-6 h-6 text-[#c49c6c]" />
                     </div>
                     <div>
-                      <h4 className="font-medium text-white">{seller?.username || "Private Seller"}</h4>
-                      {seller?.company && (
-                        <p className="text-sm text-white/70">{seller.company}</p>
-                      )}
+                      <h4 className="font-medium text-white">{seller?.company || "Private Seller"}</h4>
                     </div>
                   </div>
 
@@ -554,10 +530,7 @@ export default function NoteDetailPage() {
                       <span className="mr-2 text-[#c49c6c]">•</span>
                       Verify payment history and borrower information
                     </li>
-                    <li className="flex items-start">
-                      <span className="mr-2 text-[#c49c6c]">•</span>
-                      Use secure payment methods for transactions
-                    </li>
+                    
                   </ul>
                 </CardContent>
               </Card>
