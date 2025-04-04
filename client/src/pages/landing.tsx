@@ -2,7 +2,7 @@ import Header from "@/components/landing/Header";
 import HeroSection from "@/components/landing/HeroSection";
 import InvestmentStepsSection from "@/components/landing/InvestmentStepsSection";
 import FeaturesSection from "@/components/landing/FeaturesSection";
-import HowItWorksSection from "@/components/landing/HowItWorksSection";
+
 import ProcessSection from "@/components/landing/ProcessSection";
 import TerminologySection from "@/components/landing/TerminologySection";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
@@ -20,7 +20,7 @@ export default function LandingPage() {
         <InvestmentStepsSection />
         <FeaturesSection />
         <ProcessSection />
-        <HowItWorksSection />
+        
         <TerminologySection />
         <TestimonialsSection />
         <FAQSection />
