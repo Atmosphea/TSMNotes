@@ -52,6 +52,38 @@ async function addSampleListings() {
       } as any);
     }
     
+    // Add test user with credentials that the user specified
+    let testUser = await userService.getUserByUsername("user");
+    if (!testUser) {
+      testUser = await userService.createUser({
+        username: "user",
+        email: "user@notetrade.com",
+        password: await bcrypt.hash("password", 10),
+        firstName: "Test",
+        lastName: "User",
+        company: "Test Company",
+        phone: "555-555-5555",
+        role: "user",
+        status: "active"
+      } as any);
+    }
+    
+    // Add admin user as specified
+    let adminUser = await userService.getUserByEmail("tradeplayful@gmail.com");
+    if (!adminUser) {
+      adminUser = await userService.createUser({
+        username: "admin",
+        email: "tradeplayful@gmail.com",
+        password: await bcrypt.hash("tsmnotes", 10),
+        firstName: "Admin",
+        lastName: "User",
+        company: "NoteTrade Platform",
+        phone: "555-555-5555",
+        role: "admin",
+        status: "active"
+      } as any);
+    }
+    
     // Create some sample note listings
     await noteListingService.createNoteListing({
       sellerId: sampleUser.id,

@@ -1,5 +1,4 @@
 import { Response } from 'express';
-import { storage } from '../storage';
 import { insertUserSchema } from '@shared/schema';
 import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -162,4 +161,4 @@ export class AuthController {
 }
 
 // Valid invite keys (in a real app, these would be stored in the database)
-const VALID_INVITE_KEYS = ['TEST123'];
+const VALID_INVITE_KEYS = ['TEST123', 'key'];

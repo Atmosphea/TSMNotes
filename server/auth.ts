@@ -29,12 +29,26 @@ export function authenticateToken(req: AuthRequest, res: Response, next: NextFun
 
   if (!token) {
     req.isAuthenticated = false;
+    // For routes that specifically require authentication, stop here
+    if (req.path === '/api/auth/current-user') {
+      return res.status(401).json({
+        success: false,
+        message: 'Not authenticated'
+      });
+    }
     return next();
   }
 
-  jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key', (err: any, decoded: any) => {
+  jwt.verify(token, process.env.JWT_SECRET || 'notetrade-secret-key', (err: any, decoded: any) => {
     if (err) {
       req.isAuthenticated = false;
+      // For routes that specifically require authentication, stop here
+      if (req.path === '/api/auth/current-user') {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid token'
+        });
+      }
       return next();
     }
 
