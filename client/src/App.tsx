@@ -95,7 +95,8 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
+      <Auth0ProviderWithConfig>
+        <AuthProvider>
         <>
           {/* Fixed footer that sits at the bottom */}
           <Footer2 />
@@ -112,6 +113,7 @@ function App() {
           </div>
         </>
       </AuthProvider>
+      </Auth0ProviderWithConfig>
     </QueryClientProvider>
   );
 }
