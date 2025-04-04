@@ -1,0 +1,41 @@
+I. Core Backend Requirements (Things You Build Directly):
+
+Transaction State Management:
+
+Database: Transactions table to store the overall state (current_status), key dates, agreed price, associated users, etc.
+
+Logic: Implement a state machine or similar logic to control the flow of the transaction based on task completion (e.g., moving from 'Negotiation' to 'Closing').
+
+API: Endpoints to fetch transaction status and potentially trigger state changes (though usually triggered by other actions).
+
+To-Do List / Task Tracking:
+
+Database: TransactionTasks table to store each task, its status (Pending, Complete), who completed it, and when.
+
+Logic: Update task statuses when actions are performed via API calls. Check if all tasks in a phase are complete to trigger transaction state changes.
+
+API: Endpoint to mark tasks as complete (POST /api/transactions/:transactionId/tasks/:taskIdentifier/complete). Endpoint to fetch the current state of all tasks for a transaction (GET /api/transactions/:transactionId/tasks).
+
+Data Input & Storage (Vesting, Servicing, Dates, etc.):
+
+Database: Fields within the Transactions table to store this specific information.
+
+Logic: Input validation to ensure data format is correct (e.g., valid dates, potentially formatting checks for vesting info).
+
+API: Endpoints to allow users (buyer/seller) to submit or update this information (PUT /api/transactions/:transactionId). Needs strict authorization.
+
+Timeline / Activity Log:
+
+Database: TransactionTimelineEvents table to record significant actions (task completion, data updates, file uploads, status changes).
+
+Logic: Create new timeline entries automatically whenever a relevant action occurs in other parts of the backend logic (e.g., when a task is marked complete, when vesting info is updated).
+
+API: Endpoint to fetch the timeline events for a specific transaction (GET /api/transactions/:transactionId/timeline).
+
+Authorization & Access Control:
+
+Logic: Implement robust checks on all transaction-related API endpoints to ensure the requesting user is either the buyer or the seller associated with that specific transaction. Further checks might be needed (e.g., only the buyer can mark "Buyer wired funds").
+
+Fee Calculation:
+
+Logic: Calculate the platform_fee and total_price based on the current_price and your chosen fee structure (percentage, flat, hybrid). Store these calculated values in the Transactions table.

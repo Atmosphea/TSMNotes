@@ -53,6 +53,12 @@ export const noteListings = pgTable("note_listings", {
   dueDiligenceCompleted: boolean("due_diligence_completed").default(false),
   dueDiligenceNotes: text("due_diligence_notes"),
   
+  // Admin review
+  reviewedBy: integer("reviewed_by"),
+  reviewedAt: timestamp("reviewed_at"),
+  rejectionReason: text("rejection_reason"),
+  adminNotes: text("admin_notes"),
+  
   // Stats & metrics
   viewCount: integer("view_count").default(0),
   favoriteCount: integer("favorite_count").default(0),

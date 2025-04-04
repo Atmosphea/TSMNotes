@@ -24,6 +24,10 @@ export const transactionService = {
     return transaction;
   },
   
+  async getAllTransactions(): Promise<Transaction[]> {
+    return db.select().from(transactions).orderBy(desc(transactions.createdAt));
+  },
+  
   async getTransactionsByBuyerId(buyerId: number): Promise<Transaction[]> {
     return db.select().from(transactions).where(eq(transactions.buyerId, buyerId));
   },

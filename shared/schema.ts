@@ -88,6 +88,10 @@ export const insertNoteListingSchema = createInsertSchema(noteListings).pick({
   specialNotes: true,
   dueDiligenceCompleted: true,
   dueDiligenceNotes: true,
+  reviewedBy: true,
+  reviewedAt: true,
+  rejectionReason: true,
+  adminNotes: true,
 });
 
 export const insertNoteDocumentSchema = createInsertSchema(noteDocuments).pick({

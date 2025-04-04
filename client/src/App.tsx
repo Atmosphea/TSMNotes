@@ -13,6 +13,7 @@ import LoginPage from "@/pages/login";
 import SignupPage from "@/pages/signup";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AdminProtectedRoute } from "@/components/auth/AdminProtectedRoute";
 import Navigation from "@/components/ui/navigation";
 import Footer2 from "@/components/ui/footer2";
 import InquiriesPage from "@/pages/inquiries";
@@ -44,9 +45,9 @@ function Router() {
       </Route>
       <Route path="/admin">
         {() => (
-          <ProtectedRoute>
+          <AdminProtectedRoute>
             <AdminPage />
-          </ProtectedRoute>
+          </AdminProtectedRoute>
         )}
       </Route>
       <Route

@@ -1,7 +1,7 @@
 import { db } from "../db";
 import { users, type User } from "@shared/models";
 import { InsertUser } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 export const userService = {
   async getUser(id: number): Promise<User | undefined> {
@@ -38,5 +38,26 @@ export const userService = {
       .returning();
     
     return updatedUser;
+  },
+
+  async getAllUsers(): Promise<User[]> {
+    return await db
+      .select()
+      .from(users)
+      .orderBy(desc(users.createdAt));
+  },
+
+  async deleteUser(id: number): Promise<boolean> {
+    try {
+      const deleted = await db
+        .delete(users)
+        .where(eq(users.id, id))
+        .returning({ id: users.id });
+      
+      return deleted.length > 0;
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      return false;
+    }
   }
 }; 

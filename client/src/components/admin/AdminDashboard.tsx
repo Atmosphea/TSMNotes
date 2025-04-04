@@ -128,8 +128,18 @@ export default function AdminDashboard() {
   // Fetch users data
   const { data: usersData, isLoading: isUsersLoading } = useQuery({
     queryKey: ['/api/admin/users'],
-    // Use mock data for now
-    queryFn: async () => ({ success: true, data: mockUsers }),
+    queryFn: async () => {
+      try {
+        const response = await apiRequest('GET', '/api/admin/users');
+        if (!response.ok) {
+          throw new Error('Failed to fetch users');
+        }
+        return { success: true, data: await response.json() };
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        return { success: false, data: [] };
+      }
+    },
     staleTime: 30000,
     refetchOnWindowFocus: false,
   });
@@ -137,8 +147,18 @@ export default function AdminDashboard() {
   // Fetch listings data
   const { data: listingsData, isLoading: isListingsLoading } = useQuery({
     queryKey: ['/api/admin/listings'],
-    // Use mock data for now
-    queryFn: async () => ({ success: true, data: mockListings }),
+    queryFn: async () => {
+      try {
+        const response = await apiRequest('GET', '/api/admin/listings');
+        if (!response.ok) {
+          throw new Error('Failed to fetch listings');
+        }
+        return { success: true, data: await response.json() };
+      } catch (error) {
+        console.error('Error fetching listings:', error);
+        return { success: false, data: [] };
+      }
+    },
     staleTime: 30000,
     refetchOnWindowFocus: false,
   });
@@ -146,8 +166,18 @@ export default function AdminDashboard() {
   // Fetch stats data
   const { data: statsData, isLoading: isStatsLoading } = useQuery({
     queryKey: ['/api/admin/stats'],
-    // Use mock data for now
-    queryFn: async () => ({ success: true, data: mockStats }),
+    queryFn: async () => {
+      try {
+        const response = await apiRequest('GET', '/api/admin/stats');
+        if (!response.ok) {
+          throw new Error('Failed to fetch stats');
+        }
+        return { success: true, data: await response.json() };
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+        return { success: false, data: mockStats }; // Fallback to mock data if API fails
+      }
+    },
     staleTime: 30000,
     refetchOnWindowFocus: false,
   });
@@ -155,11 +185,11 @@ export default function AdminDashboard() {
   // Update user mutation
   const updateUserMutation = useMutation({
     mutationFn: async (userData: any) => {
-      return await apiRequest({
-        url: `/api/admin/users/${userData.id}`,
-        method: "PATCH",
-        data: userData,
-      });
+      const response = await apiRequest('PATCH', `/api/admin/users/${userData.id}`, userData);
+      if (!response.ok) {
+        throw new Error('Failed to update user');
+      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
@@ -176,18 +206,16 @@ export default function AdminDashboard() {
         variant: "destructive",
       });
     },
-    meta: {
-      invalidates: ['/api/admin/users'],
-    },
   });
 
   // Delete user mutation
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: number) => {
-      return await apiRequest({
-        url: `/api/admin/users/${userId}`,
-        method: "DELETE",
-      });
+      const response = await apiRequest('DELETE', `/api/admin/users/${userId}`);
+      if (!response.ok) {
+        throw new Error('Failed to delete user');
+      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
@@ -203,8 +231,55 @@ export default function AdminDashboard() {
         variant: "destructive",
       });
     },
-    meta: {
-      invalidates: ['/api/admin/users'],
+  });
+  
+  // Approve listing mutation
+  const approveListingMutation = useMutation({
+    mutationFn: async (listingId: number) => {
+      const response = await apiRequest('POST', `/api/admin/listings/${listingId}/approve`);
+      if (!response.ok) {
+        throw new Error('Failed to approve listing');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/listings'] });
+      toast({
+        title: "Listing Approved",
+        description: "The listing has been approved and is now live.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "There was a problem approving the listing.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Reject listing mutation
+  const rejectListingMutation = useMutation({
+    mutationFn: async (listingId: number) => {
+      const response = await apiRequest('POST', `/api/admin/listings/${listingId}/reject`);
+      if (!response.ok) {
+        throw new Error('Failed to reject listing');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/listings'] });
+      toast({
+        title: "Listing Rejected",
+        description: "The listing has been rejected.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "There was a problem rejecting the listing.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -226,6 +301,20 @@ export default function AdminDashboard() {
   const handleDeleteUser = (userId: number) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       deleteUserMutation.mutate(userId);
+    }
+  };
+  
+  // Handle approve listing
+  const handleApproveListing = (listingId: number) => {
+    if (window.confirm("Are you sure you want to approve this listing?")) {
+      approveListingMutation.mutate(listingId);
+    }
+  };
+  
+  // Handle reject listing
+  const handleRejectListing = (listingId: number) => {
+    if (window.confirm("Are you sure you want to reject this listing?")) {
+      rejectListingMutation.mutate(listingId);
     }
   };
 
@@ -565,6 +654,7 @@ export default function AdminDashboard() {
                                 variant="ghost" 
                                 size="icon"
                                 className="text-green-600"
+                                onClick={() => handleApproveListing(listing.id)}
                               >
                                 <CheckCircle className="h-4 w-4" />
                               </Button>
@@ -572,6 +662,7 @@ export default function AdminDashboard() {
                                 variant="ghost" 
                                 size="icon"
                                 className="text-red-600"
+                                onClick={() => handleRejectListing(listing.id)}
                               >
                                 <XCircle className="h-4 w-4" />
                               </Button>

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import React from "react";
 import { useLocation } from "wouter";
+import { useAuth } from "@/contexts/AuthContext";
 import AdminDashboard from "@/components/admin/AdminDashboard";
 import Header from "@/components/landing/Header";
 import Footer from "@/components/landing/Footer";
@@ -8,32 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Shield, AlertTriangle } from "lucide-react";
 
 export default function AdminPage() {
-  const [location, setLocation] = useLocation();
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [, setLocation] = useLocation();
+  const { user, isLoading } = useAuth();
 
-  // Fetch the current user's data to check if they have admin rights
-  const { data: userData, isLoading } = useQuery({
-    queryKey: ['/api/users/current'],
-    // Since we don't have a real auth system yet, we'll simulate an admin check
-    queryFn: async () => {
-      // This would normally make a real API call
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
-      return { success: true, data: { role: "admin" } }; // For demo purpose, hardcode admin role
-    },
-  });
-
-  useEffect(() => {
-    if (!isLoading) {
-      const userRole = userData?.data?.role;
-      if (userRole === "admin") {
-        setIsAuthorized(true);
-      }
-      setIsCheckingAuth(false);
-    }
-  }, [isLoading, userData]);
-
-  if (isCheckingAuth) {
+  if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="w-16 h-16 border-t-4 border-primary border-solid rounded-full animate-spin"></div>
@@ -41,7 +19,7 @@ export default function AdminPage() {
     );
   }
 
-  if (!isAuthorized) {
+  if (!user || user.role !== 'admin') {
     return (
       <div className="min-h-screen flex flex-col bg-background">
         <Header />

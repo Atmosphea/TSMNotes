@@ -26,6 +26,7 @@ import { NoteListingController } from "./controllers/NoteListingController";
 import { DocumentController } from "./controllers/DocumentController";
 import { InquiryController } from "./controllers/InquiryController";
 import { TransactionController } from "./controllers/TransactionController";
+import { AdminController } from "./controllers/AdminController";
 
 // Function to add sample note listings
 async function addSampleListings() {
@@ -157,6 +158,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const documentController = new DocumentController();
   const inquiryController = new InquiryController();
   const transactionController = new TransactionController();
+  const adminController = new AdminController();
 
   // Waitlist routes
   app.post("/api/waitlist", waitlistController.create.bind(waitlistController));
@@ -211,6 +213,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Transaction timeline events
   app.get("/api/transactions/:id/timeline", transactionController.getTimelineByTransactionId.bind(transactionController));
   app.post("/api/transactions/:id/timeline", transactionController.createTimelineEvent.bind(transactionController));
+  
+  // Admin routes
+  app.get("/api/admin/users", adminController.getUsers.bind(adminController));
+  app.get("/api/admin/users/:id", adminController.getUserById.bind(adminController));
+  app.patch("/api/admin/users/:id", adminController.updateUser.bind(adminController));
+  app.delete("/api/admin/users/:id", adminController.deleteUser.bind(adminController));
+  
+  app.get("/api/admin/listings", adminController.getListings.bind(adminController));
+  app.post("/api/admin/listings/:id/approve", adminController.approveListing.bind(adminController));
+  app.post("/api/admin/listings/:id/reject", adminController.rejectListing.bind(adminController));
+  
+  app.get("/api/admin/stats", adminController.getStats.bind(adminController));
+  app.get("/api/admin/transactions/stats", adminController.getTransactionStats.bind(adminController));
 
   const httpServer = createServer(app);
 
