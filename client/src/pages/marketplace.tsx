@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
+import NoteDetailModal from "@/components/marketplace/NoteDetailModal";
 import { 
   Breadcrumb,
   BreadcrumbItem,
@@ -78,6 +79,7 @@ export default function MarketplacePage() {
   const [filterPropertyType, setFilterPropertyType] = useState<string | null>(null);
   const [advancedFilters, setAdvancedFilters] = useState<FilterState | null>(null);
   const [activeFilterCount, setActiveFilterCount] = useState(0);
+  const [selectedNoteId, setSelectedNoteId] = useState<number | null>(null);
 
   // Filter state variables
   const [noteType, setNoteType] = useState("");
@@ -1154,16 +1156,14 @@ export default function MarketplacePage() {
             {displayedListings.map((listing, index) => (
               <Card 
                 key={listing.id} 
-                className="transition-all duration-500 group relative hover:scale-[1.02] overflow-hidden animate-fadeIn bg-black/30 backdrop-blur-sm border border-white/10"
+                className="transition-all duration-500 group relative hover:scale-[1.02] overflow-hidden animate-fadeIn bg-black/30 backdrop-blur-sm border border-white/10 cursor-pointer"
                 style={{ 
                   animationDelay: `${index * 100}ms`,
                   opacity: 0,
                   transform: 'translateY(20px)'
                 }}
+                onClick={() => setSelectedNoteId(listing.id)}
               >
-                <Link href={`/note/${listing.id}`} className="absolute inset-0 z-10">
-                  <span className="sr-only">View details for {listing.propertyAddress}</span>
-                </Link>
 
                 {/* Card Border Gradient */}
                 <div className="absolute inset-0 rounded-lg border border-white/20 pointer-events-none"></div>
@@ -1309,6 +1309,15 @@ export default function MarketplacePage() {
       </main>
 
       <Footer />
+      
+      {/* Note Detail Modal */}
+      {selectedNoteId && (
+        <NoteDetailModal 
+          isOpen={selectedNoteId !== null}
+          onClose={() => setSelectedNoteId(null)}
+          noteId={selectedNoteId}
+        />
+      )}
     </div>
   );
 }

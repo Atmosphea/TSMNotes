@@ -4,16 +4,18 @@ import { addDays, isPast } from 'date-fns';
 
 interface StatusIndicatorProps {
   status: string;
-  accessRequests: number;
-  lastAccessRequestAt: Date | null;
+  accessRequests?: number;
+  lastAccessRequestAt?: Date | null;
   soldAt?: Date | null;
+  className?: string;
 }
 
 export function StatusIndicator({ 
   status, 
-  accessRequests, 
-  lastAccessRequestAt,
-  soldAt
+  accessRequests = 0, 
+  lastAccessRequestAt = null,
+  soldAt = null,
+  className = ''
 }: StatusIndicatorProps) {
   // Function to determine if access requests are still active (within 48 hours)
   const areAccessRequestsActive = () => {
@@ -61,7 +63,7 @@ export function StatusIndicator({
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="absolute top-3 right-3 flex items-center">
+          <div className={`flex items-center ${className}`}>
             {/* Main status dot */}
             <div 
               className={`${statusInfo.color} h-3 w-3 rounded-full ${status === 'sold' ? 'opacity-70' : ''}`} 
