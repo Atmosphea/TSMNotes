@@ -146,6 +146,19 @@ async function addSampleListings() {
 const emailSchema = z.string().email("Please enter a valid email address");
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Test endpoint for transaction fee calculation
+  app.get('/api/test/transaction-fee', (req, res) => {
+    const amount = parseFloat(req.query.amount as string) || 100000;
+    const fee = amount * 0.008;
+    const total = amount + fee;
+    
+    res.json({
+      amount,
+      fee,
+      total,
+      feePercentage: "0.8%"
+    });
+  });
   // Set up authentication routes and middleware
   setupAuth(app);
   
