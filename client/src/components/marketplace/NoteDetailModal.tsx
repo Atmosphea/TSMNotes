@@ -112,10 +112,18 @@ export default function NoteDetailModal({ isOpen, onClose, noteId }: NoteDetailM
 
                 <TabsContent value="overview" className="p-4 border border-white/10 rounded-lg mt-4 bg-black/30 backdrop-blur-sm">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Left column - first row */}
+                    {/* Left column - first row with property image */}
                     <div>
                       <div className="text-white/70 text-sm font-medium mb-1.5">Unpaid Principal Balance</div>
                       <div className="text-3xl font-bold text-white">{formatCurrency(listing.currentLoanAmount)}</div>
+                      
+                      {/* Property image/map moved here */}
+                      <div className="mt-4 aspect-video bg-black/40 rounded-lg flex items-center justify-center border border-white/10">
+                        <MapPin className="w-12 h-12 text-white/50 opacity-50" />
+                        <p className="ml-2 text-white/70">
+                          Property view available
+                        </p>
+                      </div>
                     </div>
 
                     {/* Right column - first row */}

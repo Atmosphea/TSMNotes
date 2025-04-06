@@ -39,7 +39,6 @@ import {
 } from "@/components/ui/pagination";
 import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/landing/Header";
-import Footer from "@/components/landing/Footer";
 import { type NoteListing } from "@shared/schema";
 import { FilterModal, FilterDrawer, FilterState } from "@/components/marketplace";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -1173,14 +1172,14 @@ export default function MarketplacePage() {
 
                 <CardContent className="p-6 pt-4">
                   {/* Address */}
-                  <p className="text-sm text-gray-500 mb-2 truncate">{listing.propertyAddress}</p>
+                  <p className="text-sm text-white/70 mb-2 truncate">{listing.propertyAddress}</p>
 
                   {/* Price and Yield */}
                   <div className="flex items-baseline justify-between mb-4">
-                    <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-black bg-clip-text text-transparent">
+                    <h3 className="text-2xl font-bold text-white">
                       {formatCurrency(listing.askingPrice)}
                     </h3>
-                    <div className="flex items-center text-green-600 font-medium">
+                    <div className="flex items-center text-green-400 font-medium">
                       <span className="text-xs font-bold mr-1">YIELD</span>
                       <span>{listing.interestRate}%</span>
                     </div>
@@ -1189,20 +1188,20 @@ export default function MarketplacePage() {
                   {/* Loan Stats */}
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-2">
                     <div>
-                      <p className="text-xs text-gray-500">Original Amount</p>
-                      <p className="font-medium">{formatCurrency(listing.originalLoanAmount)}</p>
+                      <p className="text-xs text-white/60">Original Amount</p>
+                      <p className="font-medium text-white">{formatCurrency(listing.originalLoanAmount)}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Monthly Payment</p>
-                      <p className="font-medium">{formatCurrency(listing.monthlyPaymentAmount)}</p>
+                      <p className="text-xs text-white/60">Monthly Payment</p>
+                      <p className="font-medium text-white">{formatCurrency(listing.monthlyPaymentAmount)}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Term</p>
-                      <p className="font-medium">{Math.floor(listing.originalLoanTerm / 12)} years</p>
+                      <p className="text-xs text-white/60">Term</p>
+                      <p className="font-medium text-white">{Math.floor(listing.originalLoanTerm / 12)} years</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Time Held</p>
-                      <p className="font-medium">
+                      <p className="text-xs text-white/60">Time Held</p>
+                      <p className="font-medium text-white">
                         {listing.loanOriginationDate 
                           ? Math.floor((new Date().getTime() - new Date(listing.loanOriginationDate).getTime()) / (1000 * 60 * 60 * 24 * 30))
                           : 0} months
@@ -1291,8 +1290,6 @@ export default function MarketplacePage() {
           )}
         </div>
       </main>
-
-      <Footer />
       
       {/* Note Detail Modal */}
       {selectedNoteId && (
