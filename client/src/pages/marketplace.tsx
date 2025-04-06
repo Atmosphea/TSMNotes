@@ -270,43 +270,27 @@ export default function MarketplacePage() {
       <main className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 relative">
         <div className="absolute inset-5 border border-white/20"></div>
         <div className="container px-4 py-12 mx-auto max-w-7xl relative z-10">
-          {/* Breadcrumb */}
-          <Breadcrumb className="mb-8">
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/">Home</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Notes</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-
-          {/* Sort Dropdown Only */}
-          <div className="flex justify-end mb-8">
-            <div className="flex items-center gap-2">
-              <p className="text-sm text-white whitespace-nowrap">Sort by:</p>
-              <select 
-                className="px-2 py-1 border rounded-md text-sm bg-[#131823] text-white"
-                value={sortBy}
-                onChange={(e) => {
-                  // Show animation when sorting changes
-                  setIsFiltering(true);
-                  setTimeout(() => {
-                    setSortBy(e.target.value as any);
-                    setIsFiltering(false);
-                  }, 300);
-                }}
-              >
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="priceHigh">Price (High to Low)</option>
-                <option value="priceLow">Price (Low to High)</option>
-                <option value="yieldHigh">Yield (High to Low)</option>
-                <option value="yieldLow">Yield (Low to High)</option>
-              </select>
-            </div>
+          {/* Breadcrumb with Add Listing Link on the right */}
+          <div className="flex justify-between items-center mb-8">
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Notes</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            
+            <Link href="/selling" className="text-[#c49c6c] hover:text-[#b38b5b] flex items-center gap-1 font-medium">
+              <span>Add a Listing</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </Link>
           </div>
 
           {/* Collapsible Filter Panel with Gradient Header */}
