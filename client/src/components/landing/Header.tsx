@@ -27,7 +27,8 @@ const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [location] = useLocation();
   const isLandingPage = location === "/";
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, logout } = useAuth();
+  const isAuthenticated = !!user;
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -38,6 +39,25 @@ const Header = () => {
       document.body.style.overflow = "";
     }
   };
+  
+  // Close menu when clicking outside it
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isMenuOpen) {
+        const isClickInside = event.target instanceof Node && 
+          document.querySelector('.mobile-menu')?.contains(event.target);
+        if (!isClickInside) {
+          setIsMenuOpen(false);
+          document.body.style.overflow = "";
+        }
+      }
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isMenuOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -81,55 +101,6 @@ const Header = () => {
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
-          {isLandingPage ? (
-            // Landing page navigation
-            <>
-              <div className="relative group">
-                <button 
-                  className="flex items-center text-sm font-medium hover:text-primary transition-colors nav-glow px-3 py-2"
-                  onMouseMove={(e) => {
-                    const el = e.currentTarget;
-                    const rect = el.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    el.style.setProperty("--x", `${x}px`);
-                    el.style.setProperty("--y", `${y}px`);
-                  }}
-                >
-                  Learn <ChevronDown className="h-4 w-4 ml-1" />
-                </button>
-                <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-black/90 border border-gray-800 hidden group-hover:block backdrop-blur-md">
-                  <div className="py-1">
-                    <button 
-                      onClick={() => scrollToSection("features")} 
-                      className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white"
-                    >
-                      Features
-                    </button>
-                    <button 
-                      onClick={() => scrollToSection("how-it-works")} 
-                      className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white"
-                    >
-                      How It Works
-                    </button>
-                    <button 
-                      onClick={() => scrollToSection("testimonials")} 
-                      className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white"
-                    >
-                      Testimonials
-                    </button>
-                    <button 
-                      onClick={() => scrollToSection("faq")} 
-                      className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white"
-                    >
-                      FAQ
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </>
-          ) : null}
-          
           <Link href="/marketplace" className="flex items-center text-sm font-medium hover:text-primary transition-colors nav-glow px-3 py-2">
             <ShoppingBag className="h-4 w-4 mr-1" />
             Buying
@@ -138,11 +109,6 @@ const Header = () => {
           <Link href="/selling" className="flex items-center text-sm font-medium hover:text-primary transition-colors nav-glow px-3 py-2">
             <FileText className="h-4 w-4 mr-1" />
             Selling
-          </Link>
-          
-          <Link href="/faq" className="flex items-center text-sm font-medium hover:text-primary transition-colors nav-glow px-3 py-2">
-            <HelpCircle className="h-4 w-4 mr-1" />
-            FAQ
           </Link>
         </nav>
         
@@ -153,9 +119,8 @@ const Header = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                   <Avatar className="h-10 w-10">
-                    <AvatarImage src={user?.profileImageUrl} alt={user?.username} />
                     <AvatarFallback>
-                      {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0) || user?.username?.charAt(0)}
+                      {user?.firstName?.charAt(0) || ''}{user?.lastName?.charAt(0) || user?.username?.charAt(0) || ''}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -208,7 +173,7 @@ const Header = () => {
       
       {/* Fly-out Mobile menu */}
       {isMenuOpen && (
-        <div className="fixed inset-0 bg-black/95 z-50 md:hidden backdrop-blur-sm overflow-y-auto pt-16">
+        <div className="fixed inset-0 bg-black/95 z-50 md:hidden backdrop-blur-sm overflow-y-auto pt-16 mobile-menu">
           <button 
             className="absolute top-4 right-6"
             onClick={toggleMenu}
@@ -218,41 +183,6 @@ const Header = () => {
           </button>
           
           <div className="px-6 py-8 flex flex-col space-y-8">
-            {isLandingPage && (
-              <div className="space-y-6">
-                <h3 className="text-xs uppercase tracking-wider text-gray-400 font-semibold">Learn</h3>
-                <div className="space-y-4 pl-2">
-                  <button 
-                    onClick={() => scrollToSection("features")} 
-                    className="flex w-full items-center text-xl font-medium hover:text-primary transition-colors"
-                  >
-                    Features
-                    <ChevronRight className="ml-auto h-5 w-5 opacity-60" />
-                  </button>
-                  <button 
-                    onClick={() => scrollToSection("how-it-works")} 
-                    className="flex w-full items-center text-xl font-medium hover:text-primary transition-colors"
-                  >
-                    How It Works
-                    <ChevronRight className="ml-auto h-5 w-5 opacity-60" />
-                  </button>
-                  <button 
-                    onClick={() => scrollToSection("testimonials")} 
-                    className="flex w-full items-center text-xl font-medium hover:text-primary transition-colors"
-                  >
-                    Testimonials
-                    <ChevronRight className="ml-auto h-5 w-5 opacity-60" />
-                  </button>
-                  <button 
-                    onClick={() => scrollToSection("faq")} 
-                    className="flex w-full items-center text-xl font-medium hover:text-primary transition-colors"
-                  >
-                    FAQ
-                    <ChevronRight className="ml-auto h-5 w-5 opacity-60" />
-                  </button>
-                </div>
-              </div>
-            )}
             
             <div className="space-y-6">
               <h3 className="text-xs uppercase tracking-wider text-gray-400 font-semibold">Platform</h3>
@@ -281,18 +211,7 @@ const Header = () => {
                   Selling
                   <ChevronRight className="ml-auto h-5 w-5 opacity-60" />
                 </Link>
-                <Link 
-                  href="/faq" 
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    document.body.style.overflow = "";
-                  }}
-                  className="flex w-full items-center text-xl font-medium hover:text-primary transition-colors"
-                >
-                  <HelpCircle className="h-5 w-5 mr-2" />
-                  FAQ
-                  <ChevronRight className="ml-auto h-5 w-5 opacity-60" />
-                </Link>
+
               </div>
             </div>
             
