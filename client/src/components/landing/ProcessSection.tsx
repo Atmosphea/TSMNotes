@@ -1,9 +1,8 @@
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { Briefcase, Map, ShieldCheck, Clock } from "lucide-react";
 
 const ProcessSection = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
 
   const processes = [
@@ -37,28 +36,6 @@ const ProcessSection = () => {
     },
   ];
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const interval = setInterval(() => {
-              setActiveIndex((prev) => (prev + 1) % processes.length);
-            }, 3000);
-            return () => clearInterval(interval);
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
   return (
     <section 
       ref={sectionRef} 
@@ -90,7 +67,7 @@ const ProcessSection = () => {
         }}
       />
       
-      <div className="container mx-auto px-6 lg:px-8">
+      <div className="container mx-auto px-4 md:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto mb-12 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Our{" "}
@@ -103,23 +80,21 @@ const ProcessSection = () => {
           </p>
         </div>
 
-        <div className="relative h-[300px] max-w-lg mx-auto">
-          {processes.map((process, index) => (
+        <div className="scrollport">
+          {processes.map((process) => (
             <div
               key={process.id}
-              className={`absolute inset-0 process-card transition-all duration-500 ${
-                index === activeIndex ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}
+              className="core-values-card min-w-[280px] sm:min-w-[320px] lg:min-w-[300px] p-6 flex flex-col"
             >
-              <div className="glass-card p-8 h-full flex flex-col items-center justify-center text-center">
-                <div className="feature-icon-container p-3 mb-6">
-                  {process.icon}
-                </div>
-                <h3 className="text-xl font-bold text-gray-100 mb-3">
-                  {process.title}
-                </h3>
-                <p className="text-gray-300 text-sm">{process.description}</p>
+              <div className="feature-icon-container p-3 mb-4 self-start">
+                {process.icon}
               </div>
+              <h3 className="text-xl font-bold text-gray-100 mb-3">
+                {process.title}
+              </h3>
+              <p className="text-gray-300 text-sm">
+                {process.description}
+              </p>
             </div>
           ))}
         </div>

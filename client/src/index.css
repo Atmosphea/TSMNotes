@@ -90,6 +90,39 @@
     background: linear-gradient(135deg, #323232 0%, #222222 100%);
   }
   
+  /* Scrolling core values */
+  .scrollport {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+    
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    
+    display: flex;
+    gap: 1.5rem;
+    align-items: stretch;
+    padding: 1rem 3rem;
+    margin: 0 -1rem;
+  }
+  
+  .scrollport::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .core-values-card {
+    @apply backdrop-blur-md bg-black/50 border border-white/30 rounded-md;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    height: 240px;
+  }
+  
+  .core-values-card:hover {
+    @apply bg-black/70 border-primary/50;
+    transform: translateY(-5px);
+  }
+  
   .glass-card {
     @apply backdrop-blur-md bg-black/50 border border-white/30 rounded-sm opacity-0;
     animation: fadeIn 0.8s ease-out forwards;

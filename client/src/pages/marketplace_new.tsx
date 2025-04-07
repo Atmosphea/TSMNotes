@@ -38,7 +38,7 @@ import {
 } from "@/components/ui/pagination";
 import { formatCurrency } from "@/lib/utils";
 import Header from "@/components/landing/Header";
-import Footer from "@/components/landing/Footer";
+
 import { type NoteListing } from "@shared/schema";
 import { FilterModal, FilterDrawer, FilterState } from "@/components/marketplace";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -1321,7 +1321,7 @@ export default function MarketplacePage() {
         </div>
       </main>
       
-      <Footer />
+      
     </div>
   );
 }

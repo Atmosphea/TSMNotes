@@ -16,7 +16,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Loader2, PlusCircle } from "lucide-react";
 import { Link } from "wouter";
 import Header from "@/components/landing/Header";
-import Footer from "@/components/landing/Footer";
+
 import { Helmet } from "react-helmet";
 import { StatusIndicator } from "@/components/marketplace/StatusIndicator";
 
@@ -524,7 +524,7 @@ export default function SellingPage() {
         </div>
       </main>
       
-      <Footer />
+      
     </div>
   );
 }

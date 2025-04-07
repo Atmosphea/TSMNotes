@@ -25,7 +25,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/landing/Header";
-import Footer from "@/components/landing/Footer";
+
 
 const formSchema = z
   .object({
