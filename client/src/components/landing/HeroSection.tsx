@@ -84,7 +84,7 @@ const HeroSection = () => {
           {/* Have a key button */}
           <button 
             onClick={() => setKeyDialogOpen(true)}
-            className="text-white/70 hover:text-white text-sm flex items-center justify-center mx-auto mt-4 transition-colors"
+            className="bg-[#FFD700] hover:bg-[#F7C400] text-black font-medium text-sm flex items-center justify-center mx-auto mt-4 px-4 py-2 rounded-md transition-colors"
           >
             <Key className="h-3 w-3 mr-2 text-primary" />
             Have an invite key?

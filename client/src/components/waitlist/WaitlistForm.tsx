@@ -108,7 +108,7 @@ const WaitlistForm = ({ className, variant = "default" }: WaitlistFormProps) => 
               <FormItem className="flex-1">
                 <FormControl>
                   <Input 
-                    placeholder="Enter your email" 
+                    placeholder="Email" 
                     className="bg-white/10 border-white/20 text-white placeholder-white/50 focus:ring-primary-400" 
                     {...field} 
                   />
@@ -118,8 +118,6 @@ const WaitlistForm = ({ className, variant = "default" }: WaitlistFormProps) => 
             )}
           />
           
-          <input type="hidden" {...form.register("role")} value="interested" />
-          
           <Button type="submit" className="bg-white text-primary-900 hover:bg-primary-50" disabled={mutation.isPending}>
             {mutation.isPending ? (
               <>
@@ -127,7 +125,7 @@ const WaitlistForm = ({ className, variant = "default" }: WaitlistFormProps) => 
                 Processing...
               </>
             ) : (
-              "Join Waitlist"
+              "Join the waitlist"
             )}
           </Button>
         </form>
