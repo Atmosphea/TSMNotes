@@ -8,19 +8,12 @@ import {
   ChevronRight, 
   ShoppingBag, 
   FileText, 
-  HelpCircle, 
-  ChevronDown,
   User,
-  LogOut
+  LogOut,
+  LogIn,
+  UserPlus
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { 
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -79,88 +72,95 @@ const Header = () => {
             <div className="rounded-md bg-primary p-1.5">
               <DollarSign className="h-5 w-5 text-white" />
             </div>
-            <span className="font-serif text-xl font-bold sm:inline-block">NoteTrade</span>
+            {/* NoteTrade text removed as requested */}
           </Link>
         </div>
         
-        <nav className="hidden md:flex items-center space-x-8">
-          <Link href="/marketplace" className="flex items-center text-sm font-medium hover:text-primary transition-colors nav-glow px-3 py-2">
-            <ShoppingBag className="h-4 w-4 mr-1" />
-            Buying
+        <nav className="hidden md:flex items-center space-x-6">
+          {/* Adding frame around nav buttons similar to login page with wipe animation */}
+          <Link 
+            href="/marketplace" 
+            className="nav-button-frame group flex items-center text-sm font-medium px-5 py-2.5 relative overflow-hidden"
+          >
+            <span className="nav-button-fill"></span>
+            <span className="flex items-center relative z-10">
+              <ShoppingBag className="h-4 w-4 mr-2" />
+              Buying
+            </span>
           </Link>
           
-          <Link href="/selling" className="flex items-center text-sm font-medium hover:text-primary transition-colors nav-glow px-3 py-2">
-            <FileText className="h-4 w-4 mr-1" />
-            Selling
+          <Link 
+            href="/selling" 
+            className="nav-button-frame group flex items-center text-sm font-medium px-5 py-2.5 relative overflow-hidden"
+          >
+            <span className="nav-button-fill"></span>
+            <span className="flex items-center relative z-10">
+              <FileText className="h-4 w-4 mr-2" />
+              Selling
+            </span>
           </Link>
         </nav>
         
         <div className="flex items-center space-x-4">
           {/* User controls on desktop */}
           {isAuthenticated ? (
-            // User is logged in - show profile dropdown
-            <div className="hidden md:block">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 overflow-hidden border border-primary/30">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-black/30 text-white">
-                        {user?.firstName?.charAt(0) || ''}{user?.lastName?.charAt(0) || user?.username?.charAt(0) || ''}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end">
-                  <div className="flex items-center justify-start gap-2 p-2">
-                    <div className="flex flex-col space-y-0.5 leading-none">
-                      <p className="font-medium text-sm">
-                        {user?.firstName} {user?.lastName || user?.username}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate w-40">
-                        {user?.email}
-                      </p>
-                    </div>
-                  </div>
-                  <DropdownMenuItem asChild>
-                    <Link href="/profile" className="w-full cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>Profile</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={logout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            // User is logged in - show just profile and logout buttons without avatar
+            <div className="hidden md:flex items-center space-x-3">
+              <Link 
+                href="/profile" 
+                className="nav-button-frame group flex items-center text-sm font-medium px-5 py-2.5 relative overflow-hidden"
+              >
+                <span className="nav-button-fill"></span>
+                <span className="flex items-center relative z-10">
+                  <User className="h-4 w-4 mr-2" />
+                  Profile
+                </span>
+              </Link>
+              
+              <button 
+                onClick={logout}
+                className="nav-button-frame group flex items-center text-sm font-medium px-5 py-2.5 relative overflow-hidden"
+              >
+                <span className="nav-button-fill"></span>
+                <span className="flex items-center relative z-10">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </span>
+              </button>
             </div>
           ) : (
-            // User is not logged in - show login/signup buttons on desktop
+            // User is not logged in - show login/signup buttons with new styling
             <div className="hidden md:flex items-center space-x-3">
-              <Link href="/login">
-                <Button variant="ghost" className="text-white hover:text-primary">
+              <Link 
+                href="/login"
+                className="nav-button-frame group flex items-center text-sm font-medium px-5 py-2.5 relative overflow-hidden"
+              >
+                <span className="nav-button-fill"></span>
+                <span className="flex items-center relative z-10">
+                  <LogIn className="h-4 w-4 mr-2" />
                   Login
-                </Button>
+                </span>
               </Link>
-              <Link href="/signup">
-                <Button className="bg-primary hover:bg-primary/90">Sign Up</Button>
+              
+              <Link 
+                href="/signup"
+                className="nav-button-primary group flex items-center text-sm font-medium px-5 py-2.5 relative overflow-hidden"
+              >
+                <span className="absolute inset-0 bg-primary opacity-20 group-hover:opacity-30 transition-opacity"></span>
+                <span className="flex items-center relative z-10">
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Sign Up
+                </span>
               </Link>
             </div>
           )}
           
           {/* Mobile menu button (appears on all viewport sizes) */}
           <button 
-            className="flex items-center space-x-2 p-2 rounded-full hover:bg-black/20 transition-colors" 
+            className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-black/20 transition-colors" 
             onClick={toggleMenu}
             aria-label="Menu"
           >
-            {isAuthenticated && (
-              <Avatar className="h-8 w-8 md:hidden mr-1 border border-primary/30">
-                <AvatarFallback className="bg-black/30 text-white text-xs">
-                  {user?.firstName?.charAt(0) || ''}{user?.lastName?.charAt(0) || user?.username?.charAt(0) || ''}
-                </AvatarFallback>
-              </Avatar>
-            )}
             {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
@@ -182,16 +182,7 @@ const Header = () => {
           <X className="h-6 w-6" />
         </button>
         
-        {/* User profile on top right */}
-        {isAuthenticated && (
-          <div className="absolute top-6 right-16 z-20">
-            <Avatar className="h-10 w-10 ring-2 ring-primary/50">
-              <AvatarFallback className="bg-black/30 text-white">
-                {user?.firstName?.charAt(0) || ''}{user?.lastName?.charAt(0) || user?.username?.charAt(0) || ''}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-        )}
+        {/* User profile removed */}
 
         {/* Content area with staggered animations */}
         <div className="h-full flex flex-col items-center justify-center px-8 overflow-auto">

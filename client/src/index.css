@@ -285,4 +285,41 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   }
+  
+  /* Navigation button frame and wipe fill animation */
+  .nav-button-frame {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .nav-button-frame:hover {
+    border-color: rgba(196, 156, 108, 0.6);
+  }
+
+  .nav-button-fill {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(196, 156, 108, 0.15);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+    border-radius: 5px;
+  }
+
+  .nav-button-frame:hover .nav-button-fill {
+    transform: scaleX(1);
+  }
+
+  .nav-button-primary {
+    border: 1px solid rgba(196, 156, 108, 0.6);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .nav-button-primary:hover {
+    border-color: rgba(196, 156, 108, 0.9);
+  }
 }
