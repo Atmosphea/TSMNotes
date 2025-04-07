@@ -80,8 +80,6 @@ const HeroSection = () => {
           <div className="bg-black/30 backdrop-blur-md p-5 border border-white/10 rounded-lg mb-4">
             <WaitlistForm />
           </div>
-          
-          {/* Have a key button */}
           <button 
             onClick={() => setKeyDialogOpen(true)}
             className="bg-[#FFD700] hover:bg-[#F7C400] text-black font-medium text-sm flex items-center justify-center mx-auto mt-4 px-4 py-2 rounded-md transition-colors"

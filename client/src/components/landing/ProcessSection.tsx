@@ -1,6 +1,11 @@
+
+import { useEffect, useRef, useState } from "react";
 import { Briefcase, Map, ShieldCheck, Clock } from "lucide-react";
 
 const ProcessSection = () => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const sectionRef = useRef<HTMLElement>(null);
+
   const processes = [
     {
       title: "Professional",
@@ -32,8 +37,59 @@ const ProcessSection = () => {
     },
   ];
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const interval = setInterval(() => {
+              setActiveIndex((prev) => (prev + 1) % processes.length);
+            }, 3000);
+            return () => clearInterval(interval);
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section id="process" className="py-20 gradient-bg-darker">
+    <section 
+      ref={sectionRef} 
+      id="process" 
+      className="py-20 relative overflow-hidden"
+      style={{
+        background: `
+          linear-gradient(
+            45deg,
+            rgba(var(--primary-rgb), 0.1),
+            rgba(var(--primary-rgb), 0.2),
+            rgba(var(--primary-rgb), 0.1)
+          )
+        `
+      }}
+    >
+      <div 
+        className="absolute inset-0 animate-gradient-x"
+        style={{
+          background: `
+            linear-gradient(
+              45deg,
+              rgba(var(--primary-rgb), 0.05) 0%,
+              rgba(var(--primary-rgb), 0.1) 50%,
+              rgba(var(--primary-rgb), 0.05) 100%
+            )
+          `,
+          backgroundSize: "200% 200%",
+        }}
+      />
+      
       <div className="container mx-auto px-6 lg:px-8">
         <div className="max-w-4xl mx-auto mb-12 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -47,45 +103,25 @@ const ProcessSection = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="relative h-[300px] max-w-lg mx-auto">
           {processes.map((process, index) => (
             <div
               key={process.id}
-              className="process-card group hover-glow"
-              style={{ "--card-index": index } as React.CSSProperties}
+              className={`absolute inset-0 process-card transition-all duration-500 ${
+                index === activeIndex ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              }`}
             >
-              <div className="feature-icon-container p-3 mb-6 group-hover:bg-primary/20 transition-all">
-                {process.icon}
+              <div className="glass-card p-8 h-full flex flex-col items-center justify-center text-center">
+                <div className="feature-icon-container p-3 mb-6">
+                  {process.icon}
+                </div>
+                <h3 className="text-xl font-bold text-gray-100 mb-3">
+                  {process.title}
+                </h3>
+                <p className="text-gray-300 text-sm">{process.description}</p>
               </div>
-              <h3 className="text-xl font-bold text-gray-100 mb-3 category-title">
-                {process.title}
-              </h3>
-              <p className="text-gray-300 text-sm">{process.description}</p>
             </div>
           ))}
-        </div>
-
-        <div className="mt-16 p-6 glass-card">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-y-4">
-            <div className="flex items-start px-4">
-              <div className="text-primary mr-3 text-2xl">✔</div>
-              <p className="text-gray-200">
-                Handcrafted Network of known players
-              </p>
-            </div>
-            <div className="flex items-start px-4">
-              <div className="text-primary mr-3 text-2xl">✔</div>
-              <p className="text-gray-200">Simple interface</p>
-            </div>
-            <div className="flex items-start px-4">
-              <div className="text-primary mr-3 text-2xl">✔</div>
-              <p className="text-gray-200">Open Bounty System</p>
-            </div>
-            <div className="flex items-start px-4">
-              <div className="text-primary mr-3 text-2xl">✔</div>
-              <p className="text-gray-200">Custom Contract Creation</p>
-            </div>
-          </div>
         </div>
       </div>
     </section>
