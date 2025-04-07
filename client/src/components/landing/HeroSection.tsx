@@ -1,157 +1,117 @@
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
-import { Shield, ArrowRight, Key } from "lucide-react";
-import WaitlistForm from "@/components/waitlist/WaitlistForm";
-import KeyEntryDialog from "@/components/auth/KeyEntryDialog";
+import { Input } from "@/components/ui/input";
+import { DollarSign, ChevronRight, Key } from "lucide-react";
+import { useLocation } from "wouter";
 
 const HeroSection = () => {
-  const [isKeyDialogOpen, setIsKeyDialogOpen] = useState(false);
+  const [inviteKey, setInviteKey] = useState("");
+  const [isAnimated, setIsAnimated] = useState(false);
+  const [, navigate] = useLocation();
+
+  // Animation effect that triggers after component mounts
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsAnimated(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleKeySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (inviteKey.trim()) {
+      navigate(`/signup?key=${encodeURIComponent(inviteKey)}`);
+    }
+  };
 
   return (
-    <section
-      className="relative min-h-[90vh] flex items-center overflow-hidden parallax-bg"
-      style={{
-        backgroundImage:
-          "url('https://images.unsplash.com/photo-1560520031-3a4dc4e9de0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2073&q=80')",
-      }}
-    >
-      <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/90 to-gray-900/60"></div>
-      <div className="container mx-auto px-6 lg:px-8 relative z-10 py-16">
-        <div className="flex flex-col lg:flex-row items-start gap-16">
-          <div className="flex-1 max-w-2xl">
-            <div className="border-l-4 border-primary pl-6 mb-8">
-              <h2 className="text-white text-lg font-medium uppercase tracking-wider">
-                Professional, Local, Secure
-              </h2>
-            </div>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight">
-              The Secure Platform for{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">
-                Mortgage Note Trading
-              </span>
-            </h1>
-            <p className="mt-6 text-lg text-gray-300 max-w-xl">
-              Connect with qualified buyers and sellers in the mortgage note
-              industry.
-            </p>
-            <div className="mt-10 flex flex-col sm:flex-row gap-4">
-              <Card className="p-5 bg-white/5 backdrop-blur-sm border-gray-800 w-full max-w-md">
-                <h3 className="text-lg font-medium mb-3 text-white">
-                  Join our exclusive waitlist
-                </h3>
-                <WaitlistForm variant="footer" />
-                <div className="mt-4 flex items-center justify-between">
-                  <div className="flex items-center space-x-2 text-sm text-gray-300">
-                    <Shield className="h-4 w-4 text-primary" />
-                    <span>Bank-level security and compliance</span>
-                  </div>
-                  <Button
-                    variant="link"
-                    className="text-primary hover:text-primary/90 p-0 h-auto"
-                    onClick={() => setIsKeyDialogOpen(true)}
-                  >
-                    <Key className="h-4 w-4 mr-1" />
-                    Have a key?
-                  </Button>
-                </div>
-              </Card>
-            </div>
-            <div className="mt-12">
-              <Button
-                variant="outline"
-                className="text-white border-gray-700 hover:bg-gray-800"
-                onClick={() => {
-                  const element = document.getElementById("features");
-                  if (element) {
-                    window.scrollTo({
-                      top: element.offsetTop - 80,
-                      behavior: "smooth",
-                    });
-                  }
-                }}
-              >
-                Learn More <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
+    <section className="h-screen w-full relative flex items-center justify-center overflow-hidden">
+      {/* Video Background */}
+      <div className="absolute inset-0 w-full h-full z-0">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="object-cover w-full h-full"
+          style={{ filter: "brightness(0.4)" }}
+        >
+          <source 
+            src="https://res.cloudinary.com/dk99kxfob/video/upload/v1744000608/mortgage-vid-bg_mlkn0g.mp4" 
+            type="video/mp4" 
+          />
+          {/* Fallback background in case video doesn't load */}
+          <div className="absolute inset-0 bg-black"></div>
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/70"></div>
+      </div>
 
-            <KeyEntryDialog
-              open={isKeyDialogOpen}
-              onOpenChange={setIsKeyDialogOpen}
-            />
-          </div>
-          <div className="flex-1 w-full max-w-lg mt-8 lg:mt-0">
-            <Card className="overflow-hidden border border-gray-800 bg-white/5 backdrop-blur-sm text-white">
-              <div className="p-4 bg-gradient-to-r from-gray-800 to-gray-700 border-b border-gray-700">
-                <div className="flex items-center">
-                  <div className="w-2 h-2 rounded-full bg-red-500 mr-2"></div>
-                  <div className="w-2 h-2 rounded-full bg-yellow-500 mr-2"></div>
-                  <div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
-                  <h3 className="font-medium text-gray-300 ml-2">
-                    Featured Note Listing
-                  </h3>
-                </div>
-              </div>
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between items-center">
-                      <h4 className="text-xl font-bold">
-                        Residential 1st Position
-                      </h4>
-                      <Badge className="px-2 py-1 text-xs font-medium rounded-full bg-green-500/20 text-green-300 border-green-500/30">
-                        Performing
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-gray-400">Central Florida, FL</p>
-                  </div>
+      {/* Full screen border frame */}
+      <div 
+        className={`absolute inset-0 border border-white/10 m-6 md:m-10 lg:m-16 transition-all duration-1000 ${isAnimated ? 'opacity-100' : 'opacity-0'}`}
+        style={{ backdropFilter: "blur(2px)" }}
+      ></div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <p className="text-xs text-gray-500">UPB</p>
-                      <p className="font-medium text-white">
-                        {formatCurrency(127500)}
-                      </p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-gray-500">Note Rate</p>
-                      <p className="font-medium text-white">6.25%</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-gray-500">Remaining Term</p>
-                      <p className="font-medium text-white">288 months</p>
-                    </div>
-                    <div className="space-y-1">
-                      <p className="text-xs text-gray-500">Payment History</p>
-                      <p className="font-medium text-green-300">
-                        12+ months current
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="pt-4 border-t border-gray-700">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-xs text-gray-500">Asking Price</p>
-                        <p className="text-xl font-bold text-primary">
-                          {formatCurrency(115000)}
-                        </p>
-                      </div>
-                      <Button
-                        variant="default"
-                        className="bg-primary hover:bg-primary/90"
-                      >
-                        Request Details
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+      {/* Content centered on page */}
+      <div className="relative z-10 text-center px-6 max-w-4xl transition-all duration-1000 transform">
+        {/* Logo */}
+        <div className={`mb-8 transform transition-all duration-1000 ${isAnimated ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}`}>
+          <div className="inline-flex items-center justify-center">
+            <div className="rounded-md bg-primary p-3 md:p-4">
+              <DollarSign className="h-8 w-8 md:h-10 md:w-10 text-white" />
+            </div>
           </div>
         </div>
+
+        {/* Main heading with animation */}
+        <h1 
+          className={`text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6 transform transition-all duration-1000 delay-200 ${isAnimated ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+        >
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-light">
+            NoteTrade
+          </span>
+        </h1>
+        
+        {/* Tagline */}
+        <p 
+          className={`text-lg md:text-xl text-white/80 max-w-xl mx-auto mb-12 transform transition-all duration-1000 delay-300 ${isAnimated ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+        >
+          Exclusive platform for mortgage note professionals
+        </p>
+
+        {/* Invite key input */}
+        <form 
+          onSubmit={handleKeySubmit}
+          className={`max-w-md mx-auto transform transition-all duration-1000 delay-400 ${isAnimated ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+        >
+          <div className="bg-black/30 backdrop-blur-md p-5 border border-white/10 rounded-lg">
+            <div className="flex flex-col space-y-4">
+              <label className="text-white text-sm font-medium flex items-center justify-center mb-1">
+                <Key className="h-4 w-4 mr-2 text-primary" />
+                Enter your invite key
+              </label>
+              <div className="flex space-x-3">
+                <Input
+                  type="text"
+                  placeholder="Invite key"
+                  value={inviteKey}
+                  onChange={(e) => setInviteKey(e.target.value)}
+                  className="bg-black/40 border-white/10 text-white placeholder:text-gray-500"
+                />
+                <Button 
+                  type="submit"
+                  className="nav-button-primary relative overflow-hidden"
+                  disabled={!inviteKey.trim()}
+                >
+                  <span className="absolute inset-0 bg-primary opacity-20 group-hover:opacity-30 transition-opacity"></span>
+                  <span className="flex items-center relative z-10">
+                    <ChevronRight className="h-5 w-5" />
+                  </span>
+                </Button>
+              </div>
+            </div>
+          </div>
+        </form>
       </div>
     </section>
   );

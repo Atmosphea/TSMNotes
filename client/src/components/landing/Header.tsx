@@ -65,9 +65,9 @@ const Header = () => {
   };
 
   return (
-    <header className={`sticky top-0 z-50 w-full ${scrolled ? 'bg-black/70 backdrop-blur-md border-b border-gray-800' : 'bg-transparent'} transition-all duration-200`}>
+    <header className={`fixed top-0 z-50 w-full ${isLandingPage ? 'bg-transparent pointer-events-none' : scrolled ? 'bg-black/70 backdrop-blur-md border-b border-gray-800' : 'bg-transparent'} transition-all duration-200`}>
       <div className="container mx-auto flex h-16 items-center justify-between px-6 lg:px-8">
-        <div className="flex items-center space-x-3">
+        <div className={`flex items-center space-x-3 ${isLandingPage ? 'invisible' : ''}`}>
           <Link href="/" className="flex items-center space-x-2">
             <div className="rounded-md bg-primary p-1.5">
               <DollarSign className="h-5 w-5 text-white" />
@@ -76,7 +76,7 @@ const Header = () => {
           </Link>
         </div>
         
-        <nav className="hidden md:flex items-center space-x-6">
+        <nav className={`hidden md:flex items-center space-x-6 ${isLandingPage ? 'invisible' : ''}`}>
           {/* Adding frame around nav buttons similar to login page with wipe animation */}
           <Link 
             href="/marketplace" 
@@ -103,7 +103,7 @@ const Header = () => {
         
         <div className="flex items-center space-x-4">
           {/* User controls on desktop */}
-          {isAuthenticated ? (
+          {isAuthenticated && !isLandingPage ? (
             // User is logged in - show just profile and logout buttons without avatar
             <div className="hidden md:flex items-center space-x-3">
               <Link 
@@ -128,7 +128,7 @@ const Header = () => {
                 </span>
               </button>
             </div>
-          ) : (
+          ) : !isLandingPage ? (
             // User is not logged in - show login/signup buttons with new styling
             <div className="hidden md:flex items-center space-x-3">
               <Link 
@@ -153,11 +153,11 @@ const Header = () => {
                 </span>
               </Link>
             </div>
-          )}
+          ) : null}
           
-          {/* Mobile menu button (appears on all viewport sizes) */}
+          {/* Mobile menu button (appears on all viewport sizes) - always visible */}
           <button 
-            className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-black/20 transition-colors" 
+            className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-black/20 transition-colors pointer-events-auto" 
             onClick={toggleMenu}
             aria-label="Menu"
           >
