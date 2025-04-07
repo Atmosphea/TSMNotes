@@ -204,13 +204,14 @@ const Header = () => {
                 setIsMenuOpen(false);
                 document.body.style.overflow = "";
               }}
-              className={`group w-full flex items-center justify-between px-6 py-4 rounded-xl bg-black/30 border border-white/10 text-xl font-medium hover:bg-primary/20 transition-all duration-300 transform ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} delay-200`}
+              className={`nav-button-frame group w-full flex items-center justify-between px-6 py-4 rounded-xl text-xl font-medium transition-all duration-300 transform relative overflow-hidden ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} delay-200`}
             >
-              <div className="flex items-center">
+              <span className="nav-button-fill"></span>
+              <div className="flex items-center relative z-10">
                 <ShoppingBag className="h-5 w-5 mr-3" />
                 <span>Buying</span>
               </div>
-              <div className="bg-primary/20 rounded-full p-1 transform transition-transform duration-300 group-hover:translate-x-1">
+              <div className="rounded-full p-1 transform transition-transform duration-300 group-hover:translate-x-1 relative z-10">
                 <ChevronRight className="h-5 w-5" />
               </div>
             </Link>
@@ -221,13 +222,14 @@ const Header = () => {
                 setIsMenuOpen(false);
                 document.body.style.overflow = "";
               }}
-              className={`group w-full flex items-center justify-between px-6 py-4 rounded-xl bg-black/30 border border-white/10 text-xl font-medium hover:bg-primary/20 transition-all duration-300 transform ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} delay-300`}
+              className={`nav-button-frame group w-full flex items-center justify-between px-6 py-4 rounded-xl text-xl font-medium transition-all duration-300 transform relative overflow-hidden ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} delay-300`}
             >
-              <div className="flex items-center">
+              <span className="nav-button-fill"></span>
+              <div className="flex items-center relative z-10">
                 <FileText className="h-5 w-5 mr-3" />
                 <span>Selling</span>
               </div>
-              <div className="bg-primary/20 rounded-full p-1 transform transition-transform duration-300 group-hover:translate-x-1">
+              <div className="rounded-full p-1 transform transition-transform duration-300 group-hover:translate-x-1 relative z-10">
                 <ChevronRight className="h-5 w-5" />
               </div>
             </Link>
@@ -246,13 +248,14 @@ const Header = () => {
                   setIsMenuOpen(false);
                   document.body.style.overflow = "";
                 }}
-                className="group w-full flex items-center justify-between px-6 py-3 rounded-xl hover:bg-black/30 transition-colors"
+                className="nav-button-frame group w-full flex items-center justify-between px-6 py-3 rounded-xl transition-all duration-300 relative overflow-hidden"
               >
-                <div className="flex items-center">
+                <span className="nav-button-fill"></span>
+                <div className="flex items-center relative z-10">
                   <User className="h-5 w-5 mr-3 text-primary" />
                   <span>Profile</span>
                 </div>
-                <div className="transform transition-transform duration-300 group-hover:translate-x-1">
+                <div className="transform transition-transform duration-300 group-hover:translate-x-1 relative z-10">
                   <ChevronRight className="h-5 w-5 opacity-60" />
                 </div>
               </Link>
@@ -263,34 +266,48 @@ const Header = () => {
                   document.body.style.overflow = "";
                   logout();
                 }}
-                className="group w-full flex items-center justify-between px-6 py-3 rounded-xl hover:bg-black/30 transition-colors"
+                className="nav-button-frame group w-full flex items-center justify-between px-6 py-3 rounded-xl transition-all duration-300 relative overflow-hidden"
               >
-                <div className="flex items-center">
+                <span className="nav-button-fill"></span>
+                <div className="flex items-center relative z-10">
                   <LogOut className="h-5 w-5 mr-3 text-primary" />
                   <span>Log Out</span>
                 </div>
-                <div className="transform transition-transform duration-300 group-hover:translate-x-1">
+                <div className="transform transition-transform duration-300 group-hover:translate-x-1 relative z-10">
                   <ChevronRight className="h-5 w-5 opacity-60" />
                 </div>
               </button>
             </div>
           ) : (
             <div className={`flex flex-col items-center space-y-4 w-full max-w-sm transform transition-all duration-500 ${isMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'} delay-400`}>
-              <Link href="/login" onClick={() => {
-                setIsMenuOpen(false);
-                document.body.style.overflow = "";
-              }}>
-                <Button variant="outline" className="w-64 h-12 text-lg">
+              <Link 
+                href="/login" 
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  document.body.style.overflow = "";
+                }}
+                className="nav-button-frame group w-full flex items-center justify-center px-6 py-3 rounded-xl text-xl font-medium transition-all duration-300 relative overflow-hidden"
+              >
+                <span className="nav-button-fill"></span>
+                <span className="flex items-center relative z-10">
+                  <LogIn className="h-5 w-5 mr-3" />
                   Login
-                </Button>
+                </span>
               </Link>
-              <Link href="/signup" onClick={() => {
-                setIsMenuOpen(false);
-                document.body.style.overflow = "";
-              }}>
-                <Button className="w-64 h-12 text-lg bg-primary hover:bg-primary/90">
+              
+              <Link 
+                href="/signup" 
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  document.body.style.overflow = "";
+                }}
+                className="nav-button-primary group w-full flex items-center justify-center px-6 py-3 rounded-xl text-xl font-medium transition-all duration-300 relative overflow-hidden"
+              >
+                <span className="absolute inset-0 bg-primary opacity-20 group-hover:opacity-30 transition-opacity"></span>
+                <span className="flex items-center relative z-10">
+                  <UserPlus className="h-5 w-5 mr-3" />
                   Sign Up
-                </Button>
+                </span>
               </Link>
             </div>
           )}
