@@ -45,15 +45,34 @@ const WaitlistForm = ({ className, variant = "default" }: WaitlistFormProps) => 
 
   const mutation = useMutation({
     mutationFn: async (values: WaitlistFormValues) => {
-      const res = await apiRequest("POST", "/api/waitlist", values);
-      return res.json();
+      try {
+        // Store to our local data file
+        const res = await fetch('/api/local-waitlist', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: values.email,
+            role: values.role,
+            timestamp: new Date().toISOString()
+          }),
+        });
+        
+        if (!res.ok) {
+          throw new Error("Failed to join waitlist");
+        }
+        
+        return res.json();
+      } catch (error) {
+        throw error;
+      }
     },
     onSuccess: () => {
       setSubmitted(true);
       toast({
         title: "Success!",
         description: "Thank you for joining our waitlist! We'll be in touch soon.",
-        variant: "success",
       });
     },
     onError: (error) => {

@@ -27,6 +27,76 @@ import { DocumentController } from "./controllers/DocumentController";
 import { InquiryController } from "./controllers/InquiryController";
 import { TransactionController } from "./controllers/TransactionController";
 import { AdminController } from "./controllers/AdminController";
+import fs from 'fs';
+import path from 'path';
+
+// Function to handle saving waitlist emails to data file
+const saveToLocalWaitlist = async (req: Request, res: Response) => {
+  try {
+    const { email, role, timestamp } = req.body;
+    
+    // Read existing waitlist data
+    const waitlistPath = path.join(process.cwd(), 'data', 'waitlist.json');
+    let waitlistData = [];
+    
+    try {
+      if (fs.existsSync(waitlistPath)) {
+        const data = fs.readFileSync(waitlistPath, 'utf8');
+        waitlistData = JSON.parse(data);
+      }
+    } catch (err) {
+      console.error('Error reading waitlist file:', err);
+    }
+    
+    // Add new entry
+    waitlistData.push({
+      email,
+      role,
+      timestamp
+    });
+    
+    // Write back to file
+    fs.writeFileSync(waitlistPath, JSON.stringify(waitlistData, null, 2));
+    
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Error saving to waitlist:', error);
+    res.status(500).json({ success: false, message: 'Failed to save to waitlist' });
+  }
+};
+
+// Function to verify invite key
+const verifyInviteKey = async (req: Request, res: Response) => {
+  try {
+    const { key } = req.body;
+    
+    // Read invite keys from file
+    const keysPath = path.join(process.cwd(), 'data', 'inviteKeys.json');
+    let keysData = [];
+    
+    try {
+      if (fs.existsSync(keysPath)) {
+        const data = fs.readFileSync(keysPath, 'utf8');
+        keysData = JSON.parse(data);
+      }
+    } catch (err) {
+      console.error('Error reading invite keys file:', err);
+      return res.status(500).json({ valid: false, message: 'Error reading keys' });
+    }
+    
+    // Check if key exists and is active
+    const keyEntry = keysData.find((k: any) => k.key === key && k.active === true);
+    
+    if (keyEntry) {
+      return res.status(200).json({ valid: true });
+    } else {
+      return res.status(200).json({ valid: false, message: 'Invalid or inactive key' });
+    }
+  } catch (error) {
+    console.error('Error verifying key:', error);
+    res.status(500).json({ valid: false, message: 'Failed to verify key' });
+  }
+};
 
 // Function to add sample note listings
 async function addSampleListings() {
@@ -209,6 +279,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/waitlist", waitlistController.create.bind(waitlistController));
   app.post("/api/validate-email", waitlistController.validateEmail.bind(waitlistController));
   app.get("/api/waitlist/count", waitlistController.getCount.bind(waitlistController));
+  
+  // Local data routes for waitlist and invite keys
+  app.post("/api/local-waitlist", saveToLocalWaitlist);
+  app.post("/api/verify-invite-key", verifyInviteKey);
 
   // Public note listing routes
   app.get("/api/note-listings", noteListingController.getAll.bind(noteListingController));

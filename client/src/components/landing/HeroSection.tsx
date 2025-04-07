@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { DollarSign, ChevronRight, Key } from "lucide-react";
 import { useLocation } from "wouter";
+import WaitlistForm from "@/components/waitlist/WaitlistForm";
+import KeyDialog from "@/components/auth/KeyDialog";
 
 const HeroSection = () => {
-  const [inviteKey, setInviteKey] = useState("");
   const [isAnimated, setIsAnimated] = useState(false);
+  const [keyDialogOpen, setKeyDialogOpen] = useState(false);
   const [, navigate] = useLocation();
 
   // Animation effect that triggers after component mounts
@@ -16,13 +17,6 @@ const HeroSection = () => {
     }, 100);
     return () => clearTimeout(timer);
   }, []);
-
-  const handleKeySubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (inviteKey.trim()) {
-      navigate(`/signup?key=${encodeURIComponent(inviteKey)}`);
-    }
-  };
 
   return (
     <section className="h-screen w-full relative flex items-center justify-center overflow-hidden">
@@ -74,45 +68,32 @@ const HeroSection = () => {
         
         {/* Tagline */}
         <p 
-          className={`text-lg md:text-xl text-white/80 max-w-xl mx-auto mb-12 transform transition-all duration-1000 delay-300 ${isAnimated ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+          className={`text-lg md:text-xl text-white/80 max-w-xl mx-auto mb-8 transform transition-all duration-1000 delay-300 ${isAnimated ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
         >
           Exclusive platform for mortgage note professionals
         </p>
 
-        {/* Invite key input */}
-        <form 
-          onSubmit={handleKeySubmit}
+        {/* Waitlist Form */}
+        <div 
           className={`max-w-md mx-auto transform transition-all duration-1000 delay-400 ${isAnimated ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
         >
-          <div className="bg-black/30 backdrop-blur-md p-5 border border-white/10 rounded-lg">
-            <div className="flex flex-col space-y-4">
-              <label className="text-white text-sm font-medium flex items-center justify-center mb-1">
-                <Key className="h-4 w-4 mr-2 text-primary" />
-                Enter your invite key
-              </label>
-              <div className="flex space-x-3">
-                <Input
-                  type="text"
-                  placeholder="Invite key"
-                  value={inviteKey}
-                  onChange={(e) => setInviteKey(e.target.value)}
-                  className="bg-black/40 border-white/10 text-white placeholder:text-gray-500"
-                />
-                <Button 
-                  type="submit"
-                  className="nav-button-primary relative overflow-hidden"
-                  disabled={!inviteKey.trim()}
-                >
-                  <span className="absolute inset-0 bg-primary opacity-20 group-hover:opacity-30 transition-opacity"></span>
-                  <span className="flex items-center relative z-10">
-                    <ChevronRight className="h-5 w-5" />
-                  </span>
-                </Button>
-              </div>
-            </div>
+          <div className="bg-black/30 backdrop-blur-md p-5 border border-white/10 rounded-lg mb-4">
+            <WaitlistForm />
           </div>
-        </form>
+          
+          {/* Have a key button */}
+          <button 
+            onClick={() => setKeyDialogOpen(true)}
+            className="text-white/70 hover:text-white text-sm flex items-center justify-center mx-auto mt-4 transition-colors"
+          >
+            <Key className="h-3 w-3 mr-2 text-primary" />
+            Have an invite key?
+          </button>
+        </div>
       </div>
+      
+      {/* Key Dialog */}
+      <KeyDialog open={keyDialogOpen} onOpenChange={setKeyDialogOpen} />
     </section>
   );
 };
