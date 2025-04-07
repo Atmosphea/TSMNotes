@@ -18,8 +18,11 @@ interface StepProps {
 const Step = ({ title, description, icon, index }: StepProps) => {
   return (
     <div
-      className="process-step-card hover-glow"
-      style={{ "--step-index": index } as React.CSSProperties}
+      className="process-step-card hover-glow animate-fade-in"
+      style={{ 
+        "--step-index": index,
+        animationDelay: `${index * 150}ms`
+      } as React.CSSProperties}
       onMouseMove={(e) => {
         const el = e.currentTarget;
         const rect = el.getBoundingClientRect();
@@ -76,13 +79,13 @@ const InvestmentStepsSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative py-12 overflow-hidden"
+      className="relative py-12 overflow-hidden view-timeline-section"
       style={{
         background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(var(--primary-rgb), 0.15) 0%, transparent 60%), linear-gradient(135deg, #121212 0%, #1a1a1a 100%)`,
       }}
     >
       <div className="container mx-auto px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        <div className="text-blocks grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
           <Step
             title="Learn"
             description="Explore our comprehensive educational resources to understand note investing fundamentals."

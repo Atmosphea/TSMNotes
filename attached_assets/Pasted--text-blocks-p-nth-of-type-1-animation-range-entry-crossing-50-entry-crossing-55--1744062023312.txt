@@ -1,0 +1,140 @@
+
+    .text-blocks p:nth-of-type(1) { animation-range: entry-crossing 50% entry-crossing 55%; }
+    .text-blocks p:nth-of-type(2) { animation-range: entry-crossing 55% entry-crossing 60%; }
+    .text-blocks p:nth-of-type(3) { animation-range: entry-crossing 60% entry-crossing 65%; }
+    .text-blocks p:nth-of-type(4) { animation-range: entry-crossing 65% entry-crossing 70%; }
+    .text-blocks p:nth-of-type(5) { animation-range: entry-crossing 70% entry-crossing 75%; }
+
+    section:nth-of-type(2) article:last-of-type {
+      z-index: 5;
+    }
+    section:nth-of-type(2) article:nth-of-type(3) {
+      height: 400vh;
+    }
+    section:nth-of-type(2) article:nth-of-type(3) h2 {
+      margin-top: 80vh;
+    }
+    section:nth-of-type(2) article:last-of-type .fixed {
+      clip-path: ellipse(220% 200% at 50% 300%);
+      animation: unclip both linear;
+      animation-timeline: --article;
+      animation-range: entry 20% entry 80%;
+    }
+    .filler h2 {
+      animation: fade-away, fade-out;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: --article;
+      animation-range: exit 40% exit 75%, exit 70% exit 90%;
+    }
+    .loud-wrap {
+      clip-path: inset(0 0 0 0);
+      animation: unmask both linear;
+      animation-timeline: --article;
+      animation-range: entry 20% entry 80%;
+      mask: linear-gradient(white 50%, transparent) 0 100% / 100% 200% no-repeat;
+    }
+    .text-wrap {
+      position: sticky;
+      bottom: 4rem;
+      transform-origin: 50% 0;
+      animation: fade-away both linear, fade-out both linear;
+      animation-timeline: --article;
+      animation-range: exit 40% exit 75%, exit 70% exit 100%;
+    }
+    .text-blocks {
+      animation: fade-out both linear;
+      animation-timeline: --article;
+      animation-range: entry-crossing 75% entry-crossing 100%;
+    }
+    section:nth-of-type(2) article:nth-of-type(3) .fixed {
+      animation: fade-in both linear, fade-out both linear;
+      animation-timeline: --article, --article;
+      animation-range: entry 45% exit-crossing 0%, exit 0% exit 15%;
+    }
+
+    section:nth-of-type(2) article:nth-of-type(2) .fixed {
+      animation: fade-in;
+      animation-fill-mode: both;
+      animation-timing-function: linear;
+      animation-timeline: --article;
+      animation-range: entry 60% exit 30%;
+    }
+    section:nth-of-type(2) article:nth-of-type(2) h2 {
+      animation: slide-in, fade-in, fade-away, fade-out;
+      animation-fill-mode: both;
+      animation-timing-function: linear;
+      animation-timeline: view(), view(), --article, --article;
+      animation-range: entry 100% cover 25%, entry 100% cover 35%, exit 20% exit 40%, exit 40% exit 50%;
+    }
+    section:nth-of-type(2) article:first-of-type h2 {
+      animation: slide-up both linear;
+      animation-timeline: --article;
+      animation-range: entry 20% entry 80%;
+    }
+    section:nth-of-type(2) article:first-of-type img {
+      animation: scale-down both linear;
+      animation-timeline: --article;
+      animation-range: entry;
+    }
+    section:nth-of-type(2) article:first-of-type .fixed {
+      clip-path: ellipse(220% 200% at 50% 300%);
+      animation: unclip both linear;
+      animation-timeline: --article;
+      animation-range: entry 0 entry 100%;
+    }
+    section:first-of-type {
+      view-timeline: --section;
+    }
+    section:first-of-type .fixed {
+      animation: scale-and-move both linear, fade-out both linear;
+      animation-timeline: --section;
+      animation-range: exit 0% exit 50%, exit 0% exit 25%;
+      transform-origin: 50% 0;
+    }
+    /* Keyframes collection	*/
+    @keyframes slide-in {
+      0% {
+        translate: 0 100%;
+      }
+    }
+
+    @keyframes fade-in {
+      0% {
+        opacity: 0;
+      }
+    }
+    @keyframes slide-up {
+      0% {
+        translate: 0 100%;
+      }
+    }
+    @keyframes fade-away {
+      to {
+        filter: blur(4rem);
+      }
+    }
+    @keyframes unmask {
+      to {
+        mask-position: 0 0;
+      }
+    }
+    @keyframes scale-down {
+      0% {
+        scale: 5;
+      }
+    }
+    @keyframes unclip {
+      to { clip-path: ellipse(220% 200% at 50% 175%); }
+    }
+    @keyframes fade-out {
+      to { opacity: 0; }
+    }
+    @keyframes scale-and-move {
+      to {
+        translate: 0 -10%;
+        scale: 0.35 0.5;
+      }
+    }
+  }
+}

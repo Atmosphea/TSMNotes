@@ -279,6 +279,72 @@
     animation: draw 2s ease-in-out forwards 0.5s;
   }
   
+  /* Scroll-based animations */
+  .view-timeline-section {
+    view-timeline-name: --section;
+    view-timeline-axis: block;
+  }
+  
+  .text-blocks > div:nth-of-type(1) { 
+    animation-timeline: view();
+    animation-range: entry 20% entry 40%;
+  }
+  .text-blocks > div:nth-of-type(2) { 
+    animation-timeline: view();
+    animation-range: entry 25% entry 45%;
+  }
+  .text-blocks > div:nth-of-type(3) { 
+    animation-timeline: view();
+    animation-range: entry 30% entry 50%;
+  }
+  .text-blocks > div:nth-of-type(4) { 
+    animation-timeline: view();
+    animation-range: entry 35% entry 55%;
+  }
+  .text-blocks > div:nth-of-type(5) { 
+    animation-timeline: view();
+    animation-range: entry 40% entry 60%;
+  }
+  
+  @keyframes slide-in {
+    0% { translate: 0 100%; }
+  }
+
+  @keyframes fade-in {
+    0% { opacity: 0; }
+  }
+  
+  @keyframes slide-up {
+    0% { translate: 0 100%; }
+  }
+  
+  @keyframes fade-away {
+    to { filter: blur(4rem); }
+  }
+  
+  @keyframes unmask {
+    to { mask-position: 0 0; }
+  }
+  
+  @keyframes scale-down {
+    0% { scale: 5; }
+  }
+  
+  @keyframes unclip {
+    to { clip-path: ellipse(220% 200% at 50% 175%); }
+  }
+  
+  @keyframes fade-out {
+    to { opacity: 0; }
+  }
+  
+  @keyframes scale-and-move {
+    to {
+      translate: 0 -10%;
+      scale: 0.35 0.5;
+    }
+  }
+  
   /* Gradient backgrounds */
   .bg-gradient-hero {
     background: linear-gradient(135deg, #251000 0%, #3a1800 100%);
