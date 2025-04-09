@@ -65,9 +65,9 @@ const Header = () => {
   };
 
   return (
-    <header className={`fixed top-0 z-50 w-full ${isLandingPage ? 'bg-transparent pointer-events-none' : scrolled ? 'bg-black/70 backdrop-blur-md border-b border-gray-800' : 'bg-transparent'} transition-all duration-200`}>
+    <header className={`fixed top-0 z-50 w-full ${isLandingPage ? 'bg-transparent' : scrolled ? 'bg-black/70 backdrop-blur-md border-b border-gray-800' : 'bg-transparent'} transition-all duration-200`}>
       <div className="container mx-auto flex h-16 items-center justify-between px-6 lg:px-8">
-        <div className={`flex items-center space-x-3 ${isLandingPage ? 'invisible' : ''}`}>
+        <div className={`flex items-center space-x-3 ${isLandingPage ? 'invisible pointer-events-auto' : ''}`}>
           <Link href="/" className="flex items-center space-x-2">
             <div className="rounded-md bg-primary p-1.5">
               <DollarSign className="h-5 w-5 text-white" />
@@ -76,7 +76,7 @@ const Header = () => {
           </Link>
         </div>
         
-        <nav className={`hidden md:flex items-center space-x-6 ${isLandingPage ? 'invisible' : ''}`}>
+        <nav className={`hidden md:flex items-center space-x-6 ${isLandingPage ? 'invisible pointer-events-auto' : ''}`}>
           {/* Adding frame around nav buttons similar to login page with wipe animation */}
           <Link 
             href="/marketplace" 

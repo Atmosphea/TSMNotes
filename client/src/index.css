@@ -74,8 +74,9 @@
   
   /* Content should stack over the footer */
   .content-wrapper {
-    @apply relative z-10 min-h-screen bg-transparent;
+    @apply relative z-20 min-h-screen bg-transparent;
     margin-bottom: 100vh;
+    pointer-events: auto;
   }
   
   .gradient-bg-dark {
