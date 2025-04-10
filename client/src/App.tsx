@@ -21,6 +21,73 @@ import MyInquiriesPage from "@/pages/my-inquiries";
 import TransactionsPage from "@/pages/transactions";
 import TransactionDetailPage from "@/pages/transaction-detail";
 
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <div className="min-h-screen flex flex-col">
+          <Navigation />
+          <Switch>
+            <Route path="/" component={LandingPage} />
+            <Route path="/login" component={LoginPage} />
+            <Route path="/signup" component={SignupPage} />
+            <Route path="/marketplace">
+              <ProtectedRoute>
+                <MarketplacePage />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/note/:id">
+              <ProtectedRoute>
+                <NoteDetailPage />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/selling">
+              <ProtectedRoute>
+                <SellingPage />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/profile">
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/admin">
+              <AdminProtectedRoute>
+                <AdminPage />
+              </AdminProtectedRoute>
+            </Route>
+            <Route path="/inquiries">
+              <ProtectedRoute>
+                <InquiriesPage />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/my-inquiries">
+              <ProtectedRoute>
+                <MyInquiriesPage />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/transactions">
+              <ProtectedRoute>
+                <TransactionsPage />
+              </ProtectedRoute>
+            </Route>
+            <Route path="/transaction/:id">
+              <ProtectedRoute>
+                <TransactionDetailPage />
+              </ProtectedRoute>
+            </Route>
+            <Route component={NotFound} />
+          </Switch>
+          <Footer2 />
+          <Toaster />
+        </div>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
+
 function Router() {
   return (
     <Switch>
