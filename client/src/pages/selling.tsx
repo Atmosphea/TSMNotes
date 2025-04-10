@@ -14,7 +14,7 @@ import { insertNoteListingSchema } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2, PlusCircle } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import Header from "@/components/landing/Header";
 
 import { Helmet } from "react-helmet";
@@ -37,6 +37,7 @@ export default function SellingPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   // Fetch user's listings
   const { data: userListings = [], isLoading: isLoadingListings } = useQuery({
@@ -95,13 +96,28 @@ export default function SellingPage() {
       }
       return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: "Note Listed",
         description: "Your note has been successfully submitted for review.",
       });
       form.reset();
+      
+      // Invalidate queries to refresh the data
       queryClient.invalidateQueries({ queryKey: ['/api/note-listings/seller', user?.id] });
+      
+      // Store the newly created note ID in sessionStorage for animation purposes
+      if (data.data?.id) {
+        sessionStorage.setItem('newNoteId', data.data.id.toString());
+      }
+      
+      // Set a flag to indicate a new listing was added
+      sessionStorage.setItem('newListingAdded', 'true');
+      
+      // Redirect to marketplace with a slight delay to allow toast to be visible
+      setTimeout(() => {
+        setLocation('/marketplace');
+      }, 800);
     },
     onError: (error: any) => {
       toast({
