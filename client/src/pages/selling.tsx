@@ -163,6 +163,24 @@ export default function SellingPage() {
 
   const onSubmit = (values: z.infer<typeof createNoteSchema>) => {
     console.log("Form submitted with values:", values);
+    
+    // Make sure originalLoanTerm is provided
+    if (!values.originalLoanTerm) {
+      values.originalLoanTerm = 360; // Add default value if missing
+    }
+    
+    // Make sure user ID is set
+    if (!values.sellerId && user?.id) {
+      values.sellerId = user.id;
+    }
+    
+    console.log("Submitting note with values:", values);
+    toast({
+      title: "Processing submission...",
+      description: "Please wait while we process your listing.",
+    });
+    
+    // Call the mutation
     createNoteMutation.mutate(values);
   };
 
@@ -304,7 +322,7 @@ export default function SellingPage() {
                     />
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="interestRate"
@@ -341,6 +359,31 @@ export default function SellingPage() {
                               className="bg-black/30 border-white/10 text-white"
                             />
                           </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="originalLoanTerm"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-white">Original Loan Term (months)</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              placeholder="Original loan term" 
+                              {...field}
+                              onChange={e => field.onChange(Number(e.target.value))}
+                              className="bg-black/30 border-white/10 text-white"
+                            />
+                          </FormControl>
+                          <FormDescription className="text-white/50 text-xs">
+                            Typical mortgage is 30 years (360 months)
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
