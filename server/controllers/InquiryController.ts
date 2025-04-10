@@ -132,6 +132,13 @@ export class InquiryController {
       const data = insertInquirySchema.parse(req.body);
       const inquiry = await inquiryService.createInquiry(data);
       
+      // Send email notification
+      try {
+        await emailService.sendInquiryNotification(inquiry);
+      } catch (error) {
+        console.error("Failed to send inquiry notification:", error);
+      }
+      
       return res.status(201).json({ 
         success: true, 
         message: "Inquiry created successfully", 
@@ -256,6 +263,13 @@ export class InquiryController {
         responseMessage,
         status
       });
+
+      // Send email notification for response
+      try {
+        await emailService.sendInquiryResponseNotification(updatedInquiry);
+      } catch (error) {
+        console.error("Failed to send response notification:", error);
+      }
       
       return res.status(200).json({ 
         success: true, 

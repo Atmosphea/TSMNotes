@@ -1,39 +1,51 @@
+
 import nodemailer from 'nodemailer';
-import { NoteListing } from '@shared/models';
+import { type Inquiry } from '@shared/models';
+import { userService } from './userService';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: true,
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: false,
   auth: {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    pass: process.env.SMTP_PASSWORD,
   },
 });
 
 export const emailService = {
-  async sendSearchAlert(userEmail: string, matches: NoteListing[]) {
-    const html = `
-      <h2>New Matching Notes Found</h2>
-      <p>We found ${matches.length} new notes matching your search criteria:</p>
-      ${matches.map(note => `
-        <div style="margin-bottom: 20px;">
-          <h3>${note.title}</h3>
-          <p>Price: $${note.askingPrice.toLocaleString()}</p>
-          <p>Location: ${note.propertyCity}, ${note.propertyState}</p>
-          <p>Type: ${note.noteType}</p>
-          <a href="${process.env.FRONTEND_URL}/note/${note.id}" style="display: inline-block; padding: 10px 20px; background-color: #4F46E5; color: white; text-decoration: none; border-radius: 5px;">
-            View Note Details
-          </a>
-        </div>
-      `).join('')}
-    `;
-
+  async sendInquiryNotification(inquiry: Inquiry) {
+    const seller = await userService.getUserById(inquiry.sellerId);
+    const buyer = await userService.getUserById(inquiry.buyerId);
+    
+    if (!seller || !buyer) return;
+    
     await transporter.sendMail({
       from: process.env.SMTP_FROM,
-      to: userEmail,
-      subject: 'New Notes Matching Your Search',
-      html
+      to: seller.email,
+      subject: 'New Inquiry Received',
+      html: `
+        <h2>New Inquiry Received</h2>
+        <p>You have received a new inquiry from ${buyer.firstName} ${buyer.lastName}</p>
+        <p>${inquiry.message}</p>
+        ${inquiry.offerAmount ? `<p>Offer Amount: $${inquiry.offerAmount}</p>` : ''}
+      `
+    });
+  },
+
+  async sendInquiryResponseNotification(inquiry: Inquiry) {
+    const buyer = await userService.getUserById(inquiry.buyerId);
+    if (!buyer) return;
+    
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM,
+      to: buyer.email,
+      subject: 'Inquiry Response Received',
+      html: `
+        <h2>Response to Your Inquiry</h2>
+        <p>Status: ${inquiry.status}</p>
+        <p>Response: ${inquiry.responseMessage}</p>
+      `
     });
   }
-}; 
+};
