@@ -172,8 +172,10 @@ function App() {
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
-    document.body.setAttribute('data-authenticated', isAuthenticated ? 'true' : 'false');
-  }, [isAuthenticated]);
+    const path = window.location.pathname;
+    const pageType = path === '/' ? 'landing' : path.substring(1);
+    document.body.setAttribute('data-page', pageType);
+  }, [location]);
 
   return (
     <QueryClientProvider client={queryClient}>

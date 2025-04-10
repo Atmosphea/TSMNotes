@@ -14,20 +14,17 @@
   }
 
   body {
-    @apply font-sans antialiased;
+    @apply font-sans antialiased bg-white text-black;
     min-height: 100vh;
     overflow-x: hidden;
   }
 
-  /* Dark theme for landing and auth pages */
-  body:not([data-authenticated="true"]) {
+  /* Dark theme only for specific pages */
+  body[data-page="landing"],
+  body[data-page="login"],
+  body[data-page="signup"] {
     @apply text-white;
     background: #000000;
-  }
-
-  /* Light theme for authenticated pages */
-  body[data-authenticated="true"] {
-    @apply text-black bg-white;
   }
   
   /* White background for Note page and marketplace */
