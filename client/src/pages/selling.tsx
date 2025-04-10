@@ -81,10 +81,18 @@ export default function SellingPage() {
   // Create note mutation
   const createNoteMutation = useMutation({
     mutationFn: async (values: z.infer<typeof createNoteSchema>) => {
+      if (!user?.id) {
+        throw new Error("User not authenticated");
+      }
       const response = await apiRequest("POST", "/api/note-listings", {
         ...values,
-        sellerId: user?.id,
+        sellerId: user.id,
+        status: "pending",
       });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to create listing");
+      }
       return await response.json();
     },
     onSuccess: () => {

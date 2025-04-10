@@ -48,23 +48,34 @@ export interface SortOptions {
 
 export const noteListingService = {
   async createNoteListing(listing: InsertNoteListing): Promise<NoteListing> {
-    const [noteListing] = await db
-      .insert(noteListings)
-      .values({
-        ...listing,
-        title: listing.title || `Property Note in ${listing.propertyState || 'Unknown Location'}`,
-        status: listing.status || 'active',
-        isPublic: listing.isPublic ?? true,
-        featured: listing.featured ?? false,
-        dueDiligenceCompleted: listing.dueDiligenceCompleted ?? false,
-        viewCount: 0,
-        favoriteCount: 0,
-        inquiryCount: 0,
-        listedAt: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date()
-      })
-      .returning();
+    try {
+      const [noteListing] = await db
+        .insert(noteListings)
+        .values({
+          ...listing,
+          title: listing.title || `Property Note in ${listing.propertyState || 'Unknown Location'}`,
+          status: listing.status || 'pending',
+          isPublic: listing.isPublic ?? true,
+          featured: listing.featured ?? false,
+          dueDiligenceCompleted: listing.dueDiligenceCompleted ?? false,
+          viewCount: 0,
+          favoriteCount: 0,
+          inquiryCount: 0,
+          listedAt: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+
+      if (!noteListing) {
+        throw new Error("Failed to create note listing");
+      }
+
+      return noteListing;
+    } catch (error) {
+      console.error("Error creating note listing:", error);
+      throw error;
+    }
 
     // Fire and forget the alert processing
     console.log('Processing alerts for new note listing:', noteListing.id);
