@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 import NoteDetailModal from "@/components/marketplace/NoteDetailModal";
 import { 
   Breadcrumb,
@@ -56,7 +57,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-
 // Add this near the top of the file, after imports
 const ITEMS_PER_PAGE = 12; // Number of listings to show per page
 
@@ -141,7 +141,7 @@ export default function MarketplacePage() {
   const { toast } = useToast();
 
   // Fetch note listings from the API
-  const { data, isLoading: apiLoading, error } = useQuery<{ 
+  const { data, isLoading: apiLoading, error, refetch } = useQuery<{ 
     success: boolean; 
     data: NoteListing[] 
   }>({
@@ -309,7 +309,7 @@ export default function MarketplacePage() {
         }, 3000);
       }
     }
-  }, [noteListings]);
+  }, [noteListings, toast, refetch]);
 
   // Handle advanced filter application with animated transition
   const handleApplyFilters = (filters: FilterState) => {

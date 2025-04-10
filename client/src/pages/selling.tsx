@@ -86,37 +86,50 @@ export default function SellingPage() {
         throw new Error("User not authenticated");
       }
       
-      // Make sure original loan term is included
-      // Calculate it if not provided (e.g., 30 year mortgage = 360 months)
-      const originalLoanTerm = values.originalLoanTerm || 360;
-      
-      console.log("Submitting with values:", {
-        ...values,
-        sellerId: user.id,
-        status: "pending",
-        originalLoanTerm
-      });
-      
-      // Clear any existing flags first to ensure we don't have stale data
-      sessionStorage.removeItem('newListingAdded');
-      sessionStorage.removeItem('newNoteId');
-      
-      const response = await apiRequest("POST", "/api/note-listings", {
-        ...values,
-        sellerId: user.id,
-        status: "pending",
-        originalLoanTerm
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Create listing error:", error);
-        throw new Error(error.message || "Failed to create listing");
+      try {
+        // Make sure original loan term is included
+        // Calculate it if not provided (e.g., 30 year mortgage = 360 months)
+        const originalLoanTerm = values.originalLoanTerm || 360;
+        
+        // Log the full payload for debugging
+        console.log("Submitting with values:", {
+          ...values,
+          sellerId: user.id,
+          status: "pending",
+          originalLoanTerm,
+          isPublic: true
+        });
+        
+        // Clear any existing flags first to ensure we don't have stale data
+        sessionStorage.removeItem('newListingAdded');
+        sessionStorage.removeItem('newNoteId');
+        
+        // Prepare the complete submission payload with all required fields
+        const submissionPayload = {
+          ...values,
+          sellerId: user.id,
+          status: "pending", 
+          originalLoanTerm,
+          isPublic: true
+        };
+        
+        // Submit to the API
+        const response = await apiRequest("POST", "/api/note-listings", submissionPayload);
+        
+        if (!response.ok) {
+          const error = await response.json();
+          console.error("Create listing error:", error);
+          throw new Error(error.message || "Failed to create listing");
+        }
+        
+        // Parse the response
+        const result = await response.json();
+        console.log("Listing created successfully:", result);
+        return result;
+      } catch (error) {
+        console.error("Error in createNoteMutation:", error);
+        throw error;
       }
-      
-      const result = await response.json();
-      console.log("Listing created successfully:", result);
-      return result;
     },
     onSuccess: (data) => {
       toast({
