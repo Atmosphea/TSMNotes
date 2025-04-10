@@ -79,6 +79,8 @@ export default function MarketplacePage() {
   const [advancedFilters, setAdvancedFilters] = useState<FilterState | null>(null);
   const [activeFilterCount, setActiveFilterCount] = useState(0);
   const [selectedNoteId, setSelectedNoteId] = useState<number | null>(null);
+  const [newListingId, setNewListingId] = useState<number | null>(null);
+  const [animateNewCard, setAnimateNewCard] = useState(false);
 
   // Filter state variables
   const [noteType, setNoteType] = useState("");
@@ -248,6 +250,38 @@ export default function MarketplacePage() {
 
   // Update the rest of your code to use noteListings directly
   const displayedListings = noteListings;
+  
+  // Check for newly created notes when navigating from selling page
+  useEffect(() => {
+    // Check if there's a flag indicating a new listing was added
+    const newListingAdded = sessionStorage.getItem('newListingAdded');
+    if (newListingAdded === 'true') {
+      // Get the new note ID
+      const newNoteId = sessionStorage.getItem('newNoteId');
+      if (newNoteId) {
+        setNewListingId(parseInt(newNoteId));
+        setAnimateNewCard(true);
+        
+        // Clear the flag and ID after animation
+        setTimeout(() => {
+          sessionStorage.removeItem('newListingAdded');
+          sessionStorage.removeItem('newNoteId');
+          // Keep the highlight for a bit longer than the animation
+          setTimeout(() => {
+            setAnimateNewCard(false);
+            setNewListingId(null);
+          }, 3000);
+        }, 1000);
+      } else {
+        // If no specific ID, just animate all cards
+        setAnimateNewCard(true);
+        sessionStorage.removeItem('newListingAdded');
+        setTimeout(() => {
+          setAnimateNewCard(false);
+        }, 3000);
+      }
+    }
+  }, [noteListings]);
 
   // Handle advanced filter application with animated transition
   const handleApplyFilters = (filters: FilterState) => {
@@ -1139,7 +1173,11 @@ export default function MarketplacePage() {
             {displayedListings.map((listing, index) => (
               <Card 
                 key={listing.id} 
-                className="transition-all duration-500 group relative hover:scale-[1.02] overflow-hidden animate-fadeIn bg-black/30 backdrop-blur-sm border border-white/10 cursor-pointer"
+                className={`transition-all duration-500 group relative hover:scale-[1.02] overflow-hidden animate-fadeIn bg-black/30 backdrop-blur-sm border cursor-pointer ${
+                  newListingId === listing.id && animateNewCard
+                    ? "border-[#c49c6c] shadow-[0_0_15px_rgba(196,156,108,0.7)] animate-pulse-soft"
+                    : "border-white/10"
+                }`}
                 style={{ 
                   animationDelay: `${index * 100}ms`,
                   opacity: 0,
