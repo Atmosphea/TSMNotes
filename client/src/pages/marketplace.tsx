@@ -1173,15 +1173,17 @@ export default function MarketplacePage() {
             {displayedListings.map((listing, index) => (
               <Card 
                 key={listing.id} 
-                className={`transition-all duration-500 group relative hover:scale-[1.02] overflow-hidden animate-fadeIn bg-black/30 backdrop-blur-sm border cursor-pointer ${
+                className={`transition-all duration-500 group relative hover:scale-[1.02] overflow-hidden bg-black/30 backdrop-blur-sm border cursor-pointer ${
                   newListingId === listing.id && animateNewCard
-                    ? "border-[#c49c6c] shadow-[0_0_15px_rgba(196,156,108,0.7)] animate-pulse-soft"
-                    : "border-white/10"
+                    ? "border-[#c49c6c] shadow-[0_0_15px_rgba(196,156,108,0.7)] animate-pulse-soft animate-new-card"
+                    : newListingId && animateNewCard
+                      ? "border-white/10 animate-shuffle-down"
+                      : "border-white/10 animate-fadeIn"
                 }`}
                 style={{ 
-                  animationDelay: `${index * 100}ms`,
-                  opacity: 0,
-                  transform: 'translateY(20px)'
+                  animationDelay: `${newListingId === listing.id ? "0ms" : newListingId ? "100ms" : index * 100 + "ms"}`,
+                  opacity: newListingId && animateNewCard ? 1 : 0,
+                  transform: newListingId && animateNewCard && newListingId !== listing.id ? 'translateY(0)' : 'translateY(20px)'
                 }}
                 onClick={() => setSelectedNoteId(listing.id)}
               >
