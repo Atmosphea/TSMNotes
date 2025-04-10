@@ -91,9 +91,13 @@ function LegacyApp() {
 */
 
 function Router() {
+  const { user } = useAuth();
+  
   return (
     <Switch>
-      <Route path="/" component={LandingPage} />
+      <Route path="/">
+        {() => user ? <MarketplacePage /> : <LandingPage />}
+      </Route>
       <Route path="/marketplace" component={MarketplacePage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/signup" component={SignupPage} />

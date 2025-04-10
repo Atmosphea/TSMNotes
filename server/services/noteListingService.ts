@@ -54,7 +54,7 @@ export const noteListingService = {
         .values({
           ...listing,
           title: listing.title || `Property Note in ${listing.propertyState || 'Unknown Location'}`,
-          status: listing.status || 'pending',
+          status: listing.status || 'active',
           isPublic: listing.isPublic ?? true,
           featured: listing.featured ?? false,
           dueDiligenceCompleted: listing.dueDiligenceCompleted ?? false,
