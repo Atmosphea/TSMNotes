@@ -262,6 +262,9 @@ export default function MarketplacePage() {
       const newNoteId = sessionStorage.getItem('newNoteId');
       console.log("New note ID found:", newNoteId);
       
+      // Invalidate queries to make sure we have the latest data
+      queryClient.invalidateQueries({ queryKey: ['/api/note-listings'] });
+      
       if (newNoteId) {
         const parsedId = parseInt(newNoteId);
         console.log("Setting new listing ID:", parsedId);
@@ -271,6 +274,18 @@ export default function MarketplacePage() {
         // Log if the new note exists in the current listing
         const noteExists = noteListings.some(listing => listing.id === parsedId);
         console.log("New note exists in listings:", noteExists);
+        
+        // If the note doesn't exist in the current listings, we might need to refetch
+        if (!noteExists) {
+          console.log("New listing not found, triggering refetch");
+          refetch();
+        }
+        
+        // Show toast notification
+        toast({
+          title: "New Listing Added!",
+          description: "A new mortgage note listing has been added to the marketplace.",
+        });
         
         // Clear the flag and ID after animation
         setTimeout(() => {

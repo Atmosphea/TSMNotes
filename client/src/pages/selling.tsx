@@ -97,6 +97,10 @@ export default function SellingPage() {
         originalLoanTerm
       });
       
+      // Clear any existing flags first to ensure we don't have stale data
+      sessionStorage.removeItem('newListingAdded');
+      sessionStorage.removeItem('newNoteId');
+      
       const response = await apiRequest("POST", "/api/note-listings", {
         ...values,
         sellerId: user.id,
@@ -109,7 +113,10 @@ export default function SellingPage() {
         console.error("Create listing error:", error);
         throw new Error(error.message || "Failed to create listing");
       }
-      return await response.json();
+      
+      const result = await response.json();
+      console.log("Listing created successfully:", result);
+      return result;
     },
     onSuccess: (data) => {
       toast({
