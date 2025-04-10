@@ -85,13 +85,28 @@ export default function SellingPage() {
       if (!user?.id) {
         throw new Error("User not authenticated");
       }
+      
+      // Make sure original loan term is included
+      // Calculate it if not provided (e.g., 30 year mortgage = 360 months)
+      const originalLoanTerm = values.originalLoanTerm || 360;
+      
+      console.log("Submitting with values:", {
+        ...values,
+        sellerId: user.id,
+        status: "pending",
+        originalLoanTerm
+      });
+      
       const response = await apiRequest("POST", "/api/note-listings", {
         ...values,
         sellerId: user.id,
         status: "pending",
+        originalLoanTerm
       });
+      
       if (!response.ok) {
         const error = await response.json();
+        console.error("Create listing error:", error);
         throw new Error(error.message || "Failed to create listing");
       }
       return await response.json();
@@ -124,7 +139,17 @@ export default function SellingPage() {
       // Force redirection to marketplace after a short delay
       setTimeout(() => {
         console.log("Redirecting to marketplace now!");
-        window.location.href = '/marketplace';
+        // Try both navigation methods to ensure one works
+        try {
+          setLocation('/marketplace');
+          setTimeout(() => {
+            // Fallback in case setLocation doesn't work
+            window.location.href = '/marketplace';
+          }, 200);
+        } catch (e) {
+          console.error("Navigation error:", e);
+          window.location.href = '/marketplace';
+        }
       }, 1000);
     },
     onError: (error: any) => {
