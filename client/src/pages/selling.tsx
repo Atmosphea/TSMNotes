@@ -115,7 +115,9 @@ export default function SellingPage() {
       sessionStorage.setItem('newListingAdded', 'true');
       
       // Redirect to marketplace with a slight delay to allow toast to be visible
+      console.log("Preparing to redirect to marketplace...");
       setTimeout(() => {
+        console.log("Redirecting to marketplace now!");
         setLocation('/marketplace');
       }, 800);
     },
