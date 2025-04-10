@@ -20,8 +20,6 @@ import InquiriesPage from "@/pages/inquiries";
 import MyInquiriesPage from "@/pages/my-inquiries";
 import TransactionsPage from "@/pages/transactions";
 import TransactionDetailPage from "@/pages/transaction-detail";
-import { useAuth } from "@/contexts/AuthContext";
-import React from "react";
 
 // This is a legacy App function that's no longer used.
 // Keeping the commented code for reference
@@ -93,13 +91,9 @@ function LegacyApp() {
 */
 
 function Router() {
-  const { user } = useAuth();
-
   return (
     <Switch>
-      <Route path="/">
-        {() => user ? <MarketplacePage /> : <LandingPage />}
-      </Route>
+      <Route path="/" component={LandingPage} />
       <Route path="/marketplace" component={MarketplacePage} />
       <Route path="/login" component={LoginPage} />
       <Route path="/signup" component={SignupPage} />
@@ -168,13 +162,6 @@ function Router() {
 }
 
 function App() {
-  const { isAuthenticated } = useAuth();
-  const queryClient = useQueryClient();
-
-  React.useEffect(() => {
-    document.body.setAttribute('data-authenticated', isAuthenticated ? 'true' : 'false');
-  }, [isAuthenticated]);
-
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
