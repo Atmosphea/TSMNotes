@@ -143,21 +143,11 @@ export default function SellingPage() {
         description: "Your listing has been submitted successfully.",
       });
       
-      // Force redirection to marketplace after a short delay
+      // Redirect to marketplace after a short delay
       setTimeout(() => {
         console.log("Redirecting to marketplace now!");
-        // Try both navigation methods to ensure one works
-        try {
-          setLocation('/marketplace');
-          setTimeout(() => {
-            // Fallback in case setLocation doesn't work
-            window.location.href = '/marketplace';
-          }, 200);
-        } catch (e) {
-          console.error("Navigation error:", e);
-          window.location.href = '/marketplace';
-        }
-      }, 1000);
+        setLocation('/marketplace');
+      }, 1500);
     },
     onError: (error: any) => {
       toast({
@@ -168,27 +158,37 @@ export default function SellingPage() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof createNoteSchema>) => {
-    console.log("Form submitted with values:", values);
-    
-    // Make sure originalLoanTerm is provided
-    if (!values.originalLoanTerm) {
-      values.originalLoanTerm = 360; // Add default value if missing
+  const onSubmit = async (values: z.infer<typeof createNoteSchema>) => {
+    try {
+      console.log("Form submitted with values:", values);
+      
+      // Make sure originalLoanTerm is provided
+      if (!values.originalLoanTerm) {
+        values.originalLoanTerm = 360;
+      }
+      
+      // Make sure user ID is set
+      if (!values.sellerId && user?.id) {
+        values.sellerId = user.id;
+      }
+      
+      console.log("Submitting note with values:", values);
+      toast({
+        title: "Processing submission...",
+        description: "Please wait while we process your listing.",
+      });
+      
+      // Call the mutation and await its completion
+      await createNoteMutation.mutateAsync(values);
+      
+    } catch (error) {
+      console.error("Submission error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to submit listing. Please try again.",
+        variant: "destructive",
+      });
     }
-    
-    // Make sure user ID is set
-    if (!values.sellerId && user?.id) {
-      values.sellerId = user.id;
-    }
-    
-    console.log("Submitting note with values:", values);
-    toast({
-      title: "Processing submission...",
-      description: "Please wait while we process your listing.",
-    });
-    
-    // Call the mutation
-    createNoteMutation.mutate(values);
   };
 
   // Early return if the user isn't logged in (for safety - should be handled by protected route)
