@@ -116,10 +116,16 @@ export default function SellingPage() {
       
       // Redirect to marketplace with a slight delay to allow toast to be visible
       console.log("Preparing to redirect to marketplace...");
+      toast({
+        title: "Redirecting to marketplace...",
+        description: "Your listing has been submitted successfully.",
+      });
+      
+      // Force redirection to marketplace after a short delay
       setTimeout(() => {
         console.log("Redirecting to marketplace now!");
-        setLocation('/marketplace');
-      }, 800);
+        window.location.href = '/marketplace';
+      }, 1000);
     },
     onError: (error: any) => {
       toast({
@@ -131,6 +137,7 @@ export default function SellingPage() {
   });
 
   const onSubmit = (values: z.infer<typeof createNoteSchema>) => {
+    console.log("Form submitted with values:", values);
     createNoteMutation.mutate(values);
   };
 

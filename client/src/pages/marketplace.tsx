@@ -253,27 +253,40 @@ export default function MarketplacePage() {
   
   // Check for newly created notes when navigating from selling page
   useEffect(() => {
+    console.log("Checking for new listings...");
     // Check if there's a flag indicating a new listing was added
     const newListingAdded = sessionStorage.getItem('newListingAdded');
+    console.log("New listing added flag:", newListingAdded);
     if (newListingAdded === 'true') {
       // Get the new note ID
       const newNoteId = sessionStorage.getItem('newNoteId');
+      console.log("New note ID found:", newNoteId);
+      
       if (newNoteId) {
-        setNewListingId(parseInt(newNoteId));
+        const parsedId = parseInt(newNoteId);
+        console.log("Setting new listing ID:", parsedId);
+        setNewListingId(parsedId);
         setAnimateNewCard(true);
+        
+        // Log if the new note exists in the current listing
+        const noteExists = noteListings.some(listing => listing.id === parsedId);
+        console.log("New note exists in listings:", noteExists);
         
         // Clear the flag and ID after animation
         setTimeout(() => {
+          console.log("Clearing session storage flags");
           sessionStorage.removeItem('newListingAdded');
           sessionStorage.removeItem('newNoteId');
           // Keep the highlight for a bit longer than the animation
           setTimeout(() => {
+            console.log("Animation complete, resetting state");
             setAnimateNewCard(false);
             setNewListingId(null);
           }, 3000);
         }, 1000);
       } else {
         // If no specific ID, just animate all cards
+        console.log("No specific ID, animating all cards");
         setAnimateNewCard(true);
         sessionStorage.removeItem('newListingAdded');
         setTimeout(() => {
