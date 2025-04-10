@@ -21,7 +21,10 @@ import MyInquiriesPage from "@/pages/my-inquiries";
 import TransactionsPage from "@/pages/transactions";
 import TransactionDetailPage from "@/pages/transaction-detail";
 
-function App() {
+// This is a legacy App function that's no longer used.
+// Keeping the commented code for reference
+/*
+function LegacyApp() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -85,8 +88,7 @@ function App() {
     </QueryClientProvider>
   );
 }
-
-export default App;
+*/
 
 function Router() {
   return (
@@ -183,4 +185,5 @@ function App() {
   );
 }
 
+// Only one export default App statement is needed
 export default App;
